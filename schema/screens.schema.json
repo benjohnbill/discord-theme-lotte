@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "screens.schema.json",
+  "type": "object",
+  "required": ["schemaVersion", "screens"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "screens": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["owns", "importantSelectors", "goals", "knownRisks"],
+        "properties": {
+          "owns": { "type": "array", "items": { "type": "string" } },
+          "latestSnapshot": { "type": "string" },
+          "latestScreenshot": { "type": "string" },
+          "importantSelectors": { "type": "array", "items": { "type": "string" } },
+          "goals": { "type": "array", "items": { "type": "string" } },
+          "knownRisks": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

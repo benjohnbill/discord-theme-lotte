@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "snapshot.schema.json",
+  "type": "object",
+  "required": ["schemaVersion", "capturedAt", "screen", "viewport", "sourceScreenshot", "elements"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "capturedAt": { "type": "string" },
+    "discordBuild": { "type": "string" },
+    "vencordVersion": { "type": "string" },
+    "themeVersion": { "type": "string" },
+    "os": { "type": "string" },
+    "zoom": { "type": "string" },
+    "screen": { "type": "string" },
+    "routeHint": { "type": "string" },
+    "viewport": { "type": "string" },
+    "sourceScreenshot": { "type": "string" },
+    "notes": { "type": "string" },
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tag", "className", "rect", "background"],
+        "properties": {
+          "tag": { "type": "string" },
+          "className": { "type": "string" },
+          "rect": { "type": "string" },
+          "background": { "type": "string" },
+          "border": { "type": "string" },
+          "text": { "type": "string" },
+          "role": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

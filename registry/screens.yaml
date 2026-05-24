@@ -1,0 +1,66 @@
+schemaVersion: 1
+screens:
+  server-sidebar:
+    owns:
+      - src/components/server-sidebar.css
+      - src/overrides/current-discord-2026-05.css
+    latestSnapshot: snapshots/2026-05-25/server-sidebar-dm-selected.json
+    latestScreenshot: screenshots/2026-05-25/server-sidebar-dm-selected.png
+    importantSelectors:
+      - wrapper_ef3116
+      - listItem__650eb
+      - blobContainer_e5445c
+      - listItemWrapper__91816
+      - wrapper__6e9f8
+    goals:
+      - server selected and hover states use subtle Lotte rings
+      - plus and discover icons use translucent pink with white icon
+    knownRisks:
+      - selected guild structure differs from selected DM structure
+  friends-page:
+    owns:
+      - src/components/friends-dm.css
+      - src/components/voice-panel.css
+    latestSnapshot: snapshots/2026-05-25/friends-page.json
+    latestScreenshot: screenshots/2026-05-25/friends-page.png
+    importantSelectors:
+      - tabBody__133bf
+      - peopleColumn__133bf
+      - peopleList__5ec2f
+      - panels__5e434
+    goals:
+      - background image remains visible through a dark translucent layer
+      - friend rows remain readable
+    knownRisks:
+      - tabBody hash may change after Discord update
+  voice-panel:
+    owns:
+      - src/components/voice-panel.css
+    latestSnapshot: snapshots/2026-05-25/voice-panel.json
+    latestScreenshot: screenshots/2026-05-25/voice-panel.png
+    importantSelectors:
+      - panels__5e434
+      - wrapper_e131a9
+      - button__67645
+      - enabled__67645
+    goals:
+      - primary voice actions use translucent main pink
+      - mute/settings controls remain distinct from primary voice actions
+      - disconnect uses danger rose
+    knownRisks:
+      - aria labels may be localized Korean strings
+  call-screen-share-view:
+    owns:
+      - src/components/call-screen.css
+    latestSnapshot: snapshots/2026-05-25/call-screen-share-view.json
+    latestScreenshot: screenshots/2026-05-25/call-screen-share-view.png
+    importantSelectors:
+      - callContainer_cb9592
+      - root_bfe55a
+      - root__6981d
+      - videoControls_bfe55a
+    goals:
+      - call screen outer black container becomes transparent
+      - actual shared video rendering is not broken
+    knownRisks:
+      - video letterbox selectors must not be transparentized blindly

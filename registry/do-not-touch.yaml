@@ -1,0 +1,14 @@
+schemaVersion: 1
+selectors:
+  wrapper__48b20:
+    screen: call-screen-share-view
+    reason: likely actual video or letterbox rendering wrapper; transparentizing may break shared screen display
+    allowedActions:
+      - inspect
+      - document
+  media-engine-video:
+    screen: call-screen-share-view
+    reason: actual media rendering node
+    allowedActions:
+      - inspect
+      - document

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "palette.schema.json",
+  "type": "object",
+  "required": ["schemaVersion", "palette"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "palette": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["role"],
+        "properties": {
+          "hex": { "type": "string" },
+          "rgb": { "type": "string" },
+          "rgba": { "type": "string" },
+          "role": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

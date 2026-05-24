@@ -1,0 +1,14 @@
+schemaVersion: 1
+risks:
+  discord_hash_drift:
+    severity: high
+    mitigation: capture new DOM snapshots and update registry/selectors.yaml before changing CSS
+  privacy_leak:
+    severity: high
+    mitigation: keep repo private and redact screenshots before sharing outside local machine
+  css_order_conflict:
+    severity: medium
+    mitigation: use theme.manifest.yaml and keep hotfix rules last only when deliberately added
+  media_rendering_breakage:
+    severity: high
+    mitigation: do not style do-not-touch selectors without a screenshot-backed test

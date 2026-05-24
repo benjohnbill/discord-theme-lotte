@@ -1,0 +1,46 @@
+schemaVersion: 1
+selectors:
+  call_screen_outer:
+    screen: call-screen-share-view
+    classes:
+      - callContainer_cb9592
+      - root_bfe55a
+      - root__6981d
+    cssOwner: src/components/call-screen.css
+    stability: hashed
+    paletteRole: transparent_outer
+    action: transparentize outer call containers only
+    reason: these classes created the black call-screen background in the 2026-05-25 snapshot
+    doNotTouch:
+      - wrapper__48b20
+  voice_primary_actions:
+    screen: voice-panel
+    classes:
+      - button__67645
+      - enabled__67645
+    cssOwner: src/components/voice-panel.css
+    stability: hashed
+    paletteRole: main_pink_translucent
+    action: style camera, screen share, activity, and soundboard buttons
+    reason: aria labels were not sufficient for localized Discord controls
+  friends_page_body:
+    screen: friends-page
+    classes:
+      - tabBody__133bf
+      - peopleColumn__133bf
+      - peopleList__5ec2f
+    cssOwner: src/components/friends-dm.css
+    stability: hashed
+    paletteRole: dark_translucent
+    action: transparentize central friends page body
+    reason: tabBody__133bf blocked the background image
+  server_sidebar_dm_selected:
+    screen: server-sidebar
+    classes:
+      - listItemWrapper__91816
+      - selected__91816
+      - wrapper__6e9f8
+    cssOwner: src/components/server-sidebar.css
+    stability: hashed
+    paletteRole: subtle_main_pink_ring
+    action: show subtle selected ring for direct message home icon

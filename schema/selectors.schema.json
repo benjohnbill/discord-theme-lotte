@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "selectors.schema.json",
+  "type": "object",
+  "required": ["schemaVersion", "selectors"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "selectors": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["screen", "classes", "cssOwner", "stability", "action"],
+        "properties": {
+          "screen": { "type": "string" },
+          "classes": { "type": "array", "items": { "type": "string" } },
+          "cssOwner": { "type": "string" },
+          "stability": { "enum": ["stable", "hashed", "text-dependent", "aria-based", "dangerous"] },
+          "paletteRole": { "type": "string" },
+          "action": { "type": "string" },
+          "reason": { "type": "string" },
+          "doNotTouch": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
