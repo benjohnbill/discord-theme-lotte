@@ -1,0 +1,21 @@
+schemaVersion: 1
+palette:
+  main_pink:
+    hex: "#F78ACB"
+    rgb: "247, 138, 203"
+    role: primary accent, selected channel, soft primary controls
+  secondary_purple:
+    hex: "#D9A5FF"
+    rgb: "217, 165, 255"
+    role: hover, secondary rings, soft purple accents
+  danger_rose:
+    hex: "#D85CA8"
+    rgb: "216, 92, 168"
+    role: destructive buttons without harsh red
+  strong_danger:
+    hex: "#C74396"
+    rgb: "199, 67, 150"
+    role: stronger destructive hover/error
+  panel_dark:
+    rgba: "rgba(0, 0, 0, .34)"
+    role: translucent utility panels

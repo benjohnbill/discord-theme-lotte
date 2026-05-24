@@ -1,0 +1,17 @@
+schemaVersion: 1
+output: dist/NewKemonoFriends.theme.css
+vencordTarget: /mnt/c/Users/benjohnbill/AppData/Roaming/Vencord/themes/NewKemonoFriends.theme.css
+partials:
+  - src/header.css
+  - src/base/original-new-kemono-friends.css
+  - src/base/palette.css
+  - src/base/background.css
+  - src/base/transparency.css
+  - src/components/server-sidebar.css
+  - src/components/channel-sidebar.css
+  - src/components/friends-dm.css
+  - src/components/voice-panel.css
+  - src/components/call-screen.css
+  - src/components/activity-cards.css
+  - src/components/modals-popouts.css
+  - src/overrides/current-discord-2026-05.css

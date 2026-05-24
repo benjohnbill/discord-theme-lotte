@@ -1,0 +1,11 @@
+/* source: src/base/palette.css */
+:root {
+  --lotte-main-pink: #F78ACB;
+  --lotte-main-pink-rgb: 247, 138, 203;
+  --lotte-secondary-purple: #D9A5FF;
+  --lotte-secondary-purple-rgb: 217, 165, 255;
+  --lotte-danger-rose: #D85CA8;
+  --lotte-danger-rose-rgb: 216, 92, 168;
+  --lotte-strong-danger: #C74396;
+  --lotte-panel-dark: rgba(0, 0, 0, .34);
+}
