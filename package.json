@@ -1,0 +1,17 @@
+{
+  "name": "discord-theme-lotte",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Maintainable Lotte-themed Vencord Discord CSS theme with DOM snapshots and selector registries.",
+  "scripts": {
+    "build": "node scripts/build-theme.js",
+    "validate": "node scripts/validate-registry.js",
+    "sync": "node scripts/sync-to-vencord.js",
+    "check": "npm run validate && npm run build"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "yaml": "^2.7.0"
+  }
+}
