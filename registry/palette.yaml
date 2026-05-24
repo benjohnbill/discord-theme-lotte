@@ -19,3 +19,15 @@ palette:
   panel_dark:
     rgba: "rgba(0, 0, 0, .34)"
     role: translucent utility panels
+  transparent_outer:
+    rgba: "transparent"
+    role: transparent outer call and page containers
+  main_pink_translucent:
+    rgba: "rgba(247, 138, 203, .28)"
+    role: translucent main pink controls
+  dark_translucent:
+    rgba: "rgba(0, 0, 0, .12)"
+    role: subtle dark content scrim
+  subtle_main_pink_ring:
+    rgba: "rgba(247, 138, 203, .82)"
+    role: subtle selected server or DM ring

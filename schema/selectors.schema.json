@@ -9,7 +9,7 @@
       "type": "object",
       "additionalProperties": {
         "type": "object",
-        "required": ["screen", "classes", "cssOwner", "stability", "action"],
+        "required": ["screen", "classes", "cssOwner", "stability", "action", "reason"],
         "properties": {
           "screen": { "type": "string" },
           "classes": { "type": "array", "items": { "type": "string" } },

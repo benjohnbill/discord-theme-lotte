@@ -44,3 +44,4 @@ selectors:
     stability: hashed
     paletteRole: subtle_main_pink_ring
     action: show subtle selected ring for direct message home icon
+    reason: DM selected state uses a different wrapper structure from guild selected state

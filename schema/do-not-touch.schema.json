@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "do-not-touch.schema.json",
+  "type": "object",
+  "required": ["schemaVersion", "selectors"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "selectors": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["screen", "reason", "allowedActions"],
+        "properties": {
+          "screen": { "type": "string" },
+          "reason": { "type": "string" },
+          "allowedActions": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

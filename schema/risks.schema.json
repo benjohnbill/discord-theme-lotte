@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "risks.schema.json",
+  "type": "object",
+  "required": ["schemaVersion", "risks"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "risks": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["severity", "mitigation"],
+        "properties": {
+          "severity": { "enum": ["high", "medium", "low"] },
+          "mitigation": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
