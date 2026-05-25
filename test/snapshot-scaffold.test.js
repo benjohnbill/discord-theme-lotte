@@ -70,3 +70,19 @@ test("scaffoldSnapshot refuses to overwrite an existing snapshot file", () => {
     /refusing to overwrite existing file snapshots\/2026-06-01\/friends-page\.json/
   );
 });
+
+test("scaffoldSnapshot rejects screens that are not in registry/screens.yaml", () => {
+  const fsImpl = makeFsImpl();
+
+  assert.throws(
+    () =>
+      scaffoldSnapshot({
+        screen: "ghost-screen",
+        today: "2026-06-01",
+        root: "/repo",
+        fsImpl,
+        screensDoc
+      }),
+    /unknown screen "ghost-screen"\. Add it to registry\/screens\.yaml first\./
+  );
+});
