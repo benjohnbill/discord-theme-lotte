@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-05-25T09:00:00+09:00",
+  "discordBuild": "seed-sanitized-baseline",
+  "vencordVersion": "seed-sanitized-baseline",
+  "themeVersion": "0.1.0",
+  "os": "linux",
+  "zoom": "100%",
+  "screen": "server-sidebar",
+  "routeHint": "/channels/@me",
+  "viewport": "1440x900",
+  "sourceScreenshot": "screenshots/2026-05-25/server-sidebar-dm-selected.png",
+  "notes": "Seed sanitized baseline observation for the direct-message selected server sidebar state. Names, avatars, and private server metadata are intentionally omitted.",
+  "elements": [
+    {
+      "tag": "nav",
+      "className": "wrapper_ef3116",
+      "rect": "0,0 72x900",
+      "background": "rgba(12, 12, 16, 0.68)",
+      "border": "none",
+      "role": "navigation"
+    },
+    {
+      "tag": "div",
+      "className": "listItem__650eb",
+      "rect": "8,8 56x48",
+      "background": "transparent",
+      "border": "none",
+      "role": "listitem"
+    },
+    {
+      "tag": "div",
+      "className": "listItemWrapper__91816 selected__91816",
+      "rect": "12,8 48x48",
+      "background": "rgba(255, 179, 208, 0.18)",
+      "border": "1px solid rgba(255, 179, 208, 0.62)",
+      "role": "link",
+      "text": "Direct Messages"
+    },
+    {
+      "tag": "div",
+      "className": "wrapper__6e9f8",
+      "rect": "12,8 48x48",
+      "background": "rgba(255, 179, 208, 0.18)",
+      "border": "1px solid rgba(255, 179, 208, 0.62)",
+      "role": "link",
+      "text": "Home"
+    },
+    {
+      "tag": "div",
+      "className": "blobContainer_e5445c",
+      "rect": "12,68 48x48",
+      "background": "rgba(255, 255, 255, 0.08)",
+      "border": "none",
+      "role": "link",
+      "text": "Sample Server"
+    },
+    {
+      "tag": "button",
+      "className": "circleIconButton__5bc7e",
+      "rect": "12,788 48x48",
+      "background": "rgba(255, 179, 208, 0.18)",
+      "border": "1px solid rgba(255, 255, 255, 0.16)",
+      "role": "button",
+      "text": "Add a Server"
+    },
+    {
+      "tag": "button",
+      "className": "circleIconButton__5bc7e discover__5bc7e",
+      "rect": "12,844 48x48",
+      "background": "rgba(255, 179, 208, 0.18)",
+      "border": "1px solid rgba(255, 255, 255, 0.16)",
+      "role": "button",
+      "text": "Discover"
+    }
+  ]
+}

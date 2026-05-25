@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-05-25T09:10:00+09:00",
+  "discordBuild": "seed-sanitized-baseline",
+  "vencordVersion": "seed-sanitized-baseline",
+  "themeVersion": "0.1.0",
+  "os": "linux",
+  "zoom": "100%",
+  "screen": "voice-panel",
+  "routeHint": "/channels/@me",
+  "viewport": "1440x900",
+  "sourceScreenshot": "screenshots/2026-05-25/voice-panel.png",
+  "notes": "Seed sanitized baseline observation for connected voice controls. Channel and user names are replaced with generic labels.",
+  "elements": [
+    {
+      "tag": "section",
+      "className": "panels__5e434",
+      "rect": "72,708 240x192",
+      "background": "rgba(18, 18, 24, 0.76)",
+      "border": "1px solid rgba(255, 255, 255, 0.10)",
+      "role": "region",
+      "text": "Voice connected"
+    },
+    {
+      "tag": "div",
+      "className": "wrapper_e131a9",
+      "rect": "80,716 224x84",
+      "background": "rgba(255, 179, 208, 0.14)",
+      "border": "1px solid rgba(255, 179, 208, 0.28)",
+      "role": "group",
+      "text": "Voice Connected - Sample Voice Channel"
+    },
+    {
+      "tag": "button",
+      "className": "button__67645 enabled__67645",
+      "rect": "88,808 32x32",
+      "background": "rgba(255, 179, 208, 0.26)",
+      "border": "1px solid rgba(255, 179, 208, 0.44)",
+      "role": "button",
+      "text": "Camera"
+    },
+    {
+      "tag": "button",
+      "className": "button__67645 enabled__67645",
+      "rect": "128,808 32x32",
+      "background": "rgba(255, 179, 208, 0.26)",
+      "border": "1px solid rgba(255, 179, 208, 0.44)",
+      "role": "button",
+      "text": "Share Screen"
+    },
+    {
+      "tag": "button",
+      "className": "button__67645 enabled__67645",
+      "rect": "168,808 32x32",
+      "background": "rgba(255, 179, 208, 0.26)",
+      "border": "1px solid rgba(255, 179, 208, 0.44)",
+      "role": "button",
+      "text": "Activity"
+    },
+    {
+      "tag": "button",
+      "className": "button__67645",
+      "rect": "208,808 32x32",
+      "background": "rgba(255, 102, 140, 0.24)",
+      "border": "1px solid rgba(255, 102, 140, 0.46)",
+      "role": "button",
+      "text": "Disconnect"
+    },
+    {
+      "tag": "button",
+      "className": "button__67645",
+      "rect": "88,852 32x32",
+      "background": "rgba(255, 255, 255, 0.08)",
+      "border": "1px solid rgba(255, 255, 255, 0.12)",
+      "role": "button",
+      "text": "Mute"
+    },
+    {
+      "tag": "button",
+      "className": "button__67645",
+      "rect": "128,852 32x32",
+      "background": "rgba(255, 255, 255, 0.08)",
+      "border": "1px solid rgba(255, 255, 255, 0.12)",
+      "role": "button",
+      "text": "Settings"
+    }
+  ]
+}

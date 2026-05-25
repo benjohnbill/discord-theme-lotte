@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-05-25T09:15:00+09:00",
+  "discordBuild": "seed-sanitized-baseline",
+  "vencordVersion": "seed-sanitized-baseline",
+  "themeVersion": "0.1.0",
+  "os": "linux",
+  "zoom": "100%",
+  "screen": "call-screen-share-view",
+  "routeHint": "/channels/@me/sample-call",
+  "viewport": "1440x900",
+  "sourceScreenshot": "screenshots/2026-05-25/call-screen-share-view.png",
+  "notes": "Seed sanitized baseline observation for a screen-share call view. Shared content details are represented only as generic media placeholders.",
+  "elements": [
+    {
+      "tag": "main",
+      "className": "callContainer_cb9592",
+      "rect": "312,48 1128x852",
+      "background": "transparent",
+      "border": "none",
+      "role": "main"
+    },
+    {
+      "tag": "div",
+      "className": "root_bfe55a",
+      "rect": "312,48 1128x852",
+      "background": "transparent",
+      "border": "none",
+      "role": "region",
+      "text": "Call"
+    },
+    {
+      "tag": "div",
+      "className": "root__6981d",
+      "rect": "336,72 1080x704",
+      "background": "rgba(0, 0, 0, 0.22)",
+      "border": "1px solid rgba(255, 255, 255, 0.10)",
+      "role": "region",
+      "text": "Shared screen stage"
+    },
+    {
+      "tag": "div",
+      "className": "wrapper__48b20",
+      "rect": "376,112 1000x624",
+      "background": "rgb(0, 0, 0)",
+      "border": "none",
+      "role": "img",
+      "text": "Shared screen video surface"
+    },
+    {
+      "tag": "video",
+      "className": "media-engine-video",
+      "rect": "376,112 1000x624",
+      "background": "rgb(0, 0, 0)",
+      "border": "none",
+      "role": "img",
+      "text": "Video render node"
+    },
+    {
+      "tag": "div",
+      "className": "videoControls_bfe55a",
+      "rect": "516,792 720x72",
+      "background": "rgba(18, 18, 24, 0.72)",
+      "border": "1px solid rgba(255, 255, 255, 0.10)",
+      "role": "toolbar",
+      "text": "Call controls"
+    },
+    {
+      "tag": "button",
+      "className": "button__67645 enabled__67645",
+      "rect": "764,812 40x40",
+      "background": "rgba(255, 179, 208, 0.26)",
+      "border": "1px solid rgba(255, 179, 208, 0.44)",
+      "role": "button",
+      "text": "Share Screen"
+    }
+  ]
+}

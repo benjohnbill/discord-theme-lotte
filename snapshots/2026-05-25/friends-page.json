@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-05-25T09:05:00+09:00",
+  "discordBuild": "seed-sanitized-baseline",
+  "vencordVersion": "seed-sanitized-baseline",
+  "themeVersion": "0.1.0",
+  "os": "linux",
+  "zoom": "100%",
+  "screen": "friends-page",
+  "routeHint": "/channels/@me",
+  "viewport": "1440x900",
+  "sourceScreenshot": "screenshots/2026-05-25/friends-page.png",
+  "notes": "Seed sanitized baseline observation for the Friends page. Friend names, custom statuses, and avatars are replaced with generic labels.",
+  "elements": [
+    {
+      "tag": "main",
+      "className": "tabBody__133bf",
+      "rect": "312,48 832x852",
+      "background": "rgba(16, 17, 22, 0.64)",
+      "border": "none",
+      "role": "main"
+    },
+    {
+      "tag": "section",
+      "className": "peopleColumn__133bf",
+      "rect": "312,48 560x852",
+      "background": "rgba(16, 17, 22, 0.36)",
+      "border": "none",
+      "role": "region",
+      "text": "Friends"
+    },
+    {
+      "tag": "div",
+      "className": "peopleList__5ec2f",
+      "rect": "332,108 520x720",
+      "background": "transparent",
+      "border": "none",
+      "role": "list"
+    },
+    {
+      "tag": "div",
+      "className": "peopleListItem_cc6179",
+      "rect": "332,156 520x62",
+      "background": "rgba(255, 255, 255, 0.04)",
+      "border": "1px solid rgba(255, 255, 255, 0.08)",
+      "role": "listitem",
+      "text": "Sample Friend - Online"
+    },
+    {
+      "tag": "aside",
+      "className": "nowPlayingColumn__133bf",
+      "rect": "872,48 272x852",
+      "background": "rgba(16, 17, 22, 0.42)",
+      "border": "1px solid rgba(255, 255, 255, 0.08)",
+      "role": "complementary",
+      "text": "Active Now"
+    },
+    {
+      "tag": "section",
+      "className": "panels__5e434",
+      "rect": "72,808 240x92",
+      "background": "rgba(18, 18, 24, 0.72)",
+      "border": "1px solid rgba(255, 255, 255, 0.10)",
+      "role": "region",
+      "text": "Account and voice controls"
+    }
+  ]
+}
