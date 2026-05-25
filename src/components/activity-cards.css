@@ -1,1 +1,25 @@
 /* source: src/components/activity-cards.css */
+
+/* Friends activity cards. */
+#app-mount .itemCard__7e549,
+#app-mount .wrapper__00943,
+#app-mount .outer_bf1984,
+#app-mount .body__00943,
+#app-mount .inset_bf1984,
+#app-mount .section__00943,
+#app-mount .voiceSection__00943,
+#app-mount [class*="itemCard_"],
+#app-mount [class*="wrapper_"][class*="00943"],
+#app-mount [class*="outer_"][class*="bf1984"] {
+    background-color: rgba(0, 0, 0, .18) !important;
+    border-color: rgba(var(--lotte-main-pink-rgb), .72) !important;
+    box-shadow: none !important;
+}
+
+#app-mount .itemCard__7e549:hover,
+#app-mount .outer_bf1984.interactive_bf1984:hover,
+#app-mount [class*="itemCard_"]:hover,
+#app-mount [class*="outer_"][class*="bf1984"]:hover {
+    background-color: rgba(var(--lotte-main-pink-rgb), .18) !important;
+    border-color: var(--lotte-secondary-purple) !important;
+}
