@@ -113,3 +113,35 @@ test("checkScreensOwns reports screens that own paths missing from manifest.part
   assert.equal(errors.length, 1);
   assert.match(errors[0], /x: owns "src\/components\/orphan\.css" not listed in theme\.manifest\.yaml partials/);
 });
+
+import { checkScreensLatestSnapshot } from "../scripts/registry-checks.js";
+
+test("checkScreensLatestSnapshot returns no errors when each latestSnapshot exists according to the predicate", () => {
+  const screensDoc = {
+    schemaVersion: 1,
+    screens: {
+      x: { ...baseScreen, latestSnapshot: "snapshots/2026-05-25/x.json" }
+    }
+  };
+  const exists = (relativePath) => relativePath === "snapshots/2026-05-25/x.json";
+  assert.deepEqual(checkScreensLatestSnapshot(screensDoc, exists), []);
+});
+
+test("checkScreensLatestSnapshot reports screens whose latestSnapshot file is missing", () => {
+  const screensDoc = {
+    schemaVersion: 1,
+    screens: {
+      x: { ...baseScreen, latestSnapshot: "snapshots/2026-05-25/missing.json" }
+    }
+  };
+  const exists = () => false;
+  const errors = checkScreensLatestSnapshot(screensDoc, exists);
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /x: latestSnapshot "snapshots\/2026-05-25\/missing\.json" does not exist on disk/);
+});
+
+test("checkScreensLatestSnapshot ignores screens without latestSnapshot", () => {
+  const screensDoc = { schemaVersion: 1, screens: { x: baseScreen } };
+  const exists = () => false;
+  assert.deepEqual(checkScreensLatestSnapshot(screensDoc, exists), []);
+});

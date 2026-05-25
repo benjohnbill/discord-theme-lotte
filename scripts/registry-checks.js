@@ -57,3 +57,17 @@ export function checkScreensOwns(screensDoc, manifest) {
 
   return errors;
 }
+
+export function checkScreensLatestSnapshot(screensDoc, exists) {
+  const screens = screensDoc?.screens ?? {};
+  const errors = [];
+
+  for (const [name, entry] of Object.entries(screens)) {
+    if (typeof entry.latestSnapshot !== "string") continue;
+    if (!exists(entry.latestSnapshot)) {
+      errors.push(`${name}: latestSnapshot "${entry.latestSnapshot}" does not exist on disk`);
+    }
+  }
+
+  return errors;
+}
