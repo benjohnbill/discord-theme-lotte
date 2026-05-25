@@ -91,3 +91,25 @@ test("checkSelectorsDoNotTouch ignores selectors that have no doNotTouch list", 
   const doNotTouchDoc = { schemaVersion: 1, selectors: {} };
   assert.deepEqual(checkSelectorsDoNotTouch(selectorsDoc, doNotTouchDoc), []);
 });
+
+import { checkScreensOwns } from "../scripts/registry-checks.js";
+
+test("checkScreensOwns returns no errors when every owned path is in manifest.partials", () => {
+  const screensDoc = {
+    schemaVersion: 1,
+    screens: { x: { ...baseScreen, owns: ["src/components/a.css"] } }
+  };
+  const manifest = { partials: ["src/components/a.css", "src/base/palette.css"] };
+  assert.deepEqual(checkScreensOwns(screensDoc, manifest), []);
+});
+
+test("checkScreensOwns reports screens that own paths missing from manifest.partials", () => {
+  const screensDoc = {
+    schemaVersion: 1,
+    screens: { x: { ...baseScreen, owns: ["src/components/orphan.css"] } }
+  };
+  const manifest = { partials: ["src/components/a.css"] };
+  const errors = checkScreensOwns(screensDoc, manifest);
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /x: owns "src\/components\/orphan\.css" not listed in theme\.manifest\.yaml partials/);
+});

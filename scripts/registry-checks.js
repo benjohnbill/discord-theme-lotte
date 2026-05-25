@@ -41,3 +41,19 @@ export function checkSelectorsDoNotTouch(selectorsDoc, doNotTouchDoc) {
 
   return errors;
 }
+
+export function checkScreensOwns(screensDoc, manifest) {
+  const screens = screensDoc?.screens ?? {};
+  const partials = new Set(manifest?.partials ?? []);
+  const errors = [];
+
+  for (const [name, entry] of Object.entries(screens)) {
+    for (const owned of entry.owns ?? []) {
+      if (!partials.has(owned)) {
+        errors.push(`${name}: owns "${owned}" not listed in theme.manifest.yaml partials`);
+      }
+    }
+  }
+
+  return errors;
+}
