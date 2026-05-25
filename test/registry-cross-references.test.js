@@ -35,3 +35,25 @@ test("checkSelectorsScreens reports selectors that reference an unknown screen",
   assert.equal(errors.length, 1);
   assert.match(errors[0], /sel_a: unknown screen "missing"/);
 });
+
+import { checkSelectorsCssOwners } from "../scripts/registry-checks.js";
+
+test("checkSelectorsCssOwners returns no errors when every cssOwner is in manifest.partials", () => {
+  const selectorsDoc = {
+    schemaVersion: 1,
+    selectors: { sel_a: { ...baseSelector, cssOwner: "src/components/a.css" } }
+  };
+  const manifest = { partials: ["src/components/a.css", "src/components/b.css"] };
+  assert.deepEqual(checkSelectorsCssOwners(selectorsDoc, manifest), []);
+});
+
+test("checkSelectorsCssOwners reports selectors whose cssOwner is not registered as a manifest partial", () => {
+  const selectorsDoc = {
+    schemaVersion: 1,
+    selectors: { sel_a: { ...baseSelector, cssOwner: "src/components/orphan.css" } }
+  };
+  const manifest = { partials: ["src/components/a.css"] };
+  const errors = checkSelectorsCssOwners(selectorsDoc, manifest);
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /sel_a: cssOwner "src\/components\/orphan\.css" not listed in theme\.manifest\.yaml partials/);
+});

@@ -11,3 +11,17 @@ export function checkSelectorsScreens(selectorsDoc, screensDoc) {
 
   return errors;
 }
+
+export function checkSelectorsCssOwners(selectorsDoc, manifest) {
+  const selectors = selectorsDoc?.selectors ?? {};
+  const partials = new Set(manifest?.partials ?? []);
+  const errors = [];
+
+  for (const [name, entry] of Object.entries(selectors)) {
+    if (!partials.has(entry.cssOwner)) {
+      errors.push(`${name}: cssOwner "${entry.cssOwner}" not listed in theme.manifest.yaml partials`);
+    }
+  }
+
+  return errors;
+}
