@@ -43,3 +43,13 @@
 - Prefer small commits that map to one durable workspace improvement.
 - Keep generated `dist/NewKemonoFriends.theme.css` changes in the same commit as the source or manifest change that produced them.
 - Do not include unrelated local edits.
+
+## Helpers
+
+- `rtk npm run snapshot:new -- <screen-id>` creates `snapshots/YYYY-MM-DD/<screen-id>.json` with placeholder metadata for the requested screen. The script refuses to overwrite an existing file and refuses screens that are not in `registry/screens.yaml`. Replace placeholder fields (`viewport`, `routeHint`, `sourceScreenshot`, and the `elements` array) before committing.
+- `rtk npm test` runs the workspace contract suite, including:
+  - `test/build-contract.test.js`: the generated theme follows the manifest output and partial order.
+  - `test/registry-cross-references.test.js`: registry and snapshot cross-references hold.
+  - `test/selector-usage-contract.test.js`: every class in `registry/selectors.yaml` is referenced inside its `cssOwner` partial.
+  - `test/snapshot-scaffold.test.js`: the snapshot scaffolder enforces its contract.
+- These tests do not launch a browser, do not open Discord, and do not touch the Vencord live theme directory.
