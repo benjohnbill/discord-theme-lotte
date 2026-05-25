@@ -1,1 +1,29 @@
 /* source: src/components/call-screen.css */
+
+/* Call screen outer containers only. */
+#app-mount .callContainer_cb9592,
+#app-mount .root_bfe55a,
+#app-mount .root__6981d,
+#app-mount .videoControls_bfe55a,
+#app-mount .chatToasts_cb9592,
+#app-mount [class*="callContainer_"],
+#app-mount [class*="root_"][class*="bfe55a"],
+#app-mount [class*="root_"][class*="6981d"],
+#app-mount [class*="videoControls_"][class*="bfe55a"] {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+#app-mount .gradientTop_bfe55a,
+#app-mount .gradientBottom_bfe55a,
+#app-mount .gradientContainer_bfe55a,
+#app-mount [class*="gradientTop_"][class*="bfe55a"],
+#app-mount [class*="gradientBottom_"][class*="bfe55a"],
+#app-mount [class*="gradientContainer_"][class*="bfe55a"] {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, .32), transparent) !important;
+}
+
+#app-mount .gradientBottom_bfe55a,
+#app-mount [class*="gradientBottom_"][class*="bfe55a"] {
+    background: linear-gradient(to top, rgba(0, 0, 0, .32), transparent) !important;
+}

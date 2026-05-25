@@ -1,1 +1,107 @@
 /* source: src/components/friends-dm.css */
+
+/* Friends and private channel transparency. */
+#app-mount .container__133bf,
+#app-mount .tabBody__133bf,
+#app-mount .peopleColumn__133bf,
+#app-mount .peopleList__5ec2f,
+#app-mount .peopleListItem_cc6179,
+#app-mount .nowPlayingColumn__133bf,
+#app-mount .container__7d20c,
+#app-mount .scroller__7d20c,
+#app-mount .privateChannels__35e86,
+#app-mount .scroller__99e7c,
+#app-mount .sidebar_c48ade,
+#app-mount .container__5e434,
+#app-mount .base__5e434,
+#app-mount .content__5e434,
+#app-mount .sidebar__5e434,
+#app-mount .sidebarList__5e434,
+#app-mount .page__5e434,
+#app-mount .scroller__629e4,
+#app-mount .content_f75fb0,
+#app-mount .chat_f75fb0 {
+    background: transparent !important;
+}
+
+#app-mount .base_c48ade,
+#app-mount .content_c48ade,
+#app-mount .page_c48ade,
+#app-mount .container__9293f,
+#app-mount .children__9293f,
+#app-mount .themed__9293f,
+#app-mount .peopleList__5ec2f > div,
+#app-mount .peopleListItem_cc6179,
+#app-mount .container__7d20c > div,
+#app-mount .privateChannels__35e86 > div,
+#app-mount .scroller__99e7c > div,
+#app-mount [class*="peopleColumn_"],
+#app-mount [class*="peopleList_"],
+#app-mount [class*="nowPlayingColumn_"],
+#app-mount [class*="privateChannels_"],
+#app-mount [class*="scroller_"][class*="99e7c"],
+#app-mount [class*="sidebar_"][class*="c48ade"],
+#app-mount [class*="container_"][class*="133bf"],
+#app-mount [class*="tabBody_"][class*="133bf"],
+#app-mount [class*="container_"][class*="7d20c"],
+#app-mount [class*="page_"][class*="c48ade"],
+#app-mount [class*="content_"][class*="c48ade"],
+#app-mount [class*="container_"][class*="5e434"],
+#app-mount [class*="base_"][class*="5e434"],
+#app-mount [class*="content_"][class*="5e434"],
+#app-mount [class*="sidebar_"][class*="5e434"],
+#app-mount [class*="sidebarList_"][class*="5e434"],
+#app-mount [class*="page_"][class*="5e434"],
+#app-mount [class*="scroller_"][class*="629e4"] {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+#app-mount .sidebarList__5e434,
+#app-mount .sidebar__5e434,
+#app-mount [class*="sidebarList_"][class*="5e434"],
+#app-mount [class*="sidebar_"][class*="5e434"] {
+    background-color: rgba(0, 0, 0, .18) !important;
+}
+
+#app-mount .uploadArea_f75fb0,
+#app-mount .uploadArea_b78547,
+#app-mount .uploadDropModal_b78547,
+#app-mount .bgScale_b78547 {
+    background-color: rgba(var(--lotte-main-pink-rgb), .72) !important;
+}
+
+/* Friends and DM rows. */
+#app-mount [class*="peopleListItem_"],
+#app-mount [class*="peopleListItem_"] > div,
+#app-mount [class*="peopleListItem_"] [class*="listItemContents_"],
+#app-mount [class*="channel_"][class*="972a0"],
+#app-mount .privateChannels__35e86 [class*="interactive_"],
+#app-mount [class*="privateChannels_"] [class*="interactive_"] {
+    background-color: transparent !important;
+}
+
+#app-mount .peopleColumn__133bf,
+#app-mount .tabBody__133bf,
+#app-mount .container__133bf {
+    background-color: rgba(0, 0, 0, .12) !important;
+}
+
+#app-mount .peopleListItem_cc6179:hover,
+#app-mount .peopleListItem_cc6179.active_cc6179,
+#app-mount .interactive_bf202d:hover,
+#app-mount .selected_bf202d,
+#app-mount .interactiveSelected__972a0,
+#app-mount .channel__972a0.selected__972a0,
+#app-mount .channel__972a0:hover {
+    background-color: rgba(var(--lotte-main-pink-rgb), .16) !important;
+    border-radius: 6px;
+}
+
+#app-mount .actionButton_f8fa06,
+#app-mount .actionButton__3e3b0,
+#app-mount [class*="actionButton_"] {
+    background-color: rgba(var(--lotte-main-pink-rgb), .34) !important;
+    color: white !important;
+    border-radius: 6px !important;
+}

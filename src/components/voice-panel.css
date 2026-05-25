@@ -1,1 +1,171 @@
 /* source: src/components/voice-panel.css */
+
+/* Voice panel button defaults. */
+#app-mount .panels_c48ade [class*="button_"][class*="lookFilled_"],
+#app-mount .panels_c48ade [class*="button_"][class*="colorBrand_"],
+#app-mount .panels_c48ade [class*="button_"][style*="background-color"],
+#app-mount .panels_c48ade button[class*="button_"],
+#app-mount .container__37e49 [class*="button_"],
+#app-mount .container__37e49 button,
+#app-mount .panels__5e434 [class*="connection_"] button,
+#app-mount .panels__5e434 [class*="connection_"] [class*="button_"],
+#app-mount [class*="panels_"][class*="5e434"] [class*="connection_"] button,
+#app-mount [class*="panels_"][class*="5e434"] [class*="connection_"] [class*="button_"] {
+    background-color: rgba(var(--lotte-main-pink-rgb), .86) !important;
+    color: white !important;
+    border-radius: 6px !important;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18), 0 0 10px rgba(var(--lotte-main-pink-rgb), .24) !important;
+}
+
+#app-mount .panels_c48ade [class*="button_"]:hover,
+#app-mount .container__37e49 [class*="button_"]:hover,
+#app-mount .panels__5e434 [class*="connection_"] button:hover,
+#app-mount .panels__5e434 [class*="connection_"] [class*="button_"]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [class*="connection_"] button:hover,
+#app-mount [class*="panels_"][class*="5e434"] [class*="connection_"] [class*="button_"]:hover {
+    background-color: var(--lotte-secondary-purple) !important;
+}
+
+#app-mount .panels__5e434,
+#app-mount [class*="panels_"][class*="5e434"] {
+    background-color: var(--lotte-panel-dark) !important;
+    border-color: rgba(var(--lotte-main-pink-rgb), .22) !important;
+}
+
+#app-mount .wrapper_e131a9,
+#app-mount .container_e131a9,
+#app-mount .connection_e131a9,
+#app-mount .inner_e131a9,
+#app-mount .rtcConnectionStatusWrapper__06d62,
+#app-mount .rtcConnectionStatus__06d62 {
+    background-color: transparent !important;
+}
+
+#app-mount .rtcConnectionStatusConnected__06d62,
+#app-mount .rtcConnectionStatusLabel__06d62,
+#app-mount .channel_e131a9 {
+    color: #9BE7B1 !important;
+}
+
+#app-mount .panels__5e434 button,
+#app-mount .panels__5e434 [class*="button_"],
+#app-mount [class*="panels_"][class*="5e434"] button,
+#app-mount [class*="panels_"][class*="5e434"] [class*="button_"],
+#app-mount .wrapper_e131a9 button,
+#app-mount .wrapper_e131a9 [class*="button_"] {
+    background-color: rgba(var(--lotte-main-pink-rgb), .86) !important;
+    color: white !important;
+    border-radius: 6px !important;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18), 0 0 10px rgba(var(--lotte-main-pink-rgb), .24) !important;
+}
+
+#app-mount .panels__5e434 button:hover,
+#app-mount .panels__5e434 [class*="button_"]:hover,
+#app-mount [class*="panels_"][class*="5e434"] button:hover,
+#app-mount [class*="panels_"][class*="5e434"] [class*="button_"]:hover,
+#app-mount .wrapper_e131a9 button:hover,
+#app-mount .wrapper_e131a9 [class*="button_"]:hover {
+    background-color: var(--lotte-secondary-purple) !important;
+}
+
+/* Voice panel control roles. */
+#app-mount .panels__5e434 button,
+#app-mount .panels__5e434 [role="button"],
+#app-mount .panels__5e434 [class*="button_"],
+#app-mount [class*="panels_"][class*="5e434"] button,
+#app-mount [class*="panels_"][class*="5e434"] [role="button"],
+#app-mount [class*="panels_"][class*="5e434"] [class*="button_"] {
+    background-color: rgba(0, 0, 0, .28) !important;
+    color: #E9D8FF !important;
+    border-radius: 7px !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--lotte-secondary-purple-rgb), .34) !important;
+}
+
+#app-mount .panels__5e434 button:hover,
+#app-mount .panels__5e434 [role="button"]:hover,
+#app-mount .panels__5e434 [class*="button_"]:hover,
+#app-mount [class*="panels_"][class*="5e434"] button:hover,
+#app-mount [class*="panels_"][class*="5e434"] [role="button"]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [class*="button_"]:hover {
+    background-color: rgba(var(--lotte-secondary-purple-rgb), .22) !important;
+    color: white !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--lotte-secondary-purple-rgb), .62), 0 0 8px rgba(var(--lotte-secondary-purple-rgb), .24) !important;
+}
+
+#app-mount .panels__5e434 [aria-label*="카메라"],
+#app-mount .panels__5e434 [aria-label*="화면 공유"],
+#app-mount .panels__5e434 [aria-label*="활동 시작"],
+#app-mount .panels__5e434 [aria-label*="사운드보드"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="카메라"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="화면 공유"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="활동 시작"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="사운드보드"] {
+    background-color: rgba(var(--lotte-main-pink-rgb), .28) !important;
+    color: white !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--lotte-main-pink-rgb), .42), 0 0 8px rgba(var(--lotte-main-pink-rgb), .14) !important;
+}
+
+#app-mount .panels__5e434 [aria-label*="카메라"]:hover,
+#app-mount .panels__5e434 [aria-label*="화면 공유"]:hover,
+#app-mount .panels__5e434 [aria-label*="활동 시작"]:hover,
+#app-mount .panels__5e434 [aria-label*="사운드보드"]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="카메라"]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="화면 공유"]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="활동 시작"]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="사운드보드"]:hover {
+    background-color: rgba(var(--lotte-main-pink-rgb), .42) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--lotte-main-pink-rgb), .62), 0 0 10px rgba(var(--lotte-main-pink-rgb), .20) !important;
+}
+
+#app-mount .panels__5e434 .button__67645,
+#app-mount .panels__5e434 button.button__67645,
+#app-mount .panels__5e434 .enabled__67645,
+#app-mount [class*="panels_"][class*="5e434"] .button__67645,
+#app-mount [class*="panels_"][class*="5e434"] button.button__67645,
+#app-mount [class*="panels_"][class*="5e434"] .enabled__67645 {
+    background-color: rgba(var(--lotte-main-pink-rgb), .28) !important;
+    color: white !important;
+    border-color: rgba(var(--lotte-main-pink-rgb), .38) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--lotte-main-pink-rgb), .42), 0 0 8px rgba(var(--lotte-main-pink-rgb), .14) !important;
+}
+
+#app-mount .panels__5e434 .button__67645:hover,
+#app-mount .panels__5e434 button.button__67645:hover,
+#app-mount .panels__5e434 .enabled__67645:hover,
+#app-mount [class*="panels_"][class*="5e434"] .button__67645:hover,
+#app-mount [class*="panels_"][class*="5e434"] button.button__67645:hover,
+#app-mount [class*="panels_"][class*="5e434"] .enabled__67645:hover {
+    background-color: rgba(var(--lotte-main-pink-rgb), .42) !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--lotte-main-pink-rgb), .62), 0 0 10px rgba(var(--lotte-main-pink-rgb), .20) !important;
+}
+
+#app-mount .panels__5e434 [aria-label*="음소거"],
+#app-mount .panels__5e434 [aria-label*="입력"],
+#app-mount .panels__5e434 [aria-label*="출력"],
+#app-mount .panels__5e434 [aria-label*="사용자 설정"],
+#app-mount .panels__5e434 [aria-label*="Krisp"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="음소거"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="입력"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="출력"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="사용자 설정"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="Krisp"] {
+    background-color: var(--lotte-panel-dark) !important;
+    color: #E9D8FF !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--lotte-secondary-purple-rgb), .38) !important;
+}
+
+#app-mount .panels__5e434 [aria-label*="연결 끊기"],
+#app-mount .panels__5e434 [aria-label*="통화 종료"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="연결 끊기"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="통화 종료"] {
+    background-color: rgba(var(--lotte-danger-rose-rgb), .38) !important;
+    color: white !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--lotte-danger-rose-rgb), .58), 0 0 8px rgba(var(--lotte-danger-rose-rgb), .16) !important;
+}
+
+#app-mount .panels__5e434 [aria-label*="연결 끊기"]:hover,
+#app-mount .panels__5e434 [aria-label*="통화 종료"]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="연결 끊기"]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="통화 종료"]:hover {
+    background-color: rgba(var(--lotte-strong-danger-rgb), .58) !important;
+}
