@@ -57,3 +57,37 @@ test("checkSelectorsCssOwners reports selectors whose cssOwner is not registered
   assert.equal(errors.length, 1);
   assert.match(errors[0], /sel_a: cssOwner "src\/components\/orphan\.css" not listed in theme\.manifest\.yaml partials/);
 });
+
+import { checkSelectorsDoNotTouch } from "../scripts/registry-checks.js";
+
+const baseDoNotTouch = {
+  screen: "x",
+  reason: "fragile",
+  allowedActions: ["inspect"]
+};
+
+test("checkSelectorsDoNotTouch returns no errors when doNotTouch references are all known", () => {
+  const selectorsDoc = {
+    schemaVersion: 1,
+    selectors: { sel_a: { ...baseSelector, doNotTouch: ["wrapper_known"] } }
+  };
+  const doNotTouchDoc = { schemaVersion: 1, selectors: { wrapper_known: baseDoNotTouch } };
+  assert.deepEqual(checkSelectorsDoNotTouch(selectorsDoc, doNotTouchDoc), []);
+});
+
+test("checkSelectorsDoNotTouch reports selectors with unknown doNotTouch references", () => {
+  const selectorsDoc = {
+    schemaVersion: 1,
+    selectors: { sel_a: { ...baseSelector, doNotTouch: ["wrapper_missing"] } }
+  };
+  const doNotTouchDoc = { schemaVersion: 1, selectors: { wrapper_known: baseDoNotTouch } };
+  const errors = checkSelectorsDoNotTouch(selectorsDoc, doNotTouchDoc);
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /sel_a: doNotTouch entry "wrapper_missing" not declared in do-not-touch\.yaml/);
+});
+
+test("checkSelectorsDoNotTouch ignores selectors that have no doNotTouch list", () => {
+  const selectorsDoc = { schemaVersion: 1, selectors: { sel_a: baseSelector } };
+  const doNotTouchDoc = { schemaVersion: 1, selectors: {} };
+  assert.deepEqual(checkSelectorsDoNotTouch(selectorsDoc, doNotTouchDoc), []);
+});

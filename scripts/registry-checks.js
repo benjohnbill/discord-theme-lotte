@@ -25,3 +25,19 @@ export function checkSelectorsCssOwners(selectorsDoc, manifest) {
 
   return errors;
 }
+
+export function checkSelectorsDoNotTouch(selectorsDoc, doNotTouchDoc) {
+  const selectors = selectorsDoc?.selectors ?? {};
+  const known = new Set(Object.keys(doNotTouchDoc?.selectors ?? {}));
+  const errors = [];
+
+  for (const [name, entry] of Object.entries(selectors)) {
+    for (const reference of entry.doNotTouch ?? []) {
+      if (!known.has(reference)) {
+        errors.push(`${name}: doNotTouch entry "${reference}" not declared in do-not-touch.yaml`);
+      }
+    }
+  }
+
+  return errors;
+}
