@@ -84,3 +84,16 @@ export function checkSnapshotsScreens(snapshots, screensDoc) {
 
   return errors;
 }
+
+export function checkSrcPartialsRegistered(srcCssFiles, manifest) {
+  const partials = new Set(manifest?.partials ?? []);
+  const errors = [];
+
+  for (const file of srcCssFiles) {
+    if (!partials.has(file)) {
+      errors.push(`${file}: not listed in theme.manifest.yaml partials`);
+    }
+  }
+
+  return errors;
+}

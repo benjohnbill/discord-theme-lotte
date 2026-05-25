@@ -165,3 +165,19 @@ test("checkSnapshotsScreens reports snapshots whose screen is not in screens.yam
   assert.equal(errors.length, 1);
   assert.match(errors[0], /snapshots\/2026-05-25\/a\.json: unknown screen "ghost"/);
 });
+
+import { checkSrcPartialsRegistered } from "../scripts/registry-checks.js";
+
+test("checkSrcPartialsRegistered returns no errors when every src css file is a manifest partial", () => {
+  const manifest = { partials: ["src/a.css", "src/b.css"] };
+  const srcCssFiles = ["src/a.css", "src/b.css"];
+  assert.deepEqual(checkSrcPartialsRegistered(srcCssFiles, manifest), []);
+});
+
+test("checkSrcPartialsRegistered reports src css files that are missing from manifest.partials", () => {
+  const manifest = { partials: ["src/a.css"] };
+  const srcCssFiles = ["src/a.css", "src/orphan.css"];
+  const errors = checkSrcPartialsRegistered(srcCssFiles, manifest);
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /src\/orphan\.css: not listed in theme\.manifest\.yaml partials/);
+});
