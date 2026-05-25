@@ -52,3 +52,21 @@ test("scaffoldSnapshot creates a snapshot file at snapshots/<today>/<screen>.jso
   assert.deepEqual(parsed.elements, []);
   assert.match(parsed.capturedAt, /^2026-06-01/);
 });
+
+test("scaffoldSnapshot refuses to overwrite an existing snapshot file", () => {
+  const fsImpl = makeFsImpl({
+    "/repo/snapshots/2026-06-01/friends-page.json": "{}"
+  });
+
+  assert.throws(
+    () =>
+      scaffoldSnapshot({
+        screen: "friends-page",
+        today: "2026-06-01",
+        root: "/repo",
+        fsImpl,
+        screensDoc
+      }),
+    /refusing to overwrite existing file snapshots\/2026-06-01\/friends-page\.json/
+  );
+});
