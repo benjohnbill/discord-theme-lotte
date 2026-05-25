@@ -7,7 +7,7 @@
   "scripts": {
     "build": "node scripts/build-theme.js",
     "validate": "node scripts/validate-registry.js",
-    "sync": "node scripts/sync-to-vencord.js",
+    "sync": "npm run check && node scripts/sync-to-vencord.js",
     "check": "npm run validate && npm run build"
   },
   "dependencies": {
