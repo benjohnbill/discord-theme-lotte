@@ -30,7 +30,7 @@
 - Use Node built-in `node:test` for workspace contract tests.
 - Test build, registry, manifest, and safety behavior.
 - Do not test visual beauty with unit tests.
-- Do not add browser automation or visual regression to Milestone 1.
+- Keep Milestone 1 tests limited to Node workspace contract tests.
 
 ## Registry And Snapshot Rules
 
