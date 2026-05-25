@@ -145,3 +145,23 @@ test("checkScreensLatestSnapshot ignores screens without latestSnapshot", () => 
   const exists = () => false;
   assert.deepEqual(checkScreensLatestSnapshot(screensDoc, exists), []);
 });
+
+import { checkSnapshotsScreens } from "../scripts/registry-checks.js";
+
+test("checkSnapshotsScreens returns no errors when every snapshot screen is known", () => {
+  const screensDoc = { schemaVersion: 1, screens: { x: baseScreen } };
+  const snapshots = [
+    { path: "snapshots/2026-05-25/a.json", data: { screen: "x" } }
+  ];
+  assert.deepEqual(checkSnapshotsScreens(snapshots, screensDoc), []);
+});
+
+test("checkSnapshotsScreens reports snapshots whose screen is not in screens.yaml", () => {
+  const screensDoc = { schemaVersion: 1, screens: { x: baseScreen } };
+  const snapshots = [
+    { path: "snapshots/2026-05-25/a.json", data: { screen: "ghost" } }
+  ];
+  const errors = checkSnapshotsScreens(snapshots, screensDoc);
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /snapshots\/2026-05-25\/a\.json: unknown screen "ghost"/);
+});

@@ -71,3 +71,16 @@ export function checkScreensLatestSnapshot(screensDoc, exists) {
 
   return errors;
 }
+
+export function checkSnapshotsScreens(snapshots, screensDoc) {
+  const known = new Set(Object.keys(screensDoc?.screens ?? {}));
+  const errors = [];
+
+  for (const { path: snapshotPath, data } of snapshots) {
+    if (!known.has(data?.screen)) {
+      errors.push(`${snapshotPath}: unknown screen "${data?.screen}"`);
+    }
+  }
+
+  return errors;
+}
