@@ -6,6 +6,7 @@
   "description": "Maintainable Lotte-themed Vencord Discord CSS theme with DOM snapshots and selector registries.",
   "scripts": {
     "build": "node scripts/build-theme.js",
+    "test": "node --test",
     "validate": "node scripts/validate-registry.js",
     "sync": "npm run check && node scripts/sync-to-vencord.js",
     "check": "npm run validate && npm run build"
