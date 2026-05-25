@@ -54,6 +54,7 @@ const screensDoc = validate("screens", "schema/screens.schema.json", "registry/s
 const selectorsDoc = validate("selectors", "schema/selectors.schema.json", "registry/selectors.yaml", loadYaml);
 const doNotTouchDoc = validate("do-not-touch", "schema/do-not-touch.schema.json", "registry/do-not-touch.yaml", loadYaml);
 validate("risks", "schema/risks.schema.json", "registry/risks.yaml", loadYaml);
+validate("archive", "schema/archive.schema.json", "registry/archive.yaml", loadYaml);
 
 const paletteRoles = new Set(Object.keys(palette.palette ?? {}));
 const unknownRoles = Object.entries(selectorsDoc.selectors ?? {})
