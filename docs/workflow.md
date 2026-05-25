@@ -53,3 +53,60 @@
   - `test/selector-usage-contract.test.js`: every class in `registry/selectors.yaml` is referenced inside its `cssOwner` partial.
   - `test/snapshot-scaffold.test.js`: the snapshot scaffolder enforces its contract.
 - These tests do not launch a browser, do not open Discord, and do not touch the Vencord live theme directory.
+
+## Discord CDP Setup (one-time)
+
+The probe workflow needs Discord Desktop to expose Chrome DevTools Protocol on port 9333. This is a one-time Windows-side setup.
+
+### Windows side
+
+1. Locate the Discord shortcut (Start Menu or Desktop). The user's launcher path is `C:\Users\benjohnbill\AppData\Local\Discord\Update.exe`. Right-click the shortcut, choose Properties, and set Target to:
+
+   ```
+   C:\Users\benjohnbill\AppData\Local\Discord\Update.exe --processStart Discord.exe --process-start-args "--remote-debugging-port=9333"
+   ```
+
+2. Fully quit Discord, including the system tray icon. Relaunch Discord via the modified shortcut.
+
+3. Verify in Windows PowerShell:
+
+   ```powershell
+   curl http://localhost:9333/json/version
+   ```
+
+   The response is a JSON object that includes `Browser`, `Protocol-Version`, and `webSocketDebuggerUrl`. If the response is empty or the connection is refused, Discord was not relaunched through the modified shortcut.
+
+4. Open an elevated Command Prompt and run:
+
+   ```
+   netsh interface portproxy add v4tov4 listenport=9333 listenaddress=0.0.0.0 connectport=9333 connectaddress=127.0.0.1
+   ```
+
+   This makes Windows listen on every interface at port 9333 and forward to local 9333 so WSL can reach the Discord CDP endpoint. The portproxy survives reboot.
+
+5. If Windows Defender Firewall blocks inbound TCP 9333, add an allow rule scoped to the WSL subnet. The portproxy listens on `0.0.0.0`; on an untrusted network this is exposed to LAN. Only enable on trusted personal machines.
+
+### WSL side
+
+1. Find the Windows host IP visible from WSL:
+
+   ```bash
+   WINDOWS_HOST=$(ip route show default | awk '{print $3}')
+   echo "$WINDOWS_HOST"
+   ```
+
+2. Verify the endpoint:
+
+   ```bash
+   curl "http://${WINDOWS_HOST}:9333/json/version"
+   ```
+
+3. Export the URL so the probe CLI sees it:
+
+   ```bash
+   export DISCORD_CDP_URL="http://${WINDOWS_HOST}:9333"
+   ```
+
+   Add this line to `~/.zshenv` (or your shell's env file) to make it persistent.
+
+`DISCORD_CDP_URL` is intentionally separate from `BU_CDP_URL` so the browser-harness Chrome session and the Discord renderer session do not collide.
