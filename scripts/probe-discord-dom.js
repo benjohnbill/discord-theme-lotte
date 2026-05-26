@@ -59,6 +59,9 @@ async function evaluateOnTarget(webSocketDebuggerUrl, expression) {
   };
 
   const replied = new Promise((resolve, reject) => {
+    // Listener stays attached across messages because CDP may emit unsolicited
+    // events before our id=1 reply arrives; ws.close() below detaches once we
+    // match on data.id === 1.
     ws.addEventListener("message", (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -88,11 +91,27 @@ async function evaluateOnTarget(webSocketDebuggerUrl, expression) {
   throw new Error("CDP Runtime.evaluate returned an unexpected shape");
 }
 
-function buildRealCdpClient(baseUrl) {
+const DEFAULT_CDP_EVALUATE_TIMEOUT_MS = 10000;
+
+function buildRealCdpClient(baseUrl, { timeoutMs = DEFAULT_CDP_EVALUATE_TIMEOUT_MS } = {}) {
   return {
     async evaluate(expression) {
       const target = await findDiscordTarget(baseUrl);
-      return evaluateOnTarget(target.webSocketDebuggerUrl, expression);
+      let timeoutHandle;
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutHandle = setTimeout(
+          () => reject(new Error(`CDP Runtime.evaluate timed out after ${timeoutMs}ms; Discord may be unresponsive`)),
+          timeoutMs
+        );
+      });
+      try {
+        return await Promise.race([
+          evaluateOnTarget(target.webSocketDebuggerUrl, expression),
+          timeoutPromise
+        ]);
+      } finally {
+        clearTimeout(timeoutHandle);
+      }
     }
   };
 }
