@@ -110,3 +110,45 @@ The probe workflow needs Discord Desktop to expose Chrome DevTools Protocol on p
    Add this line to `~/.zshenv` (or your shell's env file) to make it persistent.
 
 `DISCORD_CDP_URL` is intentionally separate from `BU_CDP_URL` so the browser-harness Chrome session and the Discord renderer session do not collide.
+
+## Probe And Archive Workflow
+
+### When to run
+
+- Discord behavior on a specific screen looks different than last seen.
+- A registered selector seems to have no effect after Vencord reload.
+- After Vencord or Discord update notifications.
+
+### Probe
+
+1. Open Discord Desktop and navigate to the screen you want to verify (e.g. voice-panel by connecting to a voice channel).
+2. From WSL, with `DISCORD_CDP_URL` exported per the setup section:
+
+   ```bash
+   rtk npm run probe -- voice-panel
+   ```
+
+3. The probe prints a JSON object with `results` (per-class `{class, source, count}`), `present`, and `missing` arrays. Exit code is `0` when every class is observed at least once and `1` when any class is missing.
+
+### Archive
+
+When a class is in `missing` and you confirm Discord no longer renders it on the relevant screen:
+
+```bash
+rtk npm run archive -- <entry-key> --reason "<short why>" [--evidence "snapshots/YYYY-MM-DD/<screen>.json"] [--replaced-by <new-key>] [--from selectors|do-not-touch]
+```
+
+The command:
+
+- Reads the entry from `registry/selectors.yaml` or `registry/do-not-touch.yaml` (auto-detects if the key is unambiguous; otherwise requires `--from`).
+- Appends a record to `registry/archive.yaml` with `archivedAt: <today>`, the original entry as `snapshot`, and the provided `reason` / `evidence` / `replacedBy`.
+- Removes the entry from the source registry.
+
+The command does NOT touch CSS partials. After archiving, manually prune the orphan CSS block in the entry's former `cssOwner` partial if it now does nothing. `rtk npm run check` and `rtk npm test` should still pass.
+
+### Caveats
+
+- The probe is read-only. It runs only `document.querySelectorAll('.<class>').length` expressions through CDP.
+- The probe is screen-aware. A class that exists only when a voice call is active will be reported as missing if the user is not currently in a call. Open the correct Discord screen before probing.
+- Archive is forensic-only. Once an entry is archived, it is not garbage-collected; the file grows append-only. Audit `registry/archive.yaml` periodically when looking for replaced entries.
+- YAML serialization through `YAML.stringify` does not preserve source comments. Registry files in this repo currently carry no meaningful comments, so this is acceptable for M4 v1.
