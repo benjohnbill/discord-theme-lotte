@@ -50,7 +50,7 @@
 - `rtk npm test` runs the workspace contract suite, including:
   - `test/build-contract.test.js`: the generated theme follows the manifest output and partial order.
   - `test/registry-cross-references.test.js`: registry and snapshot cross-references hold.
-  - `test/selector-usage-contract.test.js`: every class in `registry/selectors.yaml` is referenced inside its `cssOwner` partial.
+  - `test/selector-usage-contract.test.js`: every class declared in `registry/selectors.yaml` is referenced inside the CSS partial named by that entry's `cssOwner` field (the partial path under `src/` that the selector entry says it lives in).
   - `test/snapshot-scaffold.test.js`: the snapshot scaffolder enforces its contract.
 - These tests do not launch a browser, do not open Discord, and do not touch the Vencord live theme directory.
 
@@ -128,7 +128,10 @@ The probe workflow needs Discord Desktop to expose Chrome DevTools Protocol on p
    rtk npm run probe -- voice-panel
    ```
 
-3. The probe prints a JSON object with `results` (per-class `{class, source, count}`), `present`, and `missing` arrays. Exit code is `0` when every class is observed at least once and `1` when any class is missing.
+3. The probe prints a JSON object with `results` (per-class `{class, source, count}`), `present`, and `missing` arrays. Exit codes:
+   - `0` — every registered class for the screen was observed at least once in the live DOM.
+   - `1` — at least one registered class was missing from the live DOM (the JSON payload still prints).
+   - `2` — the probe itself failed (no `DISCORD_CDP_URL`, no Discord renderer found, CDP error, unknown screen, etc.). An error message is written to stderr.
 
 ### Archive
 
@@ -143,6 +146,8 @@ The command:
 - Reads the entry from `registry/selectors.yaml` or `registry/do-not-touch.yaml` (auto-detects if the key is unambiguous; otherwise requires `--from`).
 - Appends a record to `registry/archive.yaml` with `archivedAt: <today>`, the original entry as `snapshot`, and the provided `reason` / `evidence` / `replacedBy`.
 - Removes the entry from the source registry.
+- The optional `--replaced-by <new-key>` records that the archived entry was succeeded by `<new-key>` in the same source registry. This is a forensic annotation only; the command does not verify that `<new-key>` exists. Use it when Discord renamed or restructured a class set and the active registry now has the replacement under a different entry key.
+- The optional `--from <selectors|do-not-touch>` disambiguates the source registry when an entry key happens to exist in both. Without it, the command auto-detects and refuses to proceed if the key is ambiguous.
 
 The command does NOT touch CSS partials. After archiving, manually prune the orphan CSS block in the entry's former `cssOwner` partial if it now does nothing. `rtk npm run check` and `rtk npm test` should still pass.
 
