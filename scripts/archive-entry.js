@@ -17,12 +17,20 @@ const SOURCES = {
 function parseArgs(argv) {
   const args = { key: undefined, from: undefined, reason: undefined, evidence: undefined, replacedBy: undefined };
 
-  for (let i = 0; i < argv.length; i++) {
+  function consumeValue(flag) {
+    if (i + 1 >= argv.length) {
+      throw new Error(`${flag} requires a value`);
+    }
+    return argv[++i];
+  }
+
+  let i = 0;
+  for (; i < argv.length; i++) {
     const token = argv[i];
-    if (token === "--from") args.from = argv[++i];
-    else if (token === "--reason") args.reason = argv[++i];
-    else if (token === "--evidence") args.evidence = argv[++i];
-    else if (token === "--replaced-by") args.replacedBy = argv[++i];
+    if (token === "--from") args.from = consumeValue("--from");
+    else if (token === "--reason") args.reason = consumeValue("--reason");
+    else if (token === "--evidence") args.evidence = consumeValue("--evidence");
+    else if (token === "--replaced-by") args.replacedBy = consumeValue("--replaced-by");
     else if (!args.key) args.key = token;
     else throw new Error(`unexpected argument: ${token}`);
   }
@@ -96,4 +104,7 @@ function main() {
   console.log(`Archived ${args.key} from ${source.file} → registry/archive.yaml`);
 }
 
-main();
+const isCli = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname);
+if (isCli) {
+  main();
+}
