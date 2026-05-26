@@ -4,13 +4,18 @@
   "private": true,
   "type": "module",
   "description": "Maintainable Lotte-themed Vencord Discord CSS theme with DOM snapshots and selector registries.",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "node scripts/build-theme.js",
     "test": "node --test",
     "validate": "node scripts/validate-registry.js",
     "sync": "npm run check && node scripts/sync-to-vencord.js",
     "check": "npm run validate && npm run build",
-    "snapshot:new": "node scripts/new-snapshot.js"
+    "snapshot:new": "node scripts/new-snapshot.js",
+    "archive": "node scripts/archive-entry.js",
+    "probe": "node scripts/probe-discord-dom.js"
   },
   "dependencies": {
     "ajv": "^8.17.1",
