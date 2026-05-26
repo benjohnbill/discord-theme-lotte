@@ -21,6 +21,8 @@ The user usually describes desired Discord theme behavior in visual language ins
 - Registries hold structured selector, screen, palette, and risk knowledge.
 - Snapshots hold raw DOM evidence gathered for a specific date and surface.
 - `CONTEXT.md` should change only when the domain language, visual direction, or safety boundaries change.
+- Drift detection is a separate cycle from active registry curation. Probe never modifies registries. Archive shrinks an active registry but never modifies CSS partials.
+- `CONTEXT.md` serves as the project's single domain glossary; no separate `DOMAIN_MAP.md` is maintained.
 
 ## Glossary
 
@@ -29,6 +31,10 @@ The user usually describes desired Discord theme behavior in visual language ins
 - **Selector evidence:** Snapshot or registry-backed reason to trust a Discord or Vencord selector.
 - **Source partial:** A CSS file listed in `theme.manifest.yaml` and concatenated into the generated theme.
 - **Dangerous selector:** A selector that can affect media playback, calls, streams, rendering surfaces, or other fragile Discord behavior.
+- **Drift detection:** The responsibility of noticing when registry knowledge has fallen out of sync with the live Discord DOM, and recording the resolution. Implemented in M3/M4 by the probe and archive commands; distinct from registry/snapshot management.
+- **Probe:** Read-only check that uses Chrome DevTools Protocol against a running Discord renderer to verify whether the classes registered for a screen are currently present in the live DOM. Implemented by `scripts/probe-discord-dom.js`. Does not modify any registry.
+- **Archive:** Forensic tombstone for a selector entry removed from an active registry. Implemented as `registry/archive.yaml` plus the `archive` command. Append-only, not garbage-collected. CSS pruning is the user's manual responsibility. See ADR-0001.
+- **Screen:** A registered Discord surface (e.g. `voice-panel`, `friends-page`), declared as an entry in `registry/screens.yaml`. Unit at which probe runs and snapshots are taken.
 
 ## Safety Boundaries
 
