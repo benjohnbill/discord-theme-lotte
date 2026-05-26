@@ -3,10 +3,14 @@ import path from "node:path";
 import process from "node:process";
 import YAML from "yaml";
 
-export function scaffoldSnapshot({ screen, today, root, fsImpl, screensDoc }) {
+export function scaffoldSnapshot({ screen, today, root, fsImpl, screensDoc, themeVersion }) {
   const knownScreens = new Set(Object.keys(screensDoc?.screens ?? {}));
   if (!knownScreens.has(screen)) {
     throw new Error(`unknown screen "${screen}". Add it to registry/screens.yaml first.`);
+  }
+
+  if (typeof themeVersion !== "string" || themeVersion.length === 0) {
+    throw new Error("themeVersion is required; pass the value from package.json");
   }
 
   const relativePath = `snapshots/${today}/${screen}.json`;
@@ -21,7 +25,7 @@ export function scaffoldSnapshot({ screen, today, root, fsImpl, screensDoc }) {
     capturedAt: `${today}T00:00:00+09:00`,
     discordBuild: "unknown",
     vencordVersion: "unknown",
-    themeVersion: "0.1.0",
+    themeVersion,
     os: "unknown",
     zoom: "unknown",
     screen,
@@ -47,6 +51,7 @@ function main() {
 
   const root = process.cwd();
   const screensDoc = YAML.parse(nodeFs.readFileSync(path.join(root, "registry/screens.yaml"), "utf8"));
+  const pkg = JSON.parse(nodeFs.readFileSync(path.join(root, "package.json"), "utf8"));
   const today = new Date().toISOString().slice(0, 10);
 
   const { relativePath } = scaffoldSnapshot({
@@ -54,7 +59,8 @@ function main() {
     today,
     root,
     fsImpl: nodeFs,
-    screensDoc
+    screensDoc,
+    themeVersion: pkg.version
   });
 
   console.log(`Scaffolded ${relativePath}`);

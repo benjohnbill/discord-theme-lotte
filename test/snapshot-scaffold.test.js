@@ -36,7 +36,8 @@ test("scaffoldSnapshot creates a snapshot file at snapshots/<today>/<screen>.jso
     today: "2026-06-01",
     root: "/repo",
     fsImpl,
-    screensDoc
+    screensDoc,
+    themeVersion: "9.9.9"
   });
 
   assert.equal(result.relativePath, "snapshots/2026-06-01/friends-page.json");
@@ -49,8 +50,25 @@ test("scaffoldSnapshot creates a snapshot file at snapshots/<today>/<screen>.jso
   assert.equal(parsed.routeHint, "replace-with-current-route");
   assert.equal(parsed.sourceScreenshot, "replace-with-screenshot-path");
   assert.equal(parsed.discordBuild, "unknown");
+  assert.equal(parsed.themeVersion, "9.9.9");
   assert.deepEqual(parsed.elements, []);
   assert.match(parsed.capturedAt, /^2026-06-01/);
+});
+
+test("scaffoldSnapshot requires themeVersion to be provided by the caller", () => {
+  const fsImpl = makeFsImpl();
+
+  assert.throws(
+    () =>
+      scaffoldSnapshot({
+        screen: "friends-page",
+        today: "2026-06-01",
+        root: "/repo",
+        fsImpl,
+        screensDoc
+      }),
+    /themeVersion is required/
+  );
 });
 
 test("scaffoldSnapshot refuses to overwrite an existing snapshot file", () => {
@@ -65,7 +83,8 @@ test("scaffoldSnapshot refuses to overwrite an existing snapshot file", () => {
         today: "2026-06-01",
         root: "/repo",
         fsImpl,
-        screensDoc
+        screensDoc,
+        themeVersion: "0.1.0"
       }),
     /refusing to overwrite existing file snapshots\/2026-06-01\/friends-page\.json/
   );

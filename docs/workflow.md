@@ -46,7 +46,7 @@
 
 ## Helpers
 
-- `rtk npm run snapshot:new -- <screen-id>` creates `snapshots/YYYY-MM-DD/<screen-id>.json` with placeholder metadata for the requested screen. The script refuses to overwrite an existing file and refuses screens that are not in `registry/screens.yaml`. Replace placeholder fields (`viewport`, `routeHint`, `sourceScreenshot`, and the `elements` array) before committing.
+- `rtk npm run snapshot:new -- <screen-id>` creates `snapshots/YYYY-MM-DD/<screen-id>.json` with placeholder metadata for the requested screen. The script refuses to overwrite an existing file and refuses screens that are not in `registry/screens.yaml`. The `themeVersion` field is auto-filled from `package.json` and stays correct as the theme version advances. Replace placeholder fields (`viewport`, `routeHint`, `sourceScreenshot`, the `elements` array, and the `discordBuild` / `vencordVersion` / `os` / `zoom` `"unknown"` markers as relevant) before committing.
 - `rtk npm test` runs the workspace contract suite, including:
   - `test/build-contract.test.js`: the generated theme follows the manifest output and partial order.
   - `test/registry-cross-references.test.js`: registry and snapshot cross-references hold.
