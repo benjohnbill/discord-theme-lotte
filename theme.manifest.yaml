@@ -1,5 +1,9 @@
 schemaVersion: 1
 output: dist/NewKemonoFriends.theme.css
+webOutput:
+  path: dist/NewKemonoFriends.user.css
+  domain: discord.com
+  updateURL: https://raw.githubusercontent.com/benjohnbill/discord-theme-lotte/master/dist/NewKemonoFriends.user.css
 vencordTarget: /mnt/c/Users/benjohnbill/AppData/Roaming/Vencord/themes/NewKemonoFriends.theme.css
 partials:
   - src/header.css
