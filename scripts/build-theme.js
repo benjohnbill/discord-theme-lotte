@@ -40,12 +40,20 @@ if (manifest.webOutput) {
 
   const meta = parseHeaderMeta(chunks[0]);
   const userStyleHeader = buildUserStyleHeader(meta, web);
-  const wrappedBody = `@-moz-document domain(${JSON.stringify(web.domain)}) {\n${desktopBody}}\n`;
+  const escapedBody = escapeNonAscii(desktopBody);
+  const wrappedBody = `@-moz-document domain(${JSON.stringify(web.domain)}) {\n${escapedBody}}\n`;
   const webPath = path.join(root, web.path);
   fs.mkdirSync(path.dirname(webPath), { recursive: true });
   fs.writeFileSync(webPath, `${userStyleHeader}\n${wrappedBody}`, "utf8");
 
   console.log(`Built ${web.path} (Stylus userstyle for ${web.domain})`);
+}
+
+function escapeNonAscii(str) {
+  return str.replace(/[-￿]/g, (ch) => {
+    const hex = ch.charCodeAt(0).toString(16).toUpperCase().padStart(6, "0");
+    return `\\${hex} `;
+  });
 }
 
 function parseHeaderMeta(headerChunk) {
