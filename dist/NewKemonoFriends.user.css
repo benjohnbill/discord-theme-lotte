@@ -5294,9 +5294,9 @@
 /* source: src/base/background.css */
 /* source: src/base/background.css */
 .app__160d8 {
-  background-image: url(https://i.imgur.com/DQBsw2D.png);
+  background-image: url(https://i.imgur.com/qbcjGns.jpeg);
   background-size: cover;
-  background-position: center 45%;
+  background-position: center;
   background-repeat: no-repeat;
   background-color: transparent;
 }
@@ -5690,27 +5690,27 @@
     box-shadow: inset 0 0 0 1px rgba(var(--lotte-secondary-purple-rgb), .62), 0 0 8px rgba(var(--lotte-secondary-purple-rgb), .24) !important;
 }
 
-#app-mount .panels__5e434 [aria-label*="카메라"],
-#app-mount .panels__5e434 [aria-label*="화면 공유"],
-#app-mount .panels__5e434 [aria-label*="활동 시작"],
-#app-mount .panels__5e434 [aria-label*="사운드보드"],
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="카메라"],
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="화면 공유"],
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="활동 시작"],
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="사운드보드"] {
+#app-mount .panels__5e434 [aria-label*="\00CE74 \00BA54 \00B77C "],
+#app-mount .panels__5e434 [aria-label*="\00D654 \00BA74  \00ACF5 \00C720 "],
+#app-mount .panels__5e434 [aria-label*="\00D65C \00B3D9  \00C2DC \00C791 "],
+#app-mount .panels__5e434 [aria-label*="\00C0AC \00C6B4 \00B4DC \00BCF4 \00B4DC "],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00CE74 \00BA54 \00B77C "],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00D654 \00BA74  \00ACF5 \00C720 "],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00D65C \00B3D9  \00C2DC \00C791 "],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00C0AC \00C6B4 \00B4DC \00BCF4 \00B4DC "] {
     background-color: rgba(var(--lotte-main-pink-rgb), .28) !important;
     color: white !important;
     box-shadow: inset 0 0 0 1px rgba(var(--lotte-main-pink-rgb), .42), 0 0 8px rgba(var(--lotte-main-pink-rgb), .14) !important;
 }
 
-#app-mount .panels__5e434 [aria-label*="카메라"]:hover,
-#app-mount .panels__5e434 [aria-label*="화면 공유"]:hover,
-#app-mount .panels__5e434 [aria-label*="활동 시작"]:hover,
-#app-mount .panels__5e434 [aria-label*="사운드보드"]:hover,
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="카메라"]:hover,
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="화면 공유"]:hover,
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="활동 시작"]:hover,
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="사운드보드"]:hover {
+#app-mount .panels__5e434 [aria-label*="\00CE74 \00BA54 \00B77C "]:hover,
+#app-mount .panels__5e434 [aria-label*="\00D654 \00BA74  \00ACF5 \00C720 "]:hover,
+#app-mount .panels__5e434 [aria-label*="\00D65C \00B3D9  \00C2DC \00C791 "]:hover,
+#app-mount .panels__5e434 [aria-label*="\00C0AC \00C6B4 \00B4DC \00BCF4 \00B4DC "]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00CE74 \00BA54 \00B77C "]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00D654 \00BA74  \00ACF5 \00C720 "]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00D65C \00B3D9  \00C2DC \00C791 "]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00C0AC \00C6B4 \00B4DC \00BCF4 \00B4DC "]:hover {
     background-color: rgba(var(--lotte-main-pink-rgb), .42) !important;
     box-shadow: inset 0 0 0 1px rgba(var(--lotte-main-pink-rgb), .62), 0 0 10px rgba(var(--lotte-main-pink-rgb), .20) !important;
 }
@@ -5737,34 +5737,34 @@
     box-shadow: inset 0 0 0 1px rgba(var(--lotte-main-pink-rgb), .62), 0 0 10px rgba(var(--lotte-main-pink-rgb), .20) !important;
 }
 
-#app-mount .panels__5e434 [aria-label*="음소거"],
-#app-mount .panels__5e434 [aria-label*="입력"],
-#app-mount .panels__5e434 [aria-label*="출력"],
-#app-mount .panels__5e434 [aria-label*="사용자 설정"],
+#app-mount .panels__5e434 [aria-label*="\00C74C \00C18C \00AC70 "],
+#app-mount .panels__5e434 [aria-label*="\00C785 \00B825 "],
+#app-mount .panels__5e434 [aria-label*="\00CD9C \00B825 "],
+#app-mount .panels__5e434 [aria-label*="\00C0AC \00C6A9 \00C790  \00C124 \00C815 "],
 #app-mount .panels__5e434 [aria-label*="Krisp"],
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="음소거"],
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="입력"],
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="출력"],
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="사용자 설정"],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00C74C \00C18C \00AC70 "],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00C785 \00B825 "],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00CD9C \00B825 "],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00C0AC \00C6A9 \00C790  \00C124 \00C815 "],
 #app-mount [class*="panels_"][class*="5e434"] [aria-label*="Krisp"] {
     background-color: var(--lotte-panel-dark) !important;
     color: #E9D8FF !important;
     box-shadow: inset 0 0 0 1px rgba(var(--lotte-secondary-purple-rgb), .38) !important;
 }
 
-#app-mount .panels__5e434 [aria-label*="연결 끊기"],
-#app-mount .panels__5e434 [aria-label*="통화 종료"],
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="연결 끊기"],
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="통화 종료"] {
+#app-mount .panels__5e434 [aria-label*="\00C5F0 \00ACB0  \00B04A \00AE30 "],
+#app-mount .panels__5e434 [aria-label*="\00D1B5 \00D654  \00C885 \00B8CC "],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00C5F0 \00ACB0  \00B04A \00AE30 "],
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00D1B5 \00D654  \00C885 \00B8CC "] {
     background-color: rgba(var(--lotte-danger-rose-rgb), .38) !important;
     color: white !important;
     box-shadow: inset 0 0 0 1px rgba(var(--lotte-danger-rose-rgb), .58), 0 0 8px rgba(var(--lotte-danger-rose-rgb), .16) !important;
 }
 
-#app-mount .panels__5e434 [aria-label*="연결 끊기"]:hover,
-#app-mount .panels__5e434 [aria-label*="통화 종료"]:hover,
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="연결 끊기"]:hover,
-#app-mount [class*="panels_"][class*="5e434"] [aria-label*="통화 종료"]:hover {
+#app-mount .panels__5e434 [aria-label*="\00C5F0 \00ACB0  \00B04A \00AE30 "]:hover,
+#app-mount .panels__5e434 [aria-label*="\00D1B5 \00D654  \00C885 \00B8CC "]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00C5F0 \00ACB0  \00B04A \00AE30 "]:hover,
+#app-mount [class*="panels_"][class*="5e434"] [aria-label*="\00D1B5 \00D654  \00C885 \00B8CC "]:hover {
     background-color: rgba(var(--lotte-strong-danger-rgb), .58) !important;
 }
 
