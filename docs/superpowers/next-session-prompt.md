@@ -1,104 +1,56 @@
-# Next Session Handoff — M3 + M4 Implementation
+# Next Session Handoff — Lotte Live2D Aliveness, Phase 0 (Feasibility Spike)
 
-Paste the body below (everything inside the `---` block) into the next Claude session as the initial prompt. It is self-contained; the next session's controller agent will not see this session's history.
+> Replaces the completed M3/M4 handoff (those milestones shipped; PR #2). This is a thin launcher by design — the substance lives in the plan and in auto-loaded memory, not here. (Per the project's own memory model, handoff files are low-trust; do not put substance here that could go stale.)
+
+Paste the body below (inside the `---` block) into the next Claude session as the initial prompt. It is self-contained; the next session will not see this session's history.
 
 ---
 
 ## Task
 
-Execute two implementation plans sequentially using the `superpowers:subagent-driven-development` skill:
+Execute **Phase 0 only** of the plan `docs/superpowers/plans/2026-05-31-lotte-live2d-aliveness.md`. Do not rewrite or "improve" the plan — execute as written.
 
-1. **M3** — `docs/superpowers/plans/2026-05-25-theme-change-workflow.md`
-2. **M4** — `docs/superpowers/plans/2026-05-25-discord-dom-probe-and-archive.md`
+Phase 0 is a **feasibility spike**: prove (or disprove) that a single Live2D rig can render live inside the Discord desktop client as a cursor-aware full-window background, using a FREE sample model — before any art-rigging or Vencord-maintenance labor.
 
-Both plans were authored in a prior session, reviewed inline, and committed to master. Do not re-write or "improve" them. Execute as written.
+## Read first (substance lives here, not in this handoff)
+
+1. `MEMORY.md` auto-loads — see memory `lotte-live2d-aliveness-direction` for the decided design + open gates.
+2. The plan's **Background** section carries the full design rationale and the rejected alternatives. Do not re-derive or re-litigate them.
 
 ## Working directory
 
 `/home/benjohnbill/dev/discord-theme-lotte`
 
-## Repo state at handoff (2026-05-25)
+## Setup
 
-Origin branches:
+- Work in an isolated worktree off `master`, per repo convention (one worktree per initiative). Invoke `superpowers:using-git-worktrees`; suggested branch `live2d-spike`:
+  ```bash
+  rtk git worktree add /home/benjohnbill/dev/discord-theme-lotte/.worktrees/live2d-spike -b live2d-spike master
+  ```
+- Spike artifacts go in `experiments/live2d-spike/` — outside the theme build pipeline (NOT in `src/`, NOT in `theme.manifest.yaml`).
 
-| Branch | Status | Notes |
-|---|---|---|
-| `master` | base | Latest commit adds three plans under `docs/superpowers/plans/`. |
-| `workspace-memory-foundation` | M1, open as PR #1 (https://github.com/benjohnbill/discord-theme-lotte/pull/1) | NOT merged. |
-| `registry-hardening` | M2, pushed, no PR | Stacks on `workspace-memory-foundation`. 8 commits. |
+## Execution order & the hard safety boundary
 
-Test/check baseline on `registry-hardening` tip: `rtk npm test` → 17 tests pass; `rtk npm run check` → prints `ok registry cross-references` before the build line.
+Use `superpowers:subagent-driven-development` or `executing-plans`.
 
-## Branch strategy — linear stack
-
-- **M3** → new branch `theme-change-workflow`, branched off `registry-hardening` (M2 tip).
-- **M4** → new branch `discord-dom-probe-and-archive`, branched off `theme-change-workflow` (M3 tip).
-
-Final stack: `master → workspace-memory-foundation (M1) → registry-hardening (M2) → theme-change-workflow (M3) → discord-dom-probe-and-archive (M4)`.
-
-Reason for stacking M3 on M2: M3's Task 5 Step 4 expects `rtk npm run check` to print `ok registry cross-references`, which is M2's behavior.
-
-## Workflow per milestone
-
-For each plan in order (M3 first, then M4):
-
-1. Invoke `superpowers:using-git-worktrees`. Create worktree at `.worktrees/<branch-name>` (already gitignored). Branch off the previous milestone's tip per the strategy above. Example for M3:
-   ```bash
-   rtk git worktree add /home/benjohnbill/dev/discord-theme-lotte/.worktrees/theme-change-workflow -b theme-change-workflow registry-hardening
-   ```
-2. Inside the worktree, run `rtk npm install`.
-3. Confirm baseline: `rtk npm test` and `rtk npm run check`. Stop and escalate if anything is red before M3 starts.
-4. Read the plan file ONCE and extract all tasks verbatim, then create a `TaskCreate` entry per plan task.
-5. Invoke `superpowers:subagent-driven-development`. For each task:
-   - Dispatch one implementer subagent (general-purpose) with the FULL task text + context. Do not have the subagent read the plan file — paste the task body into the prompt.
-   - After implementer reports DONE: dispatch spec compliance reviewer (independent verification, must read code not report).
-   - After spec ✅: dispatch code quality reviewer.
-   - Fix loop until both reviewers approve.
-   - Mark TaskUpdate completed.
-6. After all tasks complete, dispatch a final code reviewer over the whole branch diff (base = previous milestone's tip).
-7. Push the branch with upstream tracking:
-   ```bash
-   rtk git push -u origin <branch-name>
-   ```
-8. Move to the next milestone.
+- **Task 1 (read-only Vencord inspection)** and **Task 2 (standalone browser Live2D spike)** are SAFE — auto-execute both. They do not touch Discord.
+- **STOP after Task 2 and report to the user before Task 3.** Task 3 stands up a Vencord dev build and runs `pnpm inject`, which **patches the user's real Discord desktop client** — an invasive, semi-irreversible, external-effect action (Tier 3 in the user's operating model). Do NOT inject autonomously. Present Task 1's findings (stock vs dev install, the dev-build cost) and Task 2's result, and get explicit user go-ahead before proceeding to Task 3.
 
 ## Hard rules
 
-- **Shell:** prefix every command with `rtk` (token-optimization proxy). Examples: `rtk npm test`, `rtk git add`, `rtk git worktree add ...`.
-- **Sync:** NEVER run `rtk npm run sync`. NEVER edit `/mnt/c/Users/benjohnbill/AppData/Roaming/Vencord/themes/...`.
-- **Probe:** NEVER run `rtk npm run probe` against real Discord during plan execution. M4's Task 7 explicitly verifies the probe CLI handles the missing-env-var case; it does NOT invoke a real probe.
-- **Master:** NEVER edit or push `master` directly.
-- **PRs:** Do NOT open PRs in this session. Defer to user.
-- **Amends/force-push:** NEVER amend or force-push. Always create new commits.
-- **Plan fidelity:** match the plan's commit messages verbatim. Match every code block verbatim. Match every command verbatim.
-- **Scope:** if a plan task seems too small / too big / poorly factored, escalate as a concern in the implementer's report — do NOT silently restructure.
+- **Shell:** prefix dev commands with `rtk` (token-optimization proxy): `rtk npm install`, `rtk git ...`.
+- **Existing Vencord install:** READ-ONLY. Never run `rtk npm run sync`. Never edit `/mnt/c/Users/benjohnbill/AppData/Roaming/Vencord/themes/...`. (Task 1 only *reads* that tree.)
+- **master:** never edit or push directly. No PRs this session — defer to the user.
+- **No amend/force-push.** New commits only, with the plan's commit messages verbatim.
+- **Aesthetic guardrails (for any rendering you eyeball):** Tier 1 only — restraint is the whole game. The face is large, so no aggressive cursor tracking; gentle/under-animated beats uncanny.
 
-## Reference — prior milestone shape (so you know what "good" looks like)
+## What success looks like (Phase 0)
 
-M2's 8 commits on `registry-hardening` follow a strict shape:
-
-- One commit per plan task.
-- Each TDD task = 5 steps: write failing test → run-fail → implement → run-pass → commit.
-- Pure module + CLI shim pattern: `scripts/<name>-lib.js` (no I/O, exports pure functions) consumed by both tests and `scripts/<name>.js` CLI shim.
-- Tests use synthetic fixtures, never real registry data, never touch the filesystem in unit tests.
-- Defensive `?? {}` / `?? []` patterns throughout.
-
-M3 and M4 follow this same shape. Don't drift.
+- `experiments/live2d-spike/FINDINGS.md` records: Gate-1 install type + plugin-capability verdict (Task 1), standalone runtime PASS/FAIL + screenshot (Task 2), and — only if the user approved Task 3 — in-Discord injection result + CSP outcome (Task 3), plus a final GO / GO-WITH-COST / NO-GO recommendation (Task 4).
+- A working `experiments/live2d-spike/index.html` + `0b-standalone.png` committed.
+- `master` untouched; existing Vencord themes dir untouched; no `npm run sync`.
+- If GO: the session ends by proposing the Phase 1 plan (rig the real Lotte) — do not start Phase 1 without user sign-off.
 
 ## Stopping conditions
 
-Stop and report to the user when:
-- Both branches are pushed, all tasks complete, final code reviewers approved.
-- OR: A plan task is genuinely blocked (ambiguity, environment issue, or escalation from implementer subagent).
-- OR: A spec/code reviewer rejects work that the implementer cannot fix within one re-review cycle.
-
-Do NOT stop to ask "should I continue?" between tasks. Auto-execute the full plan.
-
-## What success looks like
-
-At end of session:
-- `theme-change-workflow` branch pushed to origin. All M3 tasks complete. Tests: 17 → ~20 (build-contract + 16 cross-reference + ~3 new from M3).
-- `discord-dom-probe-and-archive` branch pushed to origin. All M4 tasks complete. Tests: ~20 → 31 (adds 7 archive-lib + 7 probe-lib subtests).
-- `master` untouched, no PRs created, Vencord live dir untouched, no `npm run sync` invocation, no real Discord probe invocation.
-
-Final report should include each branch's HEAD SHA, commit count vs base, test counts, and any concerns from the final code reviews.
+Stop and report when: Task 2 is done and you need user approval for Task 3; OR Phase 0 reaches a go/no-go; OR a task is genuinely blocked (environment/ambiguity).
