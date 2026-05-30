@@ -125,10 +125,62 @@ use SwiftShader flags or the real client — never plain `bh-chrome`.
 
 ## Gate 1 proof — in Discord (Task 3)
 
-_(pending — requires explicit user approval; patches the real Discord client)_
+**DEFERRED (not run; user decision, 2026-05-31).** Task 3 patches the real Discord desktop
+client (`pnpm inject`), which is an invasive Tier-3 action. At the Task-2 hard stop the user
+chose to record a go/no-go from current evidence rather than stand up a throwaway Vencord dev
+build this session. The in-Discord render + CSP proof is therefore **deferred, not abandoned**.
+
+What remains to close this gate later:
+- Stand up a Vencord source build (steps recorded in the Gate 1 dev-build path above), build on
+  the side that owns the Discord install, run `pnpm inject`.
+- Create the userplugin from `vencord-plugin/lotteLive2dSpike/index.tsx`, **using the corrected
+  runtime triplet from the Task 2 section** (`cubism2.min.js`, not `index.min.js`; the `dylanNew`
+  Cubism 2 core mirror). The plugin code as drafted in the plan would fail identically to the
+  standalone bug we already fixed.
+- Watch the DevTools console for a CSP `Refused to load the script …` error. If it appears,
+  first try relaxing it via `native-settings.json` `customCspRules` (already proven to work for
+  this install) with a `script-src` entry for `cdn.jsdelivr.net`; bundling the runtime into the
+  plugin is the heavier fallback.
 
 ---
 
 ## Decision (Task 4)
 
-_(pending)_
+### The three gates
+
+1. **Does the runtime render + track the cursor?** (Task 2) — **YES.** `pixi-live2d-display@0.4.0`
+   (`cubism2.min.js`) + PIXI v6 + the `dylanNew` Cubism 2 core mirror renders the Shizuku sample
+   and follows a target via `model.focus(x, y)`. Proven with software WebGL (SwiftShader);
+   evidence committed.
+2. **Can a custom plugin run in this Vencord, and at what cost?** (Task 1) — **NOT as-is.** This is
+   a STOCK install with no source clone. Custom plugins require standing up a Vencord **source/dev
+   build** and `pnpm inject`-ing it into the Windows Discord, plus re-building after Discord/Vencord
+   updates. The actual in-Discord run was **deferred** (Task 3 not executed).
+3. **Does Discord's CSP allow the remote scripts, or is bundling required?** (Task 3) — **UNTESTED**
+   (Task 3 deferred). Positive signal: this install already uses Vencord `customCspRules`
+   (`native-settings.json`), so a per-domain `script-src` relaxation is a plausible lighter path
+   than full bundling.
+
+### Recommendation: **GO-WITH-COST**
+
+The runtime half of the stack is proven. The Discord-injection half is technically expected to
+work (Discord's Electron has real WebGL; Vencord supports custom plugins and custom CSP), but it
+carries a **real, recurring cost**: a self-built Vencord that must be re-built/re-injected on
+updates, set up across the WSL↔Windows boundary. That cost must be **explicitly accepted by the
+user before Phase 1/2**.
+
+**Important de-risking note:** the proven standalone rig is the portable artifact reused across
+*all* target surfaces. The desktop wallpaper (Lively) and mobile live-wallpaper surfaces have **no
+plugin/CSP constraints** — the Task 2 PASS already guarantees the rig works there. Discord is the
+*only* surface gated on the still-unverified injection. So rigging the real Lotte (Phase 1) is
+low-risk regardless of the Discord-injection outcome: if Discord injection later proves
+unacceptable, the same rig still ships on wallpaper/mobile (the plan's documented NO-GO fallback).
+
+### Next-step options for the user (no work started without sign-off)
+
+- **A — Close Gate 1 first:** do the deferred Task 3 (throwaway Vencord dev build + inject) before
+  any rigging, to fully confirm Discord before investing art labor.
+- **B — Proceed to Phase 1 rigging now:** accept the GO-WITH-COST; rig Lotte against the proven
+  plumbing (safe because the rig is portable to the unconstrained surfaces even if Discord slips).
+- **C — Pivot the flagship to desktop wallpaper (Lively):** if the Discord dev-build maintenance
+  cost is unwelcome, make the constraint-free wallpaper surface the primary target.
