@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    html, body { margin: 0; height: 100%; background: #1e1f3a; overflow: hidden; }
+    #c { display: block; width: 100vw; height: 100vh; }
+    #status { position: fixed; top: 8px; left: 8px; color: #fff; font: 14px monospace; }
+  </style>
+</head>
+<body>
+  <div id="status">loading…</div>
+  <canvas id="c"></canvas>
+  <script>
+    // Load the runtime sequentially (await each) so order is deterministic regardless of
+    // the browser's script scheduling. Mirrors the Task 3 Vencord plugin's loadScript loop.
+    //   1. Cubism 2 Core   — the Shizuku sample model is Cubism 2.1.
+    //      (the original cubism.live2d.com/webgl/live2d.min.js now 404s; this is the
+    //       canonical community mirror referenced by the pixi-live2d-display docs.)
+    //   2. PIXI v6         — pixi-live2d-display 0.4.x targets PIXI v6 and reads window.PIXI(.utils).
+    //   3. pixi-live2d-display 0.4.0 — Cubism-2-ONLY bundle (cubism2.min.js).
+    //      The combined index.min.js throws at load ("requires live2dcubismcore.js")
+    //      because it demands the Cubism 4 runtime even for Cubism 2.1 models.
+    //      cubism2.min.js has no Cubism 4 dependency and still exposes PIXI.live2d.Live2DModel.
+    const SCRIPTS = [
+      "https://cdn.jsdelivr.net/gh/dylanNew/live2d/webgl/Live2D/lib/live2d.min.js",
+      "https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js",
+      "https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism2.min.js",
+    ];
+    const MODEL = "https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display/test/assets/shizuku/shizuku.model.json";
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement("script");
+        s.src = src;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("failed to load " + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    (async () => {
+      const status = document.getElementById('status');
+      try {
+        for (const src of SCRIPTS) await loadScript(src);
+        if (!(window.PIXI && window.PIXI.live2d && window.PIXI.live2d.Live2DModel)) {
+          throw new Error("PIXI.live2d.Live2DModel missing after load");
+        }
+        const app = new PIXI.Application({
+          view: document.getElementById('c'),
+          resizeTo: window,
+          backgroundAlpha: 0,
+          autoStart: true,
+        });
+        const model = await PIXI.live2d.Live2DModel.from(MODEL);
+        app.stage.addChild(model);
+        const fit = () => {
+          const s = Math.min(window.innerWidth / model.width, window.innerHeight / model.height) * 0.9;
+          model.scale.set(s);
+          model.anchor.set(0.5, 0.5);
+          model.position.set(window.innerWidth / 2, window.innerHeight / 2);
+        };
+        // Re-fit across the first frames: model.width/height only settle once the textures
+        // finish loading, so a single early fit() can mis-scale (zoomed-in) the first frame.
+        let frames = 0;
+        const refit = () => { fit(); if (++frames < 30) requestAnimationFrame(refit); };
+        refit();
+        window.addEventListener('resize', fit);
+        // Expose for scripted verification (cursor tracking via model.focus(x, y)).
+        window.__live2d = { app, model };
+        // autoInteract is ON by default → moving the mouse drives model.focus().
+        status.textContent = 'rendered. move the mouse — eyes/head should follow.';
+      } catch (e) {
+        status.textContent = 'ERROR: ' + (e && e.message ? e.message : e);
+        console.error(e);
+      }
+    })();
+  </script>
+</body>
+</html>

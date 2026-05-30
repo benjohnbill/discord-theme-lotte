@@ -1,0 +1,4 @@
+node_modules/
+*.moc
+*.moc3
+models/

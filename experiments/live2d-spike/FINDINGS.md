@@ -71,7 +71,55 @@ Windows side (Node + pnpm on Windows). Confirm which works during Task 3.
 
 ## Gate runtime — standalone Live2D (Task 2)
 
-_(pending)_
+**Verdict: PASS.** `pixi-live2d-display` renders the Shizuku sample model and tracks a
+target point via `model.focus(x, y)` — the exact call the Task 3 plugin uses.
+
+Evidence (committed):
+- `0b-standalone.png` — `index.html` rendered: Shizuku visible, status line reads
+  `rendered. move the mouse — eyes/head should follow.` (close framing is a cosmetic
+  fit-timing artifact, not a render failure).
+- `0b-track-tl.png` / `0b-track-br.png` — gaze pinned to opposite corners
+  (`focus(0,0)` vs `focus(innerW, innerH)`). The head rotation and eye direction
+  visibly differ between the two → focus-driven cursor tracking confirmed.
+
+### Three corrections vs the plan's literal code (all were authorized verify-and-record steps)
+
+1. **Cubism 2 core URL moved.** `https://cubism.live2d.com/webgl/live2d.min.js` now returns
+   **404**. Replaced with the canonical community mirror the pixi-live2d-display docs point to:
+   `https://cdn.jsdelivr.net/gh/dylanNew/live2d/webgl/Live2D/lib/live2d.min.js` (200, exposes `window.Live2D`).
+2. **Wrong pixi-live2d-display bundle.** The combined `dist/index.min.js` throws at load:
+   `Uncaught Error: Could not find Cubism 4 runtime. This plugin requires live2dcubismcore.js to be loaded.`
+   It demands the Cubism **4** runtime even for a Cubism **2.1** model, which leaves
+   `PIXI.live2d` as an empty namespace (so `Live2DModel` is undefined). Fix: load the
+   **Cubism-2-only** bundle `dist/cubism2.min.js` (no Cubism 4 dependency; still exposes
+   `PIXI.live2d.Live2DModel`). Version pinned to `@0.4.0` (targets PIXI v6).
+3. **Deterministic loading + re-fit.** `index.html` now loads the three scripts sequentially
+   (awaited `loadScript` loop, mirroring the Task 3 plugin) and re-fits across the first frames
+   (model bounds settle only after textures load).
+
+Final working runtime triplet (use this verbatim in Task 3):
+```
+https://cdn.jsdelivr.net/gh/dylanNew/live2d/webgl/Live2D/lib/live2d.min.js   # Cubism 2 core
+https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js          # PIXI v6
+https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism2.min.js    # NOT index.min.js
+```
+
+### Environment-alignment caveat (important — do not misread as a NO-GO signal)
+
+The project's default headless browser (`bh-chrome` / WSLg Chrome) has **no WebGL at all**
+(`webgl`, `webgl2`, `experimental-webgl` all return null; the service launches plain
+`google-chrome` with no GL flags, and WSLg's GPU passthrough yields no usable GL context).
+PIXI requires WebGL, so on that browser the spike fails with
+`WebGL unsupported in this browser` — a **false negative** that says nothing about the real target.
+
+To get a valid render, the spike was run in a throwaway headless Chrome with **software WebGL**
+(`--enable-unsafe-swiftshader --use-gl=angle --use-angle=swiftshader`). All three screenshots
+above were produced this way.
+
+Implication for Task 3: Discord's Electron client ships a full Chromium GPU stack **with** WebGL,
+so the WebGL gate is expected to pass there. SwiftShader proves the code path; it does **not**
+measure GPU performance (not a Phase 0 goal). Any future headless verification of this rig must
+use SwiftShader flags or the real client — never plain `bh-chrome`.
 
 ---
 
