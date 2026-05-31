@@ -21,7 +21,9 @@
 
 **Memory-layer mechanic (easy to forget — it is OUTSIDE the repo):** surfaces 7/8 are the cross-session memory. Editing the on-disk `.md` files is what persists; the shorter copy injected into the session prompt is a *summary* of them. Always reconcile the memory layer, not just in-repo docs.
 
-**Read order for a fresh session:** launcher (1) → memory (7 → 8) → spec (2) → plan (3) → PIPELINE (4, once Task 0 created it).
+**Active plan (surface 3):** `plans/2026-05-31-lotte-live2d-full-build-w1-w5.md` (W1–W5). The Phase 1.0 pilot plan `plans/2026-05-31-lotte-live2d-phase1-rig.md` is **completed history** — its W1–W5 roadmap is annotated SUPERSEDED.
+
+**Read order for a fresh session:** launcher (1) → memory (7 → 8) → **PIPELINE (4, the live authority — now exists)** → active plan (3) → spec (2) → pilot record `live2d/pilot/RESULT.md`.
 
 ## Cross-doc invariants — must hold; check every run
 
@@ -29,12 +31,15 @@ These are the "if A changed, B must match" rules. **They are volatile — update
 
 - **INV-1 Runtime.** The Lotte **rig** uses **Cubism 4** (`live2dcubismcore.min.js` + `pixi-live2d-display@0.4.0/dist/cubism4.min.js`). Cubism 2 (`dylanNew` core + `cubism2.min.js`) was Phase 0's Shizuku **sample** only. Any doc telling the next session to use cubism2 *for the rig* is STALE.
 - **INV-2 Base.** Rig the character from `lotte-discord-original.png` (more facial px); background from `lotte-discord-version.png` (pixel-aligned outpaint). Rasters live in `live2d/source/`, **never** `src/`. Any doc saying base = `version`, or path `src/...`, is STALE.
-- **INV-3 Frontier.** Current frontier = the **Phase 1.0 vertical-slice pilot** (execute `plans/2026-05-31-lotte-live2d-phase1-rig.md`). Any launcher/memory saying "start with brainstorming" or naming Phase 0 as the next action is STALE.
-- **INV-4 Not-yet-created authorities.** `PIPELINE.md` / `DECISIONS.md` / `RIG_GUIDE.md` are created in pilot Task 0. Docs must say "authority **once Task 0 creates it**", not assert it exists now.
-- **INV-5 Split-brain.** The Live2D work is on the **unmerged `live2d-spike` worktree**; `master` still holds Phase 0 orientation (its launcher is stale). `master` is protected (no direct edits) → **escalate** the merge-vs-keep-worktree decision to the user; do not silently edit master.
+- **INV-3 Frontier.** Phase 1.0 pilot = **DONE/GO (2026-05-31)**. Current frontier = **execute `plans/2026-05-31-lotte-live2d-full-build-w1-w5.md` starting at W1**. Any launcher/memory saying "execute the pilot", "start with brainstorming", or naming Phase 0 / the pilot as the next action is STALE.
+- **INV-4 Authorities exist.** `live2d/PIPELINE.md` (live-state authority), `DECISIONS.md`, `RIG_GUIDE.md` were created in pilot Task 0 and now EXIST; `PIPELINE.md` is read-first. Any doc still saying these are "not yet created / created in Task 0" is STALE.
+- **INV-5 Split-brain.** All Live2D work is on the **unmerged `live2d-spike` worktree** (~9 commits ahead). `master` is at the **pre-pilot** state — its launcher still says "execute the pilot", and it has no pilot execution, no full-build plan, no `PIPELINE.md`. `master` is protected → **escalate** the merge-vs-keep decision; do not edit master (a one-line "SUPERSEDED → see worktree" banner on master's launcher may be *proposed*, never applied by the agent).
+- **INV-6 moc3 version.** The rig `.moc3` must export at **version ≤ 5** (the pinned web Core reports `csmGetLatestMocVersion()=5`). Cubism Editor 5.3 defaults to **v6**, which **fails to load**. Any doc/plan exporting the default or assuming "any moc3 loads" is STALE; fix = export 5.0/4.2, or bump the Core / use the `pixi-live2d-display-lipsyncpatch` fork. *(Pilot-confirmed.)*
+- **INV-7 Atlas cap.** Cubism **FREE** caps the texture atlas at **2048×2048**. Any doc asserting a single **4096** atlas for the rig (e.g. BASE.md's earlier planned "atlas 4096") is STALE vs the FREE reality — plan multi-atlas / lower upscale / PRO. *(Pilot-confirmed.)*
+- **INV-8 Eye-smile param.** The eye-smile uses the Cubism template's standard **`EyeL Smile` / `EyeR Smile`** — there is **no standard `ParamEyeForm`**. **Spec §5 still names `ParamEyeForm`** (escalated for correction); the active plan + `RIG_GUIDE.md` are already correct.
 
 ## Branches / worktrees in play
 
-- `master` — main; protected. Holds an old Phase 0 launcher (split-brain source).
-- `live2d-spike` — the Live2D initiative (unmerged). All Phase 1 work + this registry live here.
+- `master` — main; protected. Pre-pilot state: holds the "execute the pilot" launcher but none of the pilot execution / full-build plan / `PIPELINE.md` (split-brain source — escalate merge).
+- `live2d-spike` — the Live2D initiative (unmerged, ~9 commits ahead). All Phase 1 work (pilot + full-build plan) + this registry live here.
 - Other worktrees (`m5-drift-conventions`, `registry-hardening`, …) are separate initiatives — out of scope for Live2D reconciliation unless they hold a shared `CONTEXT.md`/glossary.

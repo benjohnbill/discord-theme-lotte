@@ -502,6 +502,12 @@ git commit -m "pilot(live2d): Phase 1.0 gate decision"
 
 ## Roadmap — Full build W1–W5 (high-level; detailed AFTER the pilot gate)
 
+> **SUPERSEDED (2026-05-31) ➜ see `docs/superpowers/plans/2026-05-31-lotte-live2d-full-build-w1-w5.md`.**
+> The Phase 1.0 pilot is COMPLETE (gate = GO; `live2d/pilot/RESULT.md`). This roadmap was detailed into
+> its own bite-sized plan, carrying the pilot's confirmed learnings (moc3 ≤ v5; Cubism FREE atlas 2048,
+> not 4096; mesh-deformation blink; `EyeL/R Smile` not `ParamEyeForm`). Execute that plan, not this
+> high-level roadmap. The bullets below are retained as history.
+
 Detail these into their own bite-sized plan once Task 7 is GO/ADJUST, informed by pilot findings. From spec §7:
 
 - **W1 — Base lock + upscale.** Compare `version` vs `original` facial resolution; lock the character source (`original` per BASE.md) and the background source (`version` extended); waifu2x ×2 → ~2508 px; verify ~20 parts pack a 4096 atlas; write `assets/lotte_base.png` + fill `BASE.md` result fields + checksum.
