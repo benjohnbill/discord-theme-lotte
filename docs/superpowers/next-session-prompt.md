@@ -19,9 +19,10 @@ ChatGPT/Cubism/Discord, so inline + user-verification fits better than autonomou
 
 **W1 + W2 + W3 are DONE (2026-05-31).** Start at **W4** (full Cubism rig — USER GUI in Cubism 5.3 FREE).
 Read `live2d/PIPELINE.md` FIRST for live state. W3 produced the 19-part `live2d/lotte.psd` (on-disk,
-gitignored — regenerate via `full_segment.py` + `build_psd_full.py` if missing). W4 = append the full
-Tier-1 walkthrough to `RIG_GUIDE.md` (agent), then the USER rigs `lotte.cmo3` and exports
-`model/lotte.model3.json` (+ `.moc3` **at version 5.0**), then `check_model.py` validates. Carry the W3
+gitignored — regenerate via `full_segment.py` + `build_psd_full.py` if missing). **W4.1 DONE:** the full
+Tier-1 walkthrough is in `RIG_GUIDE.md` ("Full Build (W4)") and `check_model.py` (W4.3) is staged — do
+NOT re-write them. **Start at W4.2:** the USER rigs `lotte.cmo3` in Cubism 5.3 FREE and exports
+`model/lotte.model3.json` (+ `.moc3` **at version 5.0**), then the agent runs `check_model.py`. Carry the W3
 realities into W4: atlas — parts at full res are ~3× one FREE 2048 atlas, so scale the Cubism import
 ~0.5× (≈1254²) or use 2 atlases (BASE.md W3.4); part set — bangs are baked into face_base, hair is
 `hair_L`/`hair_R` (front side locks). **W3↔W4 loop:** if rigging needs a part split/merged, edit
