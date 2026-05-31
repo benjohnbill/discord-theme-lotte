@@ -408,6 +408,8 @@ Use superpowers:writing-plans to create `docs/superpowers/plans/<date>-lotte-liv
 
 ## Roadmap — Phases 1–4 (high-level; detail AFTER Phase 0 goes green)
 
+> **SUPERSEDED for Phase 1** (2026-05-31): the Phase 1 design + plan replace the framing below — base = `lotte-discord-original.png` (character) + `lotte-discord-version.png` (background), runtime = **Cubism 4**, restructured into a Phase 1.0 pilot + W1–W5. Authority: `docs/superpowers/specs/2026-05-31-lotte-live2d-phase1-rig-design.md` and `docs/superpowers/plans/2026-05-31-lotte-live2d-phase1-rig.md`.
+
 - **Phase 1 — Rig the real Lotte.** Source = `Lotte discord version.png` (the 16:10 bust currently used in Discord). Layer-separate (eyes/eyelids, brows, mouth, bangs, side hair, back hair, face base, body, background) and inpaint occluded regions (forehead behind bangs, neck/shoulder behind side hair, behind the bow, under the collar, eye sockets for blink). The bokeh/petals/sparkles background becomes a separate drifting-particle layer (free ambient life). Modest rig only. Output: a Cubism model swapped into the Phase 0 plumbing.
 - **Phase 2 — Tier 1 polish on Discord.** Breathing, hair physics, blink cadence, time-of-day lighting, very gentle damped cursor glance. Productionize the plugin (bundle runtime if CSP required; local model asset; settings toggle). Decide repo home (theme repo vs sibling plugin repo).
 - **Phase 3 — Port to other surfaces.** Desktop wallpaper via Lively (same rig, time-of-day ambient only). Mobile: Samsung home-screen Live2D live wallpaper host app, idle motion only, subtle/battery-conscious.

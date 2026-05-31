@@ -1,6 +1,6 @@
 # Lotte Live2D — Phase 1.0 Vertical-Slice Pilot Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans (recommended for this plan — it interleaves agent scripts with user GUI work in ChatGPT/Cubism) or superpowers:subagent-driven-development to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
 > **Plan type note:** This is a **pilot / feasibility gate**, not a pure-TDD code feature. It mixes (a) agent-written scripts (testable where there is real logic), (b) user actions in external tools (ChatGPT/GPT-image-2, Cubism Editor — verified by handoff artifact), and (c) browser render checks (verified by run/observe/screenshot, not unit tests, because the project's headless `bh-chrome` has no WebGL — use a throwaway SwiftShader Chrome, per memory `bh-chrome-no-webgl`). Honor the bite-sized, concrete, no-placeholder spirit throughout.
 
