@@ -26,11 +26,28 @@ if refs.get("Physics"):
     assert (base / refs["Physics"]).exists(), "missing physics3.json"
 print("textures + physics present:", refs.get("Textures"), refs.get("Physics"))
 
+# Cubism FREE export omits the Groups array entirely (and re-omits it on every re-export),
+# so auto-blink/lip-sync have no params to drive. Ensure EyeBlink + LipSync exist and are
+# populated — create-if-absent (not just fill-if-empty) so this is idempotent across re-exports.
+# Only reference params the model actually declares (from the cdi3 DisplayInfo).
+avail = set()
+if refs.get("DisplayInfo") and (base / refs["DisplayInfo"]).exists():
+    cdi = json.loads((base / refs["DisplayInfo"]).read_text())
+    avail = {p["Id"] for p in cdi.get("Parameters", [])}
+
+WANT = {"EyeBlink": ["ParamEyeLOpen", "ParamEyeROpen"], "LipSync": ["ParamMouthOpenY"]}
+groups = d.setdefault("Groups", [])
 changed = False
-for g in d.get("Groups", []):
-    if g.get("Name") == "EyeBlink" and not g.get("Ids"):
-        g["Target"] = "Parameter"; g["Ids"] = ["ParamEyeLOpen", "ParamEyeROpen"]; changed = True
+for name, ids in WANT.items():
+    ids = [p for p in ids if not avail or p in avail]
+    if not ids:
+        print(f"skip {name}: none of its params present in model"); continue
+    g = next((x for x in groups if x.get("Name") == name), None)
+    if g is None:
+        groups.append({"Target": "Parameter", "Name": name, "Ids": ids}); changed = True
+    elif not g.get("Ids"):
+        g["Target"] = "Parameter"; g["Ids"] = ids; changed = True
 if changed:
     MODEL.write_text(json.dumps(d, indent=2, ensure_ascii=False))
-    print("populated empty EyeBlink group")
+    print("ensured EyeBlink + LipSync groups:", {g["Name"]: g["Ids"] for g in groups})
 print("OK")
