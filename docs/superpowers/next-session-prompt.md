@@ -1,7 +1,8 @@
 # Next Session — Lotte Live2D Aliveness, Phase 1 (Rig the real Lotte) — EXECUTE the full build (W1–W5)
 
 > Phase 0 = DONE/GO. **Phase 1.0 vertical-slice pilot = DONE/GO (2026-05-31)** — the whole
-> art→rig→runtime chain is proven. The full-build plan is written. This launcher is thin by
+> art→rig→runtime chain is proven. **Full-build W1 (base lock+upscale) + W2 (4 hidden-state patches)
+> = DONE (2026-05-31).** Frontier = **W3** (full ~20-part separation). This launcher is thin by
 > design — substance lives in the spec + plan + `live2d/PIPELINE.md` + auto-loaded memory.
 
 Paste the body below (inside the `---` block) into the next Claude session as the initial prompt.
@@ -15,8 +16,12 @@ Execute the full build: `docs/superpowers/plans/2026-05-31-lotte-live2d-full-bui
 `superpowers:executing-plans` (recommended — the plan interleaves agent scripts with user GUI work in
 ChatGPT/Cubism/Discord, so inline + user-verification fits better than autonomous subagents).
 
-Start at **W1 Task 1.1** (confirm + checksum the locked base — agent-only). Read `live2d/PIPELINE.md`
-FIRST for live state. STOP at the user-action tasks (W2 GPT-image-2 edits, W4 Cubism rig, W5 Discord
+**W1 + W2 are DONE (2026-05-31).** Start at **W3 Task 3.1** (full ~20-part separation — agent script).
+Read `live2d/PIPELINE.md` FIRST for live state — it carries the **W3 prep findings** you MUST apply before
+running the plan's `full_segment.py` verbatim: (1) the plan's fraction boxes are pilot-CROP coordinates,
+so recalibrate every box from the full 2508² base (eyes are at ~v0.34–0.46, not v0.55–0.74); (2) the
+eyes-closed blink source is face-crop-aligned and must be re-placed into base coords, not stretched.
+STOP at the next user-action tasks (W3.2 Step 3 contact-sheet preview review, W4 Cubism rig, W5 Discord
 verify) and at any decision that genuinely needs the user.
 
 ## Read first (substance, in order)
