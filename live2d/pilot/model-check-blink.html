@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8" />
+<style>html,body{margin:0;height:100%;background:#1e1f3a;overflow:hidden}#c{display:block;width:100vw;height:100vh}
+#status{position:fixed;top:8px;left:8px;color:#fff;font:13px monospace}</style></head>
+<body>
+<div id="status">loading…</div><canvas id="c"></canvas>
+<script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js"></script>
+<script>
+(async () => {
+  const status = document.getElementById('status');
+  try {
+    const app = new PIXI.Application({ view: document.getElementById('c'), resizeTo: window, backgroundAlpha: 0, autoStart: true });
+    const model = await PIXI.live2d.Live2DModel.from('./model/lotte-pilot.model3.json');
+    app.stage.addChild(model);
+    const s = Math.min(window.innerWidth/model.width, window.innerHeight/model.height) * 0.85;
+    model.scale.set(s); model.anchor.set(0.5,0.5); model.position.set(window.innerWidth/2, window.innerHeight/2);
+    // FORCE eyes closed: disable auto-blink, pin ParamEyeLOpen/ROpen = 0 each frame.
+    model.internalModel.eyeBlink = null;
+    app.ticker.add(() => {
+      const cm = model.internalModel.coreModel;
+      cm.setParameterValueById('ParamEyeLOpen', 0);
+      cm.setParameterValueById('ParamEyeROpen', 0);
+    });
+    model.focus(window.innerWidth*0.72, window.innerHeight*0.30); // tilt via ParamAngleZ
+    status.textContent = 'FORCED eyes-closed (blink art) + tilt. If the closed-eye lid shows, the harvest→blink chain works.';
+  } catch (e) { status.textContent = 'ERROR: ' + (e && e.message ? e.message : e); console.error(e); }
+})();
+</script></body></html>
