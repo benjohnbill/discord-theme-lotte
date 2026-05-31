@@ -34,7 +34,7 @@ verify) and at any decision that genuinely needs the user.
 ## Working directory
 
 This worktree: `/home/benjohnbill/dev/discord-theme-lotte/.worktrees/live2d-spike` (branch `live2d-spike`,
-unmerged, ~9 commits ahead of `master`). Under `live2d/`: `PIPELINE.md` (authority), `DECISIONS.md`,
+**FF-merged into `master` on 2026-05-31, not pushed** — the two are even). Under `live2d/`: `PIPELINE.md` (authority), `DECISIONS.md`,
 `BASE.md`, `RIG_GUIDE.md`, `source/` (rasters + SHA256SUMS), `gen/PROMPTS.md`, and `pilot/` (the
 complete Phase 1.0 pilot: scripts, layers, `lotte-pilot.psd`, `model/` moc3 v5, `RESULT.md`). Pilot
 Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifacts in
@@ -65,9 +65,9 @@ Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifac
 
 ## Hard rules
 
-- **Shell:** prefix dev commands with `rtk`. **`master`:** never edit or push directly; no PRs without
-  sign-off (it is ~9 commits behind this worktree — a merge-vs-keep decision is the user's). **No
-  amend/force-push** — new commits only. **Aesthetic:** Tier 1 restraint is the whole game.
+- **Shell:** prefix dev commands with `rtk`. **`master`:** the worktree is already merged into `master`
+  locally (2026-05-31, **not pushed** — pushing needs sign-off); never push or force-push without sign-off;
+  new commits only (no amend). **Aesthetic:** Tier 1 restraint is the whole game.
 
 ## Stopping conditions
 
