@@ -2,8 +2,9 @@
 
 > Phase 0 = DONE/GO. **Phase 1.0 vertical-slice pilot = DONE/GO (2026-05-31)** — the whole
 > art→rig→runtime chain is proven. **Full-build W1 (base lock+upscale) + W2 (4 hidden-state patches)
-> = DONE (2026-05-31).** Frontier = **W3** (full ~20-part separation). This launcher is thin by
-> design — substance lives in the spec + plan + `live2d/PIPELINE.md` + auto-loaded memory.
+> + W3 (19-part separation → `lotte.psd`) = DONE (2026-05-31).** Frontier = **W4** (full Cubism rig,
+> USER). This launcher is thin by design — substance lives in the spec + plan + `live2d/PIPELINE.md`
+> + auto-loaded memory.
 
 Paste the body below (inside the `---` block) into the next Claude session as the initial prompt.
 
@@ -16,13 +17,16 @@ Execute the full build: `docs/superpowers/plans/2026-05-31-lotte-live2d-full-bui
 `superpowers:executing-plans` (recommended — the plan interleaves agent scripts with user GUI work in
 ChatGPT/Cubism/Discord, so inline + user-verification fits better than autonomous subagents).
 
-**W1 + W2 are DONE (2026-05-31).** Start at **W3 Task 3.1** (full ~20-part separation — agent script).
-Read `live2d/PIPELINE.md` FIRST for live state — it carries the **W3 prep findings** you MUST apply before
-running the plan's `full_segment.py` verbatim: (1) the plan's fraction boxes are pilot-CROP coordinates,
-so recalibrate every box from the full 2508² base (eyes are at ~v0.34–0.46, not v0.55–0.74); (2) the
-eyes-closed blink source is face-crop-aligned and must be re-placed into base coords, not stretched.
-STOP at the next user-action tasks (W3.2 Step 3 contact-sheet preview review, W4 Cubism rig, W5 Discord
-verify) and at any decision that genuinely needs the user.
+**W1 + W2 + W3 are DONE (2026-05-31).** Start at **W4** (full Cubism rig — USER GUI in Cubism 5.3 FREE).
+Read `live2d/PIPELINE.md` FIRST for live state. W3 produced the 19-part `live2d/lotte.psd` (on-disk,
+gitignored — regenerate via `full_segment.py` + `build_psd_full.py` if missing). W4 = append the full
+Tier-1 walkthrough to `RIG_GUIDE.md` (agent), then the USER rigs `lotte.cmo3` and exports
+`model/lotte.model3.json` (+ `.moc3` **at version 5.0**), then `check_model.py` validates. Carry the W3
+realities into W4: atlas — parts at full res are ~3× one FREE 2048 atlas, so scale the Cubism import
+~0.5× (≈1254²) or use 2 atlases (BASE.md W3.4); part set — bangs are baked into face_base, hair is
+`hair_L`/`hair_R` (front side locks). **W3↔W4 loop:** if rigging needs a part split/merged, edit
+`full_segment.py` (`BOXES` dict / `col_layer` calls) and re-run. STOP at the W4 Cubism rig (USER) and
+W5 Discord verify, and at any decision that genuinely needs the user.
 
 ## Read first (substance, in order)
 
@@ -38,8 +42,11 @@ verify) and at any decision that genuinely needs the user.
 
 ## Working directory
 
-This worktree: `/home/benjohnbill/dev/discord-theme-lotte/.worktrees/live2d-spike` (branch `live2d-spike`,
-**FF-merged into `master` on 2026-05-31, not pushed** — the two are even). Under `live2d/`: `PIPELINE.md` (authority), `DECISIONS.md`,
+This worktree: `/home/benjohnbill/dev/discord-theme-lotte/.worktrees/live2d-spike` (branch `live2d-spike`).
+**Branch state (2026-05-31): `live2d-spike` is AHEAD of `master`** — master is at `a6674fb` (the FF-merge
+point, docs only); W1+W2+W3 commits (`b910cb5`…`aacc3b8`) live on `live2d-spike` ONLY, not merged, not
+pushed. The earlier "the two are even" note is stale — split-brain reopened after the merge. Do W4 here;
+merge/push needs sign-off. Under `live2d/`: `PIPELINE.md` (authority), `DECISIONS.md`,
 `BASE.md`, `RIG_GUIDE.md`, `source/` (rasters + SHA256SUMS), `gen/PROMPTS.md`, and `pilot/` (the
 complete Phase 1.0 pilot: scripts, layers, `lotte-pilot.psd`, `model/` moc3 v5, `RESULT.md`). Pilot
 Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifacts in
