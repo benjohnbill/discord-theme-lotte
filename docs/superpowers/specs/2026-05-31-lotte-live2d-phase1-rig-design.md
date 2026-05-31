@@ -126,12 +126,14 @@ These are design constraints; exact mesh-density and texture-atlas numbers live 
 | `ParamBreath` | breathing | runtime auto-breath | core |
 | Physics (hair, ribbon) | secondary sway | derived from angle/body params | core |
 | `ParamEyeBallX` / `ParamEyeBallY` | iris gaze | `model.focus(cursor)` | core |
-| `ParamEyeForm` | eye-smile crease | occasional smile behavior | adopted |
+| `EyeL Smile` / `EyeR Smile` | eye-smile crease | occasional smile behavior | adopted |
 | `ParamAngleZ` | head tilt | idle + gaze liveliness | core (flat) |
 | `ParamAngleX` / `ParamAngleY` | head turn — **flat: planar offset + tiny rotation + lag only** | small, damped | restrained |
 | `ParamBodyAngleX` | body lean | idle + slight follow | subtle |
 | `ParamMouthOpenY` / `ParamMouthForm` | mouth open + smile form | occasional smile; otherwise near-static open smile | adopted |
 | brow / other expression params | — | — | deferred |
+
+> **Correction (2026-05-31, Phase 1.0 pilot):** the eye-smile crease was originally named `ParamEyeForm` here, but **there is no standard `ParamEyeForm`** — the Cubism 5.3 standard template provides `EyeL Smile` / `EyeR Smile` (and only `ParamEyeBallForm`, eyeball *scaling*, exists as a similarly-named standard). Use `EyeL Smile` / `EyeR Smile`. See `live2d/RIG_GUIDE.md` and `DOC_ARCHITECTURE.md` INV-8.
 
 Concrete restrained **value ranges** (not just names) and the deformer hierarchy are authored in W4 and recorded in `RIG_GUIDE.md`.
 
