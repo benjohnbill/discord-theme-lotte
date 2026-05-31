@@ -44,5 +44,5 @@ background source adapts to the 16:9 QHD without distortion.
 - Locked character source: `live2d/source/lotte-discord-original.png` (1254×1254) — confirmed more facial px than `version` (992 tall).
 - Background (ambient layer, OUT of model): `live2d/source/lotte-discord-version.png`.
 - sha256 (character source): `84175c6721cfe8afab0e2ace90c81cb1951063ecbd69a934bcba0ba94567ffcc`
-- Upscale applied: _(W1.2 fills)_
+- Upscale applied: PIL Lanczos x2 (fallback; no neural upscaler in env) → `live2d/assets/lotte_base.png` (2508×2508), sha256 `c0e07b09fc0c4c4e…`. Quality note: softer than a neural upscaler (waifu2x/realesrgan/opencv all absent in env); acceptable for the soft-focus master, but re-upscale with a neural tool before W3 if edge crispness proves insufficient. Master preserved hi-res regardless of the later atlas downscale.
 - Atlas packing decision: _(W3.4 / W4 fills)_
