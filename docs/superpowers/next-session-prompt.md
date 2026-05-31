@@ -45,10 +45,11 @@ W5 Discord verify, and at any decision that genuinely needs the user.
 ## Working directory
 
 This worktree: `/home/benjohnbill/dev/discord-theme-lotte/.worktrees/live2d-spike` (branch `live2d-spike`).
-**Branch state (2026-05-31): `live2d-spike` is AHEAD of `master`** — master is at `a6674fb` (the FF-merge
-point, docs only); W1+W2+W3 commits (`b910cb5`…`aacc3b8`) live on `live2d-spike` ONLY, not merged, not
-pushed. The earlier "the two are even" note is stale — split-brain reopened after the merge. Do W4 here;
-merge/push needs sign-off. Under `live2d/`: `PIPELINE.md` (authority), `DECISIONS.md`,
+**Branch state (2026-05-31): `live2d-spike` is 3-way DIVERGED from `master`** (NOT a clean fast-forward).
+`live2d-spike` carries all W1–W4.1 + the reconcile/skill work (many commits ahead, growing each pass);
+`master` carries only the STALE-redirect banner commit `336822a` that the worktree lacks. Merge-base =
+`a6674fb`; master tip = `336822a`. **`master` is NOT merged** and its Live2D docs are stale — the worktree
+is the authority. Do W4.2 here; merge (3-way, at W5) and push need sign-off. Under `live2d/`: `PIPELINE.md` (authority), `DECISIONS.md`,
 `BASE.md`, `RIG_GUIDE.md`, `source/` (rasters + SHA256SUMS), `gen/PROMPTS.md`, and `pilot/` (the
 complete Phase 1.0 pilot: scripts, layers, `lotte-pilot.psd`, `model/` moc3 v5, `RESULT.md`). Pilot
 Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifacts in
@@ -80,9 +81,9 @@ Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifac
 
 ## Hard rules
 
-- **Shell:** prefix dev commands with `rtk`. **`master`:** the worktree is already merged into `master`
-  locally (2026-05-31, **not pushed** — pushing needs sign-off); never push or force-push without sign-off;
-  new commits only (no amend). **Aesthetic:** Tier 1 restraint is the whole game.
+- **Shell:** prefix dev commands with `rtk`. **`master`:** the worktree is **NOT** merged into `master`
+  (3-way diverged per INV-5; merge deferred to W5 with sign-off); never merge, push, or force-push `master`
+  without sign-off; new commits only (no amend). **Aesthetic:** Tier 1 restraint is the whole game.
 
 ## Stopping conditions
 
