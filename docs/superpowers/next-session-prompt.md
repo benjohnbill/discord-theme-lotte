@@ -1,56 +1,58 @@
-# Next Session Handoff — Lotte Live2D Aliveness, Phase 0 (Feasibility Spike)
+# Next Session — Lotte Live2D Aliveness, Phase 1 (Rig the real Lotte) — brainstorm first
 
-> Replaces the completed M3/M4 handoff (those milestones shipped; PR #2). This is a thin launcher by design — the substance lives in the plan and in auto-loaded memory, not here. (Per the project's own memory model, handoff files are low-trust; do not put substance here that could go stale.)
+> Phase 0 is DONE → **GO** (every gate green, confirmed in the real Discord client). This is a thin
+> launcher by design — substance lives in auto-loaded memory and in `FINDINGS.md`, not here (handoff
+> files are low-trust per the project's memory model; nothing here should go stale).
 
-Paste the body below (inside the `---` block) into the next Claude session as the initial prompt. It is self-contained; the next session will not see this session's history.
+Paste the body below (inside the `---` block) into the next Claude session as the initial prompt.
 
 ---
 
 ## Task
 
-Execute **Phase 0 only** of the plan `docs/superpowers/plans/2026-05-31-lotte-live2d-aliveness.md`. Do not rewrite or "improve" the plan — execute as written.
+Begin **Phase 1 — rig the real Lotte**, and **start with brainstorming** (`superpowers:brainstorming`)
+the rigging approach before any code/art. Then write the Phase 1 plan with `superpowers:writing-plans`.
+Do NOT start rigging without user sign-off. (Brainstorming / workflow-mode is user-scope — propose once.)
 
-Phase 0 is a **feasibility spike**: prove (or disprove) that a single Live2D rig can render live inside the Discord desktop client as a cursor-aware full-window background, using a FREE sample model — before any art-rigging or Vencord-maintenance labor.
+## Read first (substance lives here, not in this launcher)
 
-## Read first (substance lives here, not in this handoff)
-
-1. `MEMORY.md` auto-loads — see memory `lotte-live2d-aliveness-direction` for the decided design + open gates.
-2. The plan's **Background** section carries the full design rationale and the rejected alternatives. Do not re-derive or re-litigate them.
+1. `MEMORY.md` auto-loads → memory **`lotte-live2d-aliveness-direction`** has the decided design, the
+   Phase 0 RESULT (GO), and the "How to apply" pointer. Also **`bh-chrome-no-webgl`** (env caveat).
+2. **`experiments/live2d-spike/FINDINGS.md`** (this branch) — the proven plumbing, the corrected
+   library triplet, and the Phase 2 background-slot finding.
 
 ## Working directory
 
-`/home/benjohnbill/dev/discord-theme-lotte`
+This worktree: `/home/benjohnbill/dev/discord-theme-lotte/.worktrees/live2d-spike` (branch
+`live2d-spike`, unmerged) — Phase 0 artifacts (`FINDINGS.md`, proven `index.html`,
+`discord-console-probe.js`) are here to reuse.
 
-## Setup
+## Brainstorm topics (Phase 1)
 
-- Work in an isolated worktree off `master`, per repo convention (one worktree per initiative). Invoke `superpowers:using-git-worktrees`; suggested branch `live2d-spike`:
-  ```bash
-  rtk git worktree add /home/benjohnbill/dev/discord-theme-lotte/.worktrees/live2d-spike -b live2d-spike master
-  ```
-- Spike artifacts go in `experiments/live2d-spike/` — outside the theme build pipeline (NOT in `src/`, NOT in `theme.manifest.yaml`).
+- Source image: `Lotte discord version.png` (the 16:10 bust currently used in Discord).
+- Layer separation (eyes/eyelids, brows, mouth, bangs, side hair, back hair, face base, body, bg) +
+  inpaint occluded regions — **which tool** (Photoshop/Krita/AI segmentation)?
+- Inpaint strategy for forehead-behind-bangs, neck/shoulder behind side hair, behind bow/collar, eye sockets.
+- Background bokeh/petals/sparkles → separate drifting-particle layer (free ambient life).
+- Rig scope: **Tier 1 only** — blink, breathe, hair sway, gentle gaze. Big face → restraint; under-animated beats uncanny.
+- Repo home for the Live2D model + (future) Vencord plugin: this CSS-theme repo vs a sibling repo.
+- Swap the rigged Lotte model into the proven Phase 0 plumbing (`index.html`).
 
-## Execution order & the hard safety boundary
+## Carry-forward facts (do not re-derive)
 
-Use `superpowers:subagent-driven-development` or `executing-plans`.
-
-- **Task 1 (read-only Vencord inspection)** and **Task 2 (standalone browser Live2D spike)** are SAFE — auto-execute both. They do not touch Discord.
-- **STOP after Task 2 and report to the user before Task 3.** Task 3 stands up a Vencord dev build and runs `pnpm inject`, which **patches the user's real Discord desktop client** — an invasive, semi-irreversible, external-effect action (Tier 3 in the user's operating model). Do NOT inject autonomously. Present Task 1's findings (stock vs dev install, the dev-build cost) and Task 2's result, and get explicit user go-ahead before proceeding to Task 3.
+- **Runtime triplet (proven):** `dylanNew` Cubism 2 core + `pixi.js@6.5.10` + `pixi-live2d-display@0.4.0/dist/cubism2.min.js`.
+  The plan's Roadmap Task-3 code uses `index.min.js` — that is WRONG (demands Cubism 4 runtime); use `cubism2.min.js`.
+- **Phase 2 delivery (separate, schedulable later):** persistent always-on Discord background needs a
+  Vencord userplugin → dev Vencord (Windows has no Node/git yet) that dynamically takes over the theme's
+  background slot (`.app__<hash>`, hash is volatile — detect by element size, never hardcode).
 
 ## Hard rules
 
-- **Shell:** prefix dev commands with `rtk` (token-optimization proxy): `rtk npm install`, `rtk git ...`.
-- **Existing Vencord install:** READ-ONLY. Never run `rtk npm run sync`. Never edit `/mnt/c/Users/benjohnbill/AppData/Roaming/Vencord/themes/...`. (Task 1 only *reads* that tree.)
-- **master:** never edit or push directly. No PRs this session — defer to the user.
-- **No amend/force-push.** New commits only, with the plan's commit messages verbatim.
-- **Aesthetic guardrails (for any rendering you eyeball):** Tier 1 only — restraint is the whole game. The face is large, so no aggressive cursor tracking; gentle/under-animated beats uncanny.
-
-## What success looks like (Phase 0)
-
-- `experiments/live2d-spike/FINDINGS.md` records: Gate-1 install type + plugin-capability verdict (Task 1), standalone runtime PASS/FAIL + screenshot (Task 2), and — only if the user approved Task 3 — in-Discord injection result + CSP outcome (Task 3), plus a final GO / GO-WITH-COST / NO-GO recommendation (Task 4).
-- A working `experiments/live2d-spike/index.html` + `0b-standalone.png` committed.
-- `master` untouched; existing Vencord themes dir untouched; no `npm run sync`.
-- If GO: the session ends by proposing the Phase 1 plan (rig the real Lotte) — do not start Phase 1 without user sign-off.
+- **Shell:** prefix dev commands with `rtk`.
+- **`master`:** never edit or push directly. No PRs without user sign-off.
+- **No amend/force-push.** New commits only.
+- **Aesthetic:** Tier 1 restraint is the whole game.
 
 ## Stopping conditions
 
-Stop and report when: Task 2 is done and you need user approval for Task 3; OR Phase 0 reaches a go/no-go; OR a task is genuinely blocked (environment/ambiguity).
+Stop and report when: the Phase 1 brainstorm + plan is ready for sign-off; OR a decision genuinely needs the user.

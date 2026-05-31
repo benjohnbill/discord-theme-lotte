@@ -27,9 +27,9 @@ Evidence (read-only investigation, no Discord changes):
   disabled). No custom userplugin entries.
 
 **Conclusion:** A stock Vencord install loads themes (CSS) but cannot load custom JS plugins.
-Running the throwaway `LotteLive2dSpike` userplugin (Task 3) requires standing up a **Vencord
-source/dev build** and re-injecting it into the Windows Discord install. This is the real cost
-that gates Task 3.
+A *persistent production* Live2D background therefore needs a **Vencord source/dev build** +
+re-inject — the real Phase 2 delivery cost. (The Task 3 feasibility proof itself was done WITHOUT
+a dev build, via a DevTools console probe — see the Task 3 section below.)
 
 ### Bonus finding — custom CSP is already in use (relevant to Gate 3 / CSP)
 
@@ -44,9 +44,9 @@ that gates Task 3.
 The user already whitelists a remote domain via Vencord's `customCspRules` mechanism (almost
 certainly to let the current theme load its background image). **Implication for Task 3:** Discord's
 CSP can be relaxed per-domain through `native-settings.json` rather than only by bundling the runtime
-into the plugin. Loading remote `<script>` tags additionally needs a `script-src` entry for the CDN
-domains (`cdn.jsdelivr.net`, `cubism.live2d.com`). This is a lighter mitigation path than full
-bundling — to be confirmed in Task 3 if/when we proceed.
+into the plugin. This mechanism existed as a fallback in case Discord's CSP blocked remote scripts.
+**Task 3 later showed it is not needed at all** — Discord loaded the `cdn.jsdelivr.net` scripts with
+zero CSP violations (see the Task 3 section).
 
 ### Dev-build path (recorded for Task 3 — NOT executed in this session)
 
@@ -72,7 +72,7 @@ Windows side (Node + pnpm on Windows). Confirm which works during Task 3.
 ## Gate runtime — standalone Live2D (Task 2)
 
 **Verdict: PASS.** `pixi-live2d-display` renders the Shizuku sample model and tracks a
-target point via `model.focus(x, y)` — the exact call the Task 3 plugin uses.
+target point via `model.focus(x, y)` — the exact call the Task 3 probe (and any Phase 2 plugin) uses.
 
 Evidence (committed):
 - `0b-standalone.png` — `index.html` rendered: Shizuku visible, status line reads
@@ -97,7 +97,7 @@ Evidence (committed):
    (awaited `loadScript` loop, mirroring the Task 3 plugin) and re-fits across the first frames
    (model bounds settle only after textures load).
 
-Final working runtime triplet (use this verbatim in Task 3):
+Final working runtime triplet (used verbatim by the Task 3 probe; reuse in any Phase 2 plugin):
 ```
 https://cdn.jsdelivr.net/gh/dylanNew/live2d/webgl/Live2D/lib/live2d.min.js   # Cubism 2 core
 https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js          # PIXI v6
@@ -182,12 +182,11 @@ cannot run JS. That dev-build cost is a **Phase 2 productionization** decision, 
 blocker — and it is lighter than feared (CSP needs no special handling; the runtime loads from CDN
 as-is).
 
-**Important de-risking note:** the proven standalone rig is the portable artifact reused across
-*all* target surfaces. The desktop wallpaper (Lively) and mobile live-wallpaper surfaces have **no
-plugin/CSP constraints** — the Task 2 PASS already guarantees the rig works there. Discord is the
-*only* surface gated on the still-unverified injection. So rigging the real Lotte (Phase 1) is
-low-risk regardless of the Discord-injection outcome: if Discord injection later proves
-unacceptable, the same rig still ships on wallpaper/mobile (the plan's documented NO-GO fallback).
+**Why Phase 1 is fully de-risked:** the proven rig is one portable artifact reused across *all*
+target surfaces. Discord is now confirmed GREEN (Task 3); the desktop wallpaper (Lively) and mobile
+live-wallpaper surfaces have no plugin/CSP constraints at all, so the Task 2 PASS already guarantees
+the rig works there too. Every target surface is therefore green or unconstrained — rigging the real
+Lotte (Phase 1) carries no remaining feasibility risk.
 
 ### Next-step options for the user (no work started without sign-off)
 
