@@ -2,7 +2,7 @@
 
 Written as we learn (building while learning). Tier-1 scope only: blink, breath, gaze
 (EyeBall X/Y), head tilt (AngleZ), tiny flat head turn, hair/ribbon physics, occasional
-eye-contact smile (MouthForm + a custom eye-smile param). Flat-rig discipline: no
+eye-contact smile (MouthForm + the standard `EyeL/R Smile` param — INV-8). Flat-rig discipline: no
 pseudo-3D parallax (`DECISIONS.md` §6).
 
 The Phase 1.0 **pilot** section below is the first, smallest pass — a crude 6-part face
@@ -102,6 +102,8 @@ verified against the current manual:**
 | `ParamBodyAngleX` | −10..10 (0) | + = lean right | subtle body lean |
 | `ParamBreath` | 0..1 (0) | + = inhale | runtime auto-breath drives it |
 
+> ⚠️ SUPERSEDED → see Full Build **W4 Step 6** + registry **INV-8**: the rig uses the standard `EyeL Smile` / `EyeR Smile`; there is no `ParamEyeForm`. The pilot text below is history (kept for the chain record), not a rig instruction.
+
 **Eye-smile crease — important correction:** the spec §5 named `ParamEyeForm`, but **there
 is no standard `ParamEyeForm`** (the standard list only has `ParamEyeBallForm`, which is
 eyeball *scaling*, not an eye-smile). For the pilot either (a) **skip** the eye-smile, or
@@ -121,6 +123,8 @@ sway, not a 3D flop. Physics is under the editor manual's Physics/Scene Blend se
 (editor manual top: https://docs.live2d.com/en/cubism-editor-manual/top/).
 
 ### Step 7 — Export the Cubism 4 model
+
+> ⚠️ SUPERSEDED → see Full Build **W4 Step 10–11** + registry **INV-6/INV-7** for the settled atlas (single 2048) and moc3 export (**5.0**, never the v6 default) procedure. The pilot text below is history.
 
 File ▸ **Export embedded file** ▸ **Export as moc3 file**. In the Export settings dialog,
 include: `.moc3`, `.model3.json`, **textures** (atlas **2048** — Cubism FREE cap; the original "4096" here was wrong), and **`physics3.json`**.

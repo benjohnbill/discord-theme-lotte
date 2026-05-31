@@ -2,8 +2,8 @@
 
 > Phase 0 = DONE/GO. **Phase 1.0 vertical-slice pilot = DONE/GO (2026-05-31)** — the whole
 > art→rig→runtime chain is proven. **Full-build W1 (base lock+upscale) + W2 (4 hidden-state patches)
-> + W3 (19-part separation → `lotte.psd`) = DONE (2026-05-31).** Frontier = **W4** (full Cubism rig,
-> USER). This launcher is thin by design — substance lives in the spec + plan + `live2d/PIPELINE.md`
+> + W3 (19-part separation → `lotte.psd`) + W4.1 (rig walkthrough + W4.3 checker staged) = DONE (2026-05-31).** Frontier = **W4.2** (USER
+> rigs the PSD in Cubism 5.3 FREE). This launcher is thin by design — substance lives in the spec + plan + `live2d/PIPELINE.md`
 > + auto-loaded memory.
 
 Paste the body below (inside the `---` block) into the next Claude session as the initial prompt.
@@ -17,7 +17,7 @@ Execute the full build: `docs/superpowers/plans/2026-05-31-lotte-live2d-full-bui
 `superpowers:executing-plans` (recommended — the plan interleaves agent scripts with user GUI work in
 ChatGPT/Cubism/Discord, so inline + user-verification fits better than autonomous subagents).
 
-**W1 + W2 + W3 are DONE (2026-05-31).** Start at **W4** (full Cubism rig — USER GUI in Cubism 5.3 FREE).
+**W1 + W2 + W3 + W4.1 are DONE (2026-05-31).** Start at **W4.2** (full Cubism rig — USER GUI in Cubism 5.3 FREE).
 Read `live2d/PIPELINE.md` FIRST for live state. W3 produced the 19-part `live2d/lotte.psd` (on-disk,
 gitignored — regenerate via `full_segment.py` + `build_psd_full.py` if missing). **W4.1 DONE:** the full
 Tier-1 walkthrough is in `RIG_GUIDE.md` ("Full Build (W4)") and `check_model.py` (W4.3) is staged — do
@@ -86,5 +86,5 @@ Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifac
 
 ## Stopping conditions
 
-Stop and report at: a user-action task (W2 GPT edits, W4 Cubism rig, W5 Discord verify), any workstream
+Stop and report at: a user-action task (W4.2 Cubism rig, W5 Discord verify), any workstream
 gate, or any decision that genuinely needs the user.
