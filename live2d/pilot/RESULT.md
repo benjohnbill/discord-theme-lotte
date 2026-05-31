@@ -58,3 +58,23 @@ riggable asset?"): YES.**
    key boxes off detected landmarks, not fixed fractions.
 
 Nothing here is a NO-GO. The chain so far is GO-leaning with a minor crop adjust for W1.
+
+### Task 5 prep — layered source for Cubism
+
+- **Layers re-emitted as full-canvas aligned PNGs** (803×690, part-in-place, transparent
+  elsewhere) so they stack in register on import — the proper Live2D layer format. The
+  per-part sizes in the table above are the *content boxes*; the files are full-canvas.
+- **Eye band extended** (bottom 0.74 → 0.80) so the closed-eye art covers *both* tilted
+  eyes (the right eye sits lower); verified by overlaying `eye_upperlid` on `face_base`.
+- **Layered PSD built** (`build_psd.py`, psd-tools): `live2d/pilot/lotte-pilot.psd` — 6
+  layers, RGB/8-bit, depth-ordered face_base→…→mouth. Reopen + flatten verified
+  (`lotte-pilot-preview.png`). pytoshop was tried first but its RLE/packbits extension is
+  unbuilt on this Python (raw-mode merged image came out black) — psd-tools is the writer.
+- **Spec correction flagged:** spec §5 / `DECISIONS` reference `ParamEyeForm` for the
+  eye-smile, but **there is no standard `ParamEyeForm`** (the standard list has
+  `ParamEyeBallForm` = eyeball scaling). The pilot rig guide treats the eye-smile as a
+  custom parameter or skips it; the W4 plan should reconcile the parameter id in spec §5.
+- **moc3 compatibility recorded** as the Task 6 verify-and-decide risk: a Cubism-5-version
+  `.moc3` cannot load on an older Core (`csmReviveMocInPlace` error). Export the most
+  backward-compatible moc3 version; fallback = re-export lower or use the
+  `pixi-live2d-display-lipsyncpatch` fork. (See `RIG_GUIDE.md` Step 7.)
