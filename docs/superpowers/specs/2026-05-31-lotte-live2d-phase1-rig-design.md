@@ -33,7 +33,7 @@ These are settled; they seed `live2d/DECISIONS.md` and are not to be re-litigate
 
 2. **Scope = Discord bust only; mobile stays static.** Smallest complete end-to-end slice. Lets the user learn the full pipeline once before any extension.
 
-3. **Base image is locked, not regenerated.** The source illustrations were produced by iterative revision, so a single prompt cannot reproduce the base. Phase 1 therefore **locks one existing raster** as the base and commits to it. Recommended base: `Lotte discord version.png` (1586×992, 16:10) for the on-Discord look and its particle background. The *character pixels* may instead be taken from `Lotte discord original.png` (1254×1254) if it yields more facial resolution — decided by live comparison in W1. Upscale the chosen base with waifu2x before separation.
+3. **Base image is locked, not regenerated.** The source illustrations were produced by iterative revision, so a single prompt cannot reproduce the base. Phase 1 **locks** the base now (it does not re-decide it in W1): rig the **character from `Lotte discord original.png`** (1254×1254 — more facial pixels; it is the parent that `version` was outpainted from, so their faces are pixel-aligned), and take the **ambient background from `Lotte discord version.png`** (the live Discord look). W1 only *confirms and measures* this and records the checksum. Upscale the locked character source with waifu2x (×2, atlas 4096) before separation. See `live2d/BASE.md`.
 
 4. **Cubism 5 FREE (`.moc3`).** Free tier is sufficient for a Tier-1 bust. Runtime change from Phase 0: swap the Cubism **2** core (`dylanNew` mirror) for the **official Cubism 4 core** (`live2dcubismcore.js`); PIXI v6 + `pixi-live2d-display` otherwise unchanged. **This swap is verified up front in Phase 1.0, not assumed** (see §6 and §12).
 
@@ -252,7 +252,7 @@ One bounded workstream (or sub-step) per focused session. A session ends by prod
 ## 12. Execution-Time Checks (verify-and-decide, not placeholders)
 
 1. **Runtime core swap (Phase 1.0 step 0).** Load a dummy Cubism 4 `.model3.json` in the Phase 0 runtime with the official Cubism 4 core before rigging Lotte; confirm it loads and tracks. (Per the user's "verify tool availability before relying on it" rule.)
-2. **W1 — base pixel source.** Compare `version` vs `original` for facial resolution; lock one. Record source + checksum in `BASE.md`.
+2. **W1 — confirm the locked base.** The base is locked (character = `original`, background = `version`; §2.3). W1 measures `original`'s facial resolution to confirm it beats `version`, then records source + checksum in `BASE.md`. (Not a re-decision.)
 3. **W3 — segmentation tool availability.** Run the chosen tool (rembg / SAM / GrabCut) live on the locked base; confirm it works in this WSL environment; record the fallback ladder (§7) if it underperforms.
 4. **Smile derivation.** Attempt to derive the smile mouth from the closed-mouth art + `ParamMouthForm` before generating a dedicated smile-mouth reference.
 
