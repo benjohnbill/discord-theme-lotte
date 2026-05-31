@@ -78,7 +78,7 @@ idle ──(trigger)──> glance/follow ──> soft eye-contact ──> smile
 - **trigger** — any of: cursor enters a face-proximity radius; the Discord window regains focus; or a long randomized timer fires.
 - **glance/follow** — damped gaze tracks the cursor (`ParamEyeBallX/Y`), tiny tilt toward it (`ParamAngleZ`).
 - **soft eye-contact** — gaze settles on the cursor and holds briefly.
-- **smile-hold** — `ParamMouthForm` + `ParamEyeForm` ramp up gently and hold (~1–2 s).
+- **smile-hold** — `ParamMouthForm` + `EyeL/R Smile` ramp up gently and hold (~1–2 s). (§5: not `ParamEyeForm`.)
 - **relax** — ramp back to idle.
 
 **Tunables (start conservative, expose for tuning):** trigger interval range, cursor-distance threshold, ramp/damping time constants, smile-hold duration, and a **cooldown** so an eye-contact-smile stays rare. These move to the W5 plan with concrete starting values.
