@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    #c { display: block; width: 100vw; height: 100vh; }
+    #status { position: fixed; top: 6px; left: 8px; right: 8px; color: #0f0;
+              font: 12px monospace; white-space: pre-wrap; text-shadow: 0 0 3px #000; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div id="status">loading…</div>
+  <canvas id="c"></canvas>
+  <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js"></script>
+  <script>
+  (async () => {
+    const status = document.getElementById('status');
+    const q = new URLSearchParams(location.search);
+    const bg = '#' + (q.get('bg') || '2b2d42');
+    document.body.style.background = bg;
+    // pins: ?p=ParamAngleZ:25,ParamEyeBallX:1  -> [["ParamAngleZ","25"],...]
+    const pins = (q.get('p') || '').split(',').filter(Boolean).map(s => s.split(':'));
+    const blinkoff  = q.has('blinkoff');
+    const breathoff = q.has('breathoff');
+    const log = (m) => { status.textContent += '\n' + m; };
+    try {
+      let coreMax = '?';
+      try { coreMax = window.Live2DCubismCore.Version.csmGetLatestMocVersion(); } catch (e) {}
+      status.textContent = 'core latest moc3 = ' + coreMax + ' | bg=' + bg +
+        (pins.length ? ' | pins=' + pins.map(p => p.join('=')).join(',') : ' | pins=none') +
+        (blinkoff ? ' | blink OFF' : '') + (breathoff ? ' | breath OFF' : '');
+
+      const app = new PIXI.Application({
+        view: document.getElementById('c'), resizeTo: window,
+        backgroundAlpha: 0, antialias: true, autoStart: true,
+      });
+      const model = await PIXI.live2d.Live2DModel.from('./model/lotte.model3.json');
+      app.stage.addChild(model);
+      const im = model.internalModel;
+
+      // intrinsic canvas (pixels) from the moc3 — independent of current scale
+      const cw = im.originalWidth || model.width, ch = im.originalHeight || model.height;
+      const fit = () => {
+        // ?scale= absolute model scale; else fit the intrinsic canvas with margin
+        const base = Math.min(window.innerWidth / cw, window.innerHeight / ch);
+        const s = q.has('scale') ? parseFloat(q.get('scale')) : base * (parseFloat(q.get('fit')) || 0.92);
+        model.scale.set(s);
+        model.anchor.set(parseFloat(q.get('ax') ?? 0.5), parseFloat(q.get('ay') ?? 0.5));
+        model.position.set(window.innerWidth * (parseFloat(q.get('ox')) || 0.5),
+                           window.innerHeight * (parseFloat(q.get('oy')) || 0.5));
+      };
+      fit(); window.addEventListener('resize', fit);
+
+      if (blinkoff)  im.eyeBlink = null;
+      if (breathoff) im.breath = null;
+
+      // expose for interactive driving (CDP / console)
+      window.__lotte = model;
+      window.setParam = (id, v) => im.coreModel.setParameterValueById(id, v);
+
+      // Pin requested params AFTER the model's own update each frame so they win.
+      if (pins.length) {
+        app.ticker.add(() => {
+          const cm = im.coreModel;
+          for (const [id, v] of pins) cm.setParameterValueById(id, parseFloat(v));
+        });
+      } else {
+        // no pins -> drive a gentle focus so tilt/gaze show some life
+        model.focus(window.innerWidth * 0.62, window.innerHeight * 0.35);
+        window.addEventListener('mousemove', e => model.focus(e.clientX, e.clientY));
+      }
+
+      log('MODEL LOADED ok — canvas ' + Math.round(cw) + 'x' + Math.round(ch) +
+          ' | scale ' + model.scale.x.toFixed(3) + ' | PIXI ' + PIXI.VERSION);
+      // marker for the screenshot harness to grep in --enable-logging
+      console.log('LOTTE_RUNTIME_OK canvas=' + Math.round(cw) + 'x' + Math.round(ch));
+
+      // NOTE: keep the ticker RUNNING by default — SwiftShader software raster needs real
+      // wall-clock frames to paint a clean image; freezing early captures a blank canvas.
+      // The capture script waits for a good-size PNG then kills the process by PID.
+      // ?freeze=1 stops the ticker (only for cases that need a frozen idle page).
+      if (q.has('freeze')) {
+        setTimeout(() => { try { app.ticker.stop(); } catch (e) {} console.log('LOTTE_FROZEN'); },
+                   parseInt(q.get('settle') || '2500', 10));
+      }
+    } catch (e) {
+      log('ERROR: ' + (e && e.message ? e.message : e));
+      console.error('LOTTE_RUNTIME_ERROR', e);
+    }
+  })();
+  </script>
+</body>
+</html>
