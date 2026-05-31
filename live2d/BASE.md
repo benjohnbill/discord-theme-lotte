@@ -41,7 +41,8 @@ background source adapts to the 16:9 QHD without distortion.
 
 ## Result (W1 fills)
 
-- Locked base file: _(W1)_
-- sha256: _(W1)_
-- Upscale applied: _(W1)_
-- Atlas packing verified: _(Phase 1.0 / W1)_
+- Locked character source: `live2d/source/lotte-discord-original.png` (1254×1254) — confirmed more facial px than `version` (992 tall).
+- Background (ambient layer, OUT of model): `live2d/source/lotte-discord-version.png`.
+- sha256 (character source): `84175c6721cfe8afab0e2ace90c81cb1951063ecbd69a934bcba0ba94567ffcc`
+- Upscale applied: _(W1.2 fills)_
+- Atlas packing decision: _(W3.4 / W4 fills)_
