@@ -1,0 +1,3 @@
+# Pilot-local Python venv (Pillow etc.) — interpreter, not a source artifact.
+.venv/
+__pycache__/
