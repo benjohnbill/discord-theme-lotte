@@ -105,13 +105,36 @@ interior pixels (NOT a fresh generation). Discipline (spec §7): harvest hidden
 pixels only, landmark-align, color-match, reject unless it composites invisibly and
 survives the deformation test.
 
+- [x] eyes closed — for the upper-eyelid blink art **(Phase 1.0 pilot, on the face crop, not the full base)**
 - [ ] forehead revealed (hair pushed back) — for face base under bangs
 - [ ] cheek / jaw line (side hair tucked) — for face base under side hair
-- [ ] eyes closed — for the upper-eyelid blink art
 - [ ] smiling (softly creased) eyes — for `ParamEyeForm`
 - [ ] closed mouth — unlocks tight-closed + closed-smile via `ParamMouthForm`
 - [ ] (optional) gentle closed smile — only if deriving from closed + form looks off
 
+### eyes-closed (pilot) — produced `live2d/pilot/gen/eyes-closed.png`
+
+Input: `live2d/pilot/face-crop.png` (803×690 crop of the locked `original`). Tool: GPT-image-2.
+
 ```
-(prompts added here as W2 proceeds, each tagged with which output it produced)
+Reference image attached: a 1:1 anime portrait — long brown hair, large violet
+eyes, a violet ribbon on the top of the head, navy blue sailor uniform, gentle
+expression, slight head-tilt.
+
+Keep the character EXACTLY the same — same face, same hair, same ribbon, same
+lighting, same line weight, same colors, same framing, and the same pixel
+alignment. Change ONLY the eyes: draw them gently closed in a soft, natural,
+relaxed-eyelid shape (a calm, content closed-eye look, not a hard squint). Do not
+move, recolor, or restyle anything else — not the hair, not the mouth, not the
+background. Output the same size as the reference, character pixel-aligned to it.
 ```
+
+**Result / drift observation (W2 evidence):** Output came back at 1353×1163 (archived
+as `eyes-closed-raw-1353x1163.png`); user downscaled a copy to 803×690 = the crop
+size. Ghost-overlay + amplified-diff vs the crop: **hair / ribbon / face outline are
+pixel-aligned** (no doubling), and the closed eyes land exactly on the open-eye
+position — good for harvesting the eyelid band. **BUT GPT widened the mouth into a
+fuller open smile despite the "change ONLY the eyes" instruction** — confirmed mouth
+drift. Harmless for the pilot (only the eye band is harvested in Task 4), but it
+validates the spec §7 W2 discipline: production edits need landmark-align + tight,
+conservative masks; a naive full-region paste would import the drift.
