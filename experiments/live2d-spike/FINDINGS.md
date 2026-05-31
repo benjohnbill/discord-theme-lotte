@@ -125,22 +125,33 @@ use SwiftShader flags or the real client — never plain `bh-chrome`.
 
 ## Gate 1 proof — in Discord (Task 3)
 
-**DEFERRED (not run; user decision, 2026-05-31).** Task 3 patches the real Discord desktop
-client (`pnpm inject`), which is an invasive Tier-3 action. At the Task-2 hard stop the user
-chose to record a go/no-go from current evidence rather than stand up a throwaway Vencord dev
-build this session. The in-Discord render + CSP proof is therefore **deferred, not abandoned**.
+**DONE — GREEN, via a lighter method than planned (user-run DevTools console probe, 2026-05-31).**
 
-What remains to close this gate later:
-- Stand up a Vencord source build (steps recorded in the Gate 1 dev-build path above), build on
-  the side that owns the Discord install, run `pnpm inject`.
-- Create the userplugin from `vencord-plugin/lotteLive2dSpike/index.tsx`, **using the corrected
-  runtime triplet from the Task 2 section** (`cubism2.min.js`, not `index.min.js`; the `dylanNew`
-  Cubism 2 core mirror). The plugin code as drafted in the plan would fail identically to the
-  standalone bug we already fixed.
-- Watch the DevTools console for a CSP `Refused to load the script …` error. If it appears,
-  first try relaxing it via `native-settings.json` `customCspRules` (already proven to work for
-  this install) with a `script-src` entry for `cdn.jsdelivr.net`; bundling the runtime into the
-  plugin is the heavier fallback.
+Recon found the Windows side has **no Node/pnpm/git**, so a full Vencord dev build was a heavy
+detour. But the dev build is only a *delivery* mechanism; the actual feasibility unknowns (CSP +
+Electron render) are answerable by pasting the same injection logic into Discord's DevTools console
+— same renderer, same CSP, same scripts, same `model.focus(x,y)`. So Task 3 was run that way: no
+Discord patching, fully reversible (Ctrl+R or `__lotteSpikeStop()`).
+
+Probe: `experiments/live2d-spike/discord-console-probe.js` (a copy was dropped on the Windows
+Desktop for easy copy-paste). Results, confirmed in the real Discord client:
+- **CSP: no blocks.** All three CDN scripts (`cdn.jsdelivr.net`, incl. the `dylanNew` Cubism 2 core)
+  loaded with zero `securitypolicyviolation` events. **No `customCspRules`, no bundling required.**
+- **WebGL:** console printed `PixiJS 6.5.10 - ✰ WebGL 2 ✰` — Discord's Electron has full GPU WebGL
+  (unlike the headless bh-chrome; see the environment caveat above).
+- **Render + cursor tracking: confirmed visually.** Shizuku renders full-window behind Discord's
+  translucent message panels and follows the cursor exactly like the standalone page (user-confirmed:
+  "마우스 따라가는 것이 기존 index.html 처럼 잘 적용").
+- **Background layering — key Phase 2 finding:** the canvas must occupy the theme's background slot,
+  not `document.body`'s back. This theme paints its background image on a hashed Discord container
+  (`.app__<hash>`, observed `.app__160d8`) over an opaque base background-color. Two earlier probe
+  versions (canvas at body-back; killing only `body`/`#app-mount` bg) stayed hidden. The working v4
+  auto-detects large background-IMAGE elements by size (selector-agnostic — the hash is volatile) and
+  also clears the structural base background-COLORS, letting the back canvas show through. A
+  production plugin must do this detection dynamically, never hardcode the hash.
+
+Conclusion: every hard Discord unknown is GREEN. What remains is production *delivery* (a persistent
+always-on injector) and clean theme-layer integration — Phase 2, not feasibility.
 
 ---
 
@@ -152,22 +163,24 @@ What remains to close this gate later:
    (`cubism2.min.js`) + PIXI v6 + the `dylanNew` Cubism 2 core mirror renders the Shizuku sample
    and follows a target via `model.focus(x, y)`. Proven with software WebGL (SwiftShader);
    evidence committed.
-2. **Can a custom plugin run in this Vencord, and at what cost?** (Task 1) — **NOT as-is.** This is
-   a STOCK install with no source clone. Custom plugins require standing up a Vencord **source/dev
-   build** and `pnpm inject`-ing it into the Windows Discord, plus re-building after Discord/Vencord
-   updates. The actual in-Discord run was **deferred** (Task 3 not executed).
-3. **Does Discord's CSP allow the remote scripts, or is bundling required?** (Task 3) — **UNTESTED**
-   (Task 3 deferred). Positive signal: this install already uses Vencord `customCspRules`
-   (`native-settings.json`), so a per-domain `script-src` relaxation is a plausible lighter path
-   than full bundling.
+2. **Can a custom plugin run in this Vencord, and at what cost?** (Task 1) — **STOCK install**, no
+   source clone. Feasibility was proven via a DevTools console probe (Task 3) instead of a dev build.
+   A Vencord userplugin is only needed for *persistent* production delivery; that is where the
+   dev-build + re-inject-on-update cost applies (Phase 2).
+3. **Does Discord's CSP allow the remote scripts, or is bundling required?** (Task 3) — **YES, allowed.**
+   The console probe loaded all three CDN scripts with zero CSP violations. No `customCspRules`, no
+   bundling required. Discord's Electron also reported WebGL 2, and the model rendered + tracked.
 
-### Recommendation: **GO-WITH-COST**
+### Recommendation: **GO**
 
-The runtime half of the stack is proven. The Discord-injection half is technically expected to
-work (Discord's Electron has real WebGL; Vencord supports custom plugins and custom CSP), but it
-carries a **real, recurring cost**: a self-built Vencord that must be re-built/re-injected on
-updates, set up across the WSL↔Windows boundary. That cost must be **explicitly accepted by the
-user before Phase 1/2**.
+Every hard feasibility unknown is now GREEN, confirmed in the real Discord client: CSP allows the
+remote runtime (no bundling, no `customCspRules`), Electron has WebGL 2, and the Live2D character
+renders full-window behind the translucent UI and tracks the cursor (user-confirmed). The one
+remaining cost is **production delivery**: a persistent, always-on background needs a JS-injection
+host (a Vencord userplugin → a self-built dev Vencord, re-built on updates), because themes/QuickCSS
+cannot run JS. That dev-build cost is a **Phase 2 productionization** decision, not a feasibility
+blocker — and it is lighter than feared (CSP needs no special handling; the runtime loads from CDN
+as-is).
 
 **Important de-risking note:** the proven standalone rig is the portable artifact reused across
 *all* target surfaces. The desktop wallpaper (Lively) and mobile live-wallpaper surfaces have **no
@@ -178,9 +191,11 @@ unacceptable, the same rig still ships on wallpaper/mobile (the plan's documente
 
 ### Next-step options for the user (no work started without sign-off)
 
-- **A — Close Gate 1 first:** do the deferred Task 3 (throwaway Vencord dev build + inject) before
-  any rigging, to fully confirm Discord before investing art labor.
-- **B — Proceed to Phase 1 rigging now:** accept the GO-WITH-COST; rig Lotte against the proven
-  plumbing (safe because the rig is portable to the unconstrained surfaces even if Discord slips).
-- **C — Pivot the flagship to desktop wallpaper (Lively):** if the Discord dev-build maintenance
-  cost is unwelcome, make the constraint-free wallpaper surface the primary target.
+- **A — (DONE) Gate 1 is closed.** Discord feasibility is confirmed in the real client; proceed on
+  that basis.
+- **B — Proceed to Phase 1 rigging (recommended next):** rig the real Lotte against the proven
+  plumbing. Safe because the rig is portable to every surface (Discord proven; wallpaper/mobile
+  unconstrained).
+- **C — Phase 2 production delivery (later):** turn the console probe into a Vencord userplugin
+  (requires Node+git on Windows, a dev Vencord, dynamic `.app__<hash>` background-slot takeover).
+  Independent of Phase 1; can be scheduled whenever the always-on version is wanted.
