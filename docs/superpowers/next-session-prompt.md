@@ -1,3 +1,12 @@
+> 🛑 **STALE — do not use this copy for the Live2D initiative (2026-05-31).**
+> `master` is **~14 commits behind** for Live2D work: W1 + W2 + W3 (19-part separation → `lotte.psd`)
+> + W4.1 (rig walkthrough) are all DONE on the **`.worktrees/live2d-spike`** worktree, NOT here.
+> Go to that worktree and read its `live2d/PIPELINE.md` + `docs/superpowers/next-session-prompt.md`
+> (the live authority). Frontier = **W4.2** (user rigs in Cubism). Planned merge into `master`:
+> at Phase 1 / W5 completion. Everything below this banner is the pre-W1 state — ignore it until merged.
+
+---
+
 # Next Session — Lotte Live2D Aliveness, Phase 1 (Rig the real Lotte) — EXECUTE the full build (W1–W5)
 
 > Phase 0 = DONE/GO. **Phase 1.0 vertical-slice pilot = DONE/GO (2026-05-31)** — the whole
