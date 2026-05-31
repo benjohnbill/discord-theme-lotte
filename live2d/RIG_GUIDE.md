@@ -123,7 +123,7 @@ sway, not a 3D flop. Physics is under the editor manual's Physics/Scene Blend se
 ### Step 7 — Export the Cubism 4 model
 
 File ▸ **Export embedded file** ▸ **Export as moc3 file**. In the Export settings dialog,
-include: `.moc3`, `.model3.json`, **textures** (atlas 4096), and **`physics3.json`**.
+include: `.moc3`, `.model3.json`, **textures** (atlas **2048** — Cubism FREE cap; the original "4096" here was wrong), and **`physics3.json`**.
 Export into `live2d/pilot/model/` as `lotte-pilot.model3.json` (+ companions).
 Manual: https://docs.live2d.com/en/cubism-editor-manual/export-moc3-motion3-files/
 

@@ -14,7 +14,7 @@
 
 **Pilot learnings carried in (confirmed, see `live2d/pilot/RESULT.md`):**
 1. **moc3 export must target ≤ v5.** Cubism 5.3 default = v6; the pinned web Core reports `csmGetLatestMocVersion()=5` and rejects v6. Export at moc3 **5.0** (or 4.2). Fallback: bump the Core / use the `pixi-live2d-display-lipsyncpatch` fork.
-2. **Cubism FREE caps the texture atlas at 2048×2048** (not 4096). Keep hi-res masters in `assets/`, but scale the Cubism source so ~20 *tight-bounded* parts pack into a single 2048 atlas (verify in W3.4/W4); fall back to 2 atlases or a lower factor if not.
+2. **Cubism FREE caps the texture atlas at 2048×2048** (not 4096). Keep hi-res masters in `assets/`, but scale the Cubism source so ~20 *tight-bounded* parts pack into a single 2048 atlas (verify in W3.4/W4); fall back to 2 atlases or a lower factor if not. **(RESOLVED W4.1: FREE = ONE atlas only — multi is PRO; fit via Auto Layout magnification. INV-7.)**
 3. **`ParamEyeForm` is not standard;** the 5.3 template provides `EyeL Smile`/`EyeR Smile`. Use those (or whatever IDs the model exposes — W5 sets defensively).
 4. **Export hygiene:** set the EyeBlink group *inside* Cubism; keep the texture-folder path intact (W4.3 still re-checks).
 5. rembg matte is clean in-env; sub-parts need **landmark-keyed boxes + L/R splits**, not fixed fractions; mouth needs a lower crop + the W2 closed-mouth reference.
@@ -509,7 +509,7 @@ PY
 ```
 Decision (record in BASE.md `Atlas packing decision:`):
 - If the slack-adjusted sum fits **one 2048 atlas** → keep the upscaled master resolution for Cubism.
-- If not → in W4's atlas step, either (a) let Cubism use **2 atlases** (if FREE allows multiple — verify in W4), or (b) scale the Cubism import down (Cubism's atlas tool can downscale on layout; or pre-scale the layers) until it fits. The hi-res `assets/lotte_base.png` master is preserved either way.
+- **[RESOLVED W4.1, 2026-05-31: Cubism FREE allows only ONE atlas — option (a) is PRO-only. Use (b): the atlas tool's Auto Layout "set magnification automatically" downscales parts on layout (~0.5×) to fit the single 2048 atlas. See registry INV-7 / BASE.md.]** If not → in W4's atlas step, either (a) let Cubism use **2 atlases** (if FREE allows multiple — verify in W4), or (b) scale the Cubism import down (Cubism's atlas tool can downscale on layout; or pre-scale the layers) until it fits. The hi-res `assets/lotte_base.png` master is preserved either way.
 
 - [ ] **Step 2: Commit + update PIPELINE**
 

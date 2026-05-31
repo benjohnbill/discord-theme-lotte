@@ -32,10 +32,12 @@ background source adapts to the 16:9 QHD without distortion.
   headroom over a 1600 px display plus deformation headroom.
 - **Texture atlas budget = 4096** (Cubism). Confirm the ~20 parts pack into 4096 during
   Phase 1.0 / W1; if not, reduce upscale or merge parts.
-  > **Phase 1.0 finding (2026-05-31): Cubism FREE caps the atlas at 2048×2048, not 4096.**
-  > For the full ~20-part build, plan for this: split across **multiple 2048 atlases**
-  > (Cubism supports several), **lower the upscale**, or use **Cubism PRO** (paid) for 4096.
-  > The 6-part pilot packed into a single 2048 atlas with room to spare.
+  > **Phase 1.0 finding + W4.1 web-check (2026-05-31): Cubism FREE = a SINGLE 2048×2048 atlas, ≤100
+  > pieces. Multiple atlases are PRO-only** (the earlier "Cubism supports several" wording was wrong).
+  > For the ~19-part build, pack into the one atlas via Auto Layout "set magnification automatically"
+  > (≈0.5× on layout); or **lower the upscale**, or use **Cubism PRO** (paid) for 4096 / multi-atlas.
+  > The 6-part pilot packed into a single 2048 atlas with room to spare. **Authoritative decision: the
+  > `Atlas packing decision (W3.4)` entry below.**
 - **Order:** lock → upscale the whole base once → then separate parts (never per-part
   upscale).
 

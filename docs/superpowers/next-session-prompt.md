@@ -23,8 +23,9 @@ gitignored — regenerate via `full_segment.py` + `build_psd_full.py` if missing
 Tier-1 walkthrough is in `RIG_GUIDE.md` ("Full Build (W4)") and `check_model.py` (W4.3) is staged — do
 NOT re-write them. **Start at W4.2:** the USER rigs `lotte.cmo3` in Cubism 5.3 FREE and exports
 `model/lotte.model3.json` (+ `.moc3` **at version 5.0**), then the agent runs `check_model.py`. Carry the W3
-realities into W4: atlas — parts at full res are ~3× one FREE 2048 atlas, so scale the Cubism import
-~0.5× (≈1254²) or use 2 atlases (BASE.md W3.4); part set — bangs are baked into face_base, hair is
+realities into W4: atlas — parts at full res are ~3× one FREE 2048 atlas, so pack into the **single**
+atlas via Auto Layout "set magnification automatically" (FREE = one atlas only, multi is PRO; BASE.md
+W3.4 / registry INV-7); part set — bangs are baked into face_base, hair is
 `hair_L`/`hair_R` (front side locks). **W3↔W4 loop:** if rigging needs a part split/merged, edit
 `full_segment.py` (`BOXES` dict / `col_layer` calls) and re-run. STOP at the W4 Cubism rig (USER) and
 W5 Discord verify, and at any decision that genuinely needs the user.
@@ -61,9 +62,10 @@ Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifac
 - **moc3 export MUST target ≤ v5.** Cubism Editor 5.3 exports moc3 **v6** by default; the pinned web
   Core reports `csmGetLatestMocVersion()=5` and **rejects v6**. Export at `.moc3 file version` **5.0**
   (or 4.2). Fallback: bump the Core / use the `pixi-live2d-display-lipsyncpatch` fork. *(Pilot-confirmed.)*
-- **Texture atlas: Cubism FREE caps it at 2048×2048** (NOT 4096). Keep hi-res masters in
-  `live2d/assets/`, but scale the Cubism source so ~20 tight-bounded parts fit one 2048 atlas (or use
-  2 atlases / lower upscale). *(Pilot-confirmed — supersedes BASE.md's earlier 4096 assumption.)*
+- **Texture atlas: Cubism FREE = a SINGLE 2048×2048 atlas** (NOT 4096; multiple atlases are PRO-only —
+  web-verified W4.1). Keep hi-res masters in `live2d/assets/`, and pack the ~19 parts into the one atlas
+  via Auto Layout "set magnification automatically" (≈0.5× on layout). *(Supersedes BASE.md's earlier
+  4096 assumption and any "2-atlas" wording.)*
 - **Base:** rig the character from `lotte-discord-original.png` (more facial px); ambient background
   from `lotte-discord-version.png` (pixel-aligned outpaint). Rasters in `live2d/source/`, never `src/`.
 - **Eye-smile param:** use the Cubism template's standard **`EyeL Smile` / `EyeR Smile`** — **there is
