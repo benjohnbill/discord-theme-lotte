@@ -4,7 +4,7 @@ Read this FIRST every session. Pipeline state lives here, not in handoffs or mem
 
 ## Current state / next action
 - **Phase 1.0 pilot: COMPLETE — gate = GO.** Whole chain proven end to end (art→harvest→separation→PSD→Cubism rig→moc3 v5→runtime render+tilt+blink). See live2d/pilot/RESULT.md Task 7.
-- **Next action: detail the full W1–W5 plan** (separate writing-plans pass), carrying the pilot learnings below. Headline: moc3 export must target ≤ v5 (Cubism 5.3 default v6 won't load on the pinned Core); Cubism FREE atlas cap = 2048 (update BASE.md 4096); W4 rig = mesh-deformation blink + split L/R eyes + gaze + ~20 parts.
+- **W1–W5 full-build plan WRITTEN:** `docs/superpowers/plans/2026-05-31-lotte-live2d-full-build-w1-w5.md` (carries all pilot learnings). **Next action: execute W1** (base lock + upscale) via superpowers:executing-plans. Headline constraints baked in: moc3 export ≤ v5; Cubism FREE atlas cap = 2048; W4 = mesh-deformation blink + L/R eyes + gaze + ~20 parts + restrained smile state machine.
 - Pilot Python = live2d/pilot/.venv (Pillow/rembg/psd-tools/pytoshop); default python3 is 3.14 with no PIL and is PEP-668 externally-managed.
 
 ## Phase 1.0 — Vertical-Slice Pilot
