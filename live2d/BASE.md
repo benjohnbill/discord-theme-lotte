@@ -50,6 +50,9 @@ background source adapts to the 16:9 QHD without distortion.
   **not** fit one FREE atlas. *(Conservative: `face_base`'s bbox is the full canvas because the
   isnet-anime matte leaves faint stray alpha at the corners; real content is smaller.)* **Decision for W4:**
   scale the **Cubism import** down to ~**0.5×** (≈1254² working canvas) so all parts pack into **one 2048
-  atlas** with slack — OR let Cubism use **2 atlases** if FREE permits (verify in W4). Either way the hi-res
-  `assets/lotte_base.png` master is preserved; only the Cubism source is scaled. Re-decide in W4 against the
-  real atlas tool (it can downscale on layout).
+  atlas** with slack — using the atlas tool's
+  **Auto Layout → "Set magnification automatically" (1–100%)**, which downscales parts on layout to fit.
+  **Verified W4.1 (2026-05-31, web-check): Cubism FREE allows only ONE atlas (max 2048²); multiple
+  atlases are PRO-only — the "2-atlas" fallback is OFF the table.** Our 19 parts are well under the
+  FREE 100-piece cap. The hi-res `assets/lotte_base.png` master is preserved; only the in-editor atlas is
+  scaled. (Edit Texture Atlas manual: https://docs.live2d.com/en/cubism-editor-manual/texture-atlas-edit/)

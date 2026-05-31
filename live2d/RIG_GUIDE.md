@@ -149,8 +149,129 @@ confirms blink / gaze / smile / sway. Keep the rig rough — this proves the cha
 
 ---
 
-## Full build (W4) — extends this guide after the pilot gate
+## Full Build (W4) — the real Tier-1 rig
 
-The full Tier-1 rig (≈20 parts, full deformer hierarchy, restrained value ranges, the
-eye-contact-smile state machine, complete physics) is detailed in the W4 plan and written
-into this guide after the Task 7 gate, carrying the pilot's learnings.
+This is the production rig. Do it in **Cubism 5.3 FREE**. It carries the pilot's learnings and
+the W3 separation decisions. Keep everything **Tier-1 restrained** — start under-animated; you
+can always add motion later. The param IDs/ranges are the verified table in **Pilot Step 5** above
+(unchanged); the steps below are the full-build deltas, web-verified against the current manual
+(May 2026).
+
+**Inputs W3 prepared for you:**
+- `live2d/lotte.psd` — **19 full-canvas aligned layers** (2508²), depth-ordered back→front. These are
+  the ArtMesh / Part names you will rig:
+  `body, scarf, neck, face_base, brow_L, brow_R, sclera_L, iris_L, sclera_R, iris_R, upperlid_L,
+  upperlid_R, lowerlid_L, lowerlid_R, mouth_inner, mouth_outer, hair_L, hair_R, ribbon`.
+- `live2d/lotte-preview.png` — flattened preview (the static "closed-eye + closed-mouth on top" look is
+  EXPECTED; the rig morphs between keyforms so both states never show at once).
+- (PSD/preview are gitignored — if missing, regenerate: `live2d/pilot/.venv/bin/python
+  live2d/tools/full_segment.py` then `… build_psd_full.py`.)
+
+**What changed from the pilot — read before you start:**
+- **Bangs are baked into `face_base`** (W3.2 user decision). There is NO separate bangs part; the fringe
+  deforms with the head/face, not as its own physics chain.
+- **Hair = two front side locks**, `hair_L` / `hair_R`. Back hair is baked into `face_base`. So hair
+  physics = 2 chains + the ribbon (not the 6 the early plan listed).
+- **`face_base` already has cheek/jaw skin reconstructed under the side hair** (W2 cheekjaw patch), so
+  when `hair_L/R` sway they reveal skin, not a hole. (No forehead reconstruction — bangs are baked in.)
+- **Blink is MESH DEFORMATION, not opacity** (the pilot crude-faded opacity; the real rig deforms the
+  eye closed).
+- **Eye-smile uses `EyeL Smile` / `EyeR Smile`** — there is NO standard `ParamEyeForm` (the pilot Step 5
+  flagged this; it is now settled).
+
+### W4 Step 1 — Import + auto-mesh
+File ▸ Open `live2d/lotte.psd`. Each layer → an ArtMesh in register; names appear in the Parts palette.
+Select all (Ctrl+A) ▸ **Automatic Mesh generator** (Ctrl+Shift+A) ▸ accept the default preset. Then
+hand-clean the **eye, lid, and mouth** meshes (they deform the most).
+Manual: https://docs.live2d.com/en/cubism-editor-manual/reimport-psd/ ·
+https://docs.live2d.com/en/cubism-editor-manual/mesh-edit/
+
+### W4 Step 2 — Deformer hierarchy (flat discipline, `DECISIONS.md` §6)
+Build this nest so parameters cascade (do NOT leave parts auto-flat). Parent each part into the right
+deformer by dragging in the Parts/Deformer palette:
+```
+root
+└─ body (warp)            ← ParamBodyAngleX, ParamBreath        [body, scarf, neck]
+   └─ head (rotation)     ← ParamAngleX / Y / Z                 [face_base + everything on the face]
+      ├─ face (warp)      ← holds face_base
+      │  ├─ eyes (warp)   ← brow_L/R, sclera_L/R, iris_L/R, upperlid_L/R, lowerlid_L/R
+      │  └─ mouth (warp)  ← mouth_inner, mouth_outer
+      └─ hair (physics)   ← hair_L, hair_R, ribbon
+```
+Auto-deformer helper: https://docs.live2d.com/en/cubism-editor-manual/auto-generation-of-deformer/
+
+### W4 Step 3 — Clipping masks (eyes)
+Set `sclera_L` and `sclera_R` as **masks**; clip `iris_L` → `sclera_L` and `iris_R` → `sclera_R` so the
+iris can gaze without leaving the white. Upper + lower lids ride ABOVE the sclera (not clipped).
+Manual: https://docs.live2d.com/en/cubism-editor-manual/clipping-mask/
+
+### W4 Step 4 — Blink via MESH DEFORMATION (verified procedure)
+Replaces the pilot's opacity crossfade. For each eye (do L and R independently — the head tilt puts them
+at different heights, so do NOT copy one onto the other):
+1. Select `ParamEyeLOpen` (then `ParamEyeROpen`) ▸ click **[Add 2 Keyforms]** → value **1 = open**,
+   **0 = closed**.
+2. At **value 0 (closed)**: with the **Deform Path tool**, deform the open-eye mesh (sclera + iris) down
+   into a closed slit — pull the inner/outer corners and the lid line into the closed shape — and bring
+   `upperlid_L/R` DOWN over the eye (the upperlid art is the harvested *closed-eye* shape, already
+   correct). Deform Path: https://docs.live2d.com/en/cubism-editor-manual/deformpath/
+3. Because `iris` is clipped to `sclera` and the sclera mesh collapses, the eyeball won't poke through
+   when closed (clipping does the occlusion).
+4. Leave value 1 (open) as the neutral import shape.
+Keyform tutorial: https://docs.live2d.com/en/cubism-editor-tutorials/eye-blink/ — runtime auto-blink
+drives `ParamEyeLOpen/ROpen` 1→0→1.
+
+### W4 Step 5 — Gaze
+On `ParamEyeBallX` (−1..1, + = right) and `ParamEyeBallY` (−1..1, + = up): add keys that **translate
+`iris_L/R`** within the sclera clip — only a few px at the extremes (small, Tier-1). Runtime
+`model.focus(x,y)` drives these from the cursor.
+
+### W4 Step 6 — Eye-smile (lower lids)
+Add `EyeL Smile` / `EyeR Smile` (0..1). At 1, raise `lowerlid_L/R` into a soft upward crescent (the
+harvested eyes-smile lid art) — the "soft creased smile" eyes. **There is no `ParamEyeForm`.**
+
+### W4 Step 7 — Mouth (open↔closed + form)
+- `ParamMouthOpenY` (0..1): 0 shows `mouth_outer` (closed-lip art); opening reveals `mouth_inner`
+  (cavity). Keep the open amount small.
+- `ParamMouthForm` (−1..1, + = smile): gently curve the lip line up at +1; the closed-smile keyform uses
+  the `mouth_outer` closed art.
+
+### W4 Step 8 — Head + body (FLAT only)
+- `ParamAngleZ` (−30..30, + = tilt right): the charm channel — keep gentle; deforms the head deformer.
+- `ParamAngleX / ParamAngleY` (−30..30): **FLAT ONLY** — planar offset + a tiny rotation + hair/body lag.
+  **Do NOT build cheek/nose/mouth parallax** (the easiest way to accidentally get the 3D look —
+  `DECISIONS.md` §6).
+- `ParamBodyAngleX` (−10..10): subtle body lean (the body warp). `ParamBreath` (0..1): gentle rise;
+  runtime auto-breath drives it.
+
+### W4 Step 9 — Physics (hair + ribbon sway)
+Add Physics settings with pendulum chains driven by head/body angle:
+- `hair_L`, `hair_R` — 1–2 link pendulums each, **low output scale** so it reads as flat 2D sway (not a
+  3D flop).
+- `ribbon` — a short, light pendulum.
+Bangs/back hair are in `face_base` and move with the head deformer (no separate chain).
+Editor manual top: https://docs.live2d.com/en/cubism-editor-manual/top/
+
+### W4 Step 10 — Texture atlas (FREE = ONE 2048 atlas)
+**[Edit Texture Atlas]** ▸ New, size **2048×2048** ▸ **Auto Layout** ▸ enable **"Set magnification
+automatically"** (1–100%) so all 19 parts scale down to fit ONE atlas.
+> **Verified (May 2026):** Cubism **FREE allows only a single texture atlas** (max 2048×2048) and ≤100
+> pieces (we have 19). **Multiple atlases are PRO-only** — so everything MUST fit this one atlas; the
+> auto-magnification is how it fits (≈0.5× effective). The hi-res `assets/lotte_base.png` master is
+> untouched. Manual: https://docs.live2d.com/en/cubism-editor-manual/texture-atlas-edit/
+
+### W4 Step 11 — Export (moc3 ≤ v5 — CRITICAL)
+File ▸ **Export embedded file** ▸ moc3. Include `.moc3`, `.model3.json`, **textures**, `physics3.json`,
+`.cdi3.json`. **Set `.moc3 file version` to 5.0 (or 4.2) — NOT the v6 default**, or the runtime Core
+rejects it (pilot-confirmed: the pinned Core reports `csmGetLatestMocVersion()=5`). Export to
+`live2d/model/` as `lotte.model3.json` (+ companions); save the project as `live2d/lotte.cmo3`. Then the
+agent runs `check_model.py` (W4.3) to assert the version + populate the EyeBlink group.
+Compatibility ref: https://docs.live2d.com/en/cubism-sdk-manual/compatibility-with-cubism-5/
+
+### Tier-1 restraint cheat-sheet (start here; loosen only if it feels dead)
+- Gaze: a few px of iris travel. Tilt (`ParamAngleZ`): ±10–15° in normal idle, not the full ±30.
+  Breath/lean: subtle. Smile: occasional, gentle. Hair: low physics scale.
+- Most of the life is FREE from runtime auto-blink + auto-breath + physics. The cursor only drives a
+  small damped gaze + slight head, plus the occasional eye-contact smile (the W5.1 state machine).
+- If a part is too rough to rig cleanly, **merging it is an allowed outcome** (`DECISIONS.md` §6, spec
+  §4) — and the W3↔W4 loop lets you re-cut: edit `live2d/tools/full_segment.py` (`BOXES` / `col_layer`)
+  and re-run `full_segment.py` + `build_psd_full.py`.
