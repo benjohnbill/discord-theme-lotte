@@ -30,12 +30,18 @@ lotte-discord-original  ──┬──► lotte-discord-version   (Discord back
 
 ## Base selection (W1)
 
-W1 (base lock + upscale) compares `version` vs `original` for facial resolution,
-locks one, upscales it with waifu2x, and writes the result to
-`live2d/assets/lotte_base.png` with its rationale in `live2d/BASE.md`. Because
-`version` is itself a derivation of `original`, their faces should be close; the
-choice is mostly about which gives cleaner, higher-resolution facial pixels while
-keeping the Discord look. These four files stay here as the untouched originals.
+The discord-version bridge prompt (`live2d/gen/PROMPTS.md` §1) shows `version` is a
+**side-extension (outpaint)** of `original`: the character is preserved and
+pixel-aligned, only the left/right background is new. So `version`'s character is
+`original`'s character, and since `version` is 992 tall vs `original`'s 1254 for the
+same crop, **`original` carries more facial pixels.**
+
+Likely base plan (confirm in W1): **rig the character from `original`** (more facial
+resolution, it is the parent) and **borrow `version`'s extended background** as the
+ambient layer — they align because the character is pixel-aligned between them. W1
+upscales the chosen character source with waifu2x and writes
+`live2d/assets/lotte_base.png` with its rationale in `live2d/BASE.md`. These four
+files stay here as the untouched originals.
 
 **Provenance:** copied from the user's Windows assets folder
 `C:\Users\benjohnbill\OneDrive\바탕 화면\Life_System\04_System_Assets\` on 2026-05-31.
