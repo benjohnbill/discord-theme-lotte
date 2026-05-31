@@ -1,0 +1,7 @@
+# Generated W3 separation outputs — fully reconstructed by live2d/tools/full_segment.py +
+# build_psd_full.py from the committed base (assets/lotte_base.png), refs/patches (gen/), and the
+# pilot eyes-closed art. Heavy (lotte.psd ~69M, layers/ ~20M) and regenerable, so kept OUT of git to
+# avoid bloating history. They stay on-disk for the W4 Cubism import. To pin them, `git add -f` or use git-LFS.
+layers/
+lotte.psd
+lotte-preview.png

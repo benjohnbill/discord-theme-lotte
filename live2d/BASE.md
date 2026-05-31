@@ -45,4 +45,11 @@ background source adapts to the 16:9 QHD without distortion.
 - Background (ambient layer, OUT of model): `live2d/source/lotte-discord-version.png`.
 - sha256 (character source): `84175c6721cfe8afab0e2ace90c81cb1951063ecbd69a934bcba0ba94567ffcc`
 - Upscale applied: PIL Lanczos x2 (fallback; no neural upscaler in env) → `live2d/assets/lotte_base.png` (2508×2508), sha256 `c0e07b09fc0c4c4e…`. Quality note: softer than a neural upscaler (waifu2x/realesrgan/opencv all absent in env); acceptable for the soft-focus master, but re-upscale with a neural tool before W3 if edge crispness proves insufficient. Master preserved hi-res regardless of the later atlas downscale.
-- Atlas packing decision: _(W3.4 / W4 fills)_
+- Atlas packing decision (W3.4, 2026-05-31): at the full 2508² master resolution the 19 tight-bounded
+  parts sum to ~12.67M px² ≈ **3.0× a single 2048×2048 atlas** (4.23× with 1.4 packing slack) — does
+  **not** fit one FREE atlas. *(Conservative: `face_base`'s bbox is the full canvas because the
+  isnet-anime matte leaves faint stray alpha at the corners; real content is smaller.)* **Decision for W4:**
+  scale the **Cubism import** down to ~**0.5×** (≈1254² working canvas) so all parts pack into **one 2048
+  atlas** with slack — OR let Cubism use **2 atlases** if FREE permits (verify in W4). Either way the hi-res
+  `assets/lotte_base.png` master is preserved; only the Cubism source is scaled. Re-decide in W4 against the
+  real atlas tool (it can downscale on layout).
