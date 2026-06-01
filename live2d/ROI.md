@@ -42,12 +42,15 @@ Contribution shown with *confidence*; cost grounded in the reuse basis below.
 
 ## Gate-ordered execution (cheap measurements gate expensive commits)
 
-- **Phase A — near-free, high-confidence (no new art, no re-export).** Clamp tilt/turn amplitude (fixes the
-  live "too large" / 경박); set gaze = head-lean (zero the focus controller's eyeball weight + damp); confirm
-  breath. Applies to the **current** rig as-is → should already read better than the gray-bg footage.
-- **Phase B — cheap, high-information gate.** Produce the scene plate (#5, one inpaint), then **re-render the
-  existing rig over the scene plate.** Measures: (1) does ribbon/hair-tail sway (#4) read clean over a congruent
-  backdrop? (2) how much of the "누더기" was alien-gray-bg unfairness vs class-B face cuts? **No re-export needed.**
+- **Phase A — DONE (2026-06-02, in working tree, uncommitted).** Clamp tilt/turn amplitude + gaze = head-lean,
+  wired in `build_discord_probe.py` (`im.updateFocus` override; `GAZE = {eye:0, xy:8, z:6, body:5}` — eyeball
+  weight 0 = no iris cut; Angle/Body gains clamped from the lib default 30/30/10 → 8/6/5; FocusController spring
+  still damps); `runtime-check-full.html` updated to match. Gate accepted (read calmer / less 경박) → advanced
+  to Phase B.
+- **Phase B — IN PROGRESS (2026-06-02): scene-plate generation.** Cheap, high-information gate. Produce the
+  scene plate (#5, one inpaint — prompts in `gen/PROMPTS.md`), then **re-render the existing rig over the scene
+  plate.** Measures: (1) does ribbon/hair-tail sway (#4) read clean over a congruent backdrop? (2) how much of
+  the "누더기" was alien-gray-bg unfairness vs class-B face cuts? **No re-export needed.**
 - **Phase C — gated high-value, medium cost.** Re-align the closed-eye band at full base + feather; rig as
   opacity-swap. Gate at **real Discord scale**: does it read as a blink or a glitch (2-state first)?
 - **Phase D — core re-export (commit only after B/C signal).** Re-segment with fewer cuts + bake eyebrows into

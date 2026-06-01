@@ -1,4 +1,4 @@
-# Next Session — Lotte Live2D — rig-strategy PIVOT decided; next = Phase A config tune
+# Next Session — Lotte Live2D — Phase A DONE; Phase B (scene plate) IN PROGRESS
 
 > Phase 0 = DONE/GO. Phase 1.0 pilot = DONE/GO. **Phase 1 full build = mechanically DONE/PASS (W1–W5 +
 > physics, 2026-06-01) but SUPERSEDED on quality:** the first live Discord render exposed the
@@ -18,14 +18,15 @@ Paste the body below (inside the `---` block) into the next Claude session as th
 the mesh-deform rig as "누더기" (patchwork). The **rig-strategy pivot (ADR-0001) is decided**; the next work
 is its gate-ordered execution, NOT "Phase 1 done → Phase 2". Read `live2d/PIPELINE.md` + `live2d/ROI.md` FIRST.
 
-**START HERE — Phase A (near-free: no new art, no re-export).** Config-tune the EXISTING rig/probe:
-1. gaze = head-lean — zero the eyeball weight in the `model.focus()` controller (the probe drives
-   `model.focus(clientX, clientY)`, which currently tracks the iris too); damp the lean amplitude.
-2. clamp head tilt/turn amplitude (the live swings read "too large" / 경박).
-3. confirm breath.
-Verify in the real Discord client or a SwiftShader throwaway Chrome (bh-chrome has no WebGL — memory
-`bh-chrome-no-webgl`). Then follow `live2d/ROI.md`'s gate order: B (scene-plate re-render) → C (blink band)
-→ D (core re-export).
+**START HERE — Phase B (scene plate) IS IN PROGRESS.** Phase A (config tune) is DONE in the working tree
+(uncommitted): gaze = head-lean (`build_discord_probe.py` overrides `im.updateFocus` with
+`GAZE = {eye:0, xy:8, z:6, body:5}` — eyeball weight 0 = no iris cut; Angle/Body gains clamped from the
+lib default 30/30/10 → 8/6/5) + `runtime-check-full.html` updated to match. **Phase B now:** produce the
+scene-plate inpaint (character removed from `version`; prompts in `gen/PROMPTS.md`), then re-render the
+EXISTING rig over it (the B gate — does ribbon/hair-tail sway read over a congruent backdrop? how much
+"누더기" was alien-gray-bg unfairness vs class-B face cuts? **no re-export**). Verify in the real Discord
+client or a SwiftShader throwaway Chrome (bh-chrome has no WebGL — memory `bh-chrome-no-webgl`). Then
+follow `live2d/ROI.md`'s gate order: C (blink band) → D (core re-export).
 
 **Open / gate-dependent — do NOT pre-decide:** mouth keep vs drop · 2-state vs 3-state blink · blink
 survival at real scale.
