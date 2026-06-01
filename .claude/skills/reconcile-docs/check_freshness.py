@@ -46,10 +46,14 @@ DENYLIST = [
      "multi-atlas as a FREE option (multi-atlas is PRO-only)"),
     ("INV-8", re.compile(r"ParamEyeForm"), "ParamEyeForm rig param (use EyeL/R Smile)"),
     ("INV-1", re.compile(r"\b(cubism2|dylanNew)\b"), "cubism2/dylanNew for the rig (rig is Cubism 4)"),
-    ("split-brain", re.compile(r"already merged into\s+`?master", re.I),
-     "'already merged into master' (master is NOT merged)"),
-    ("split-brain", re.compile(r"clean fast-forward is available|0 commits master-only", re.I),
-     "'clean fast-forward available' (the branch is 3-way diverged)"),
+    # INV-5 RESOLVED 2026-06-01: live2d-spike was merged into master and removed; master is the
+    # single authority. The OLD split-brain language is now the superseded value.
+    ("INV-5", re.compile(r"live2d-spike\s+(?:is|carries|copy is)\b(?![^.]*\bmerged\b)", re.I),
+     "live2d-spike as live/authority (it was MERGED into master and removed)"),
+    ("INV-5", re.compile(r"(?:worktree is the authority|authority until .* merge|split-brain (?:active|reopened|RE-ACTIVATED))", re.I),
+     "worktree-authority / active split-brain (RESOLVED — master is the authority)"),
+    ("INV-5", re.compile(r"`?master`?\s+is\s+NOT\s+merged", re.I),
+     "'master is NOT merged' (spike WAS merged into master 2026-06-01)"),
 ]
 
 # Hit line or up to 2 preceding non-blank lines mark it superseded/correct.
@@ -67,6 +71,8 @@ FRONTIER = re.compile(
     r"\bW(\d+(?:\.\d+)?)\b"
 )
 COMMITS = re.compile(r"\b(\d+)\s+commits\b")
+# A commit-count phrased against origin is compared to origin..HEAD, not master..HEAD.
+AHEAD_OF_ORIGIN = re.compile(r"ahead of\s+`?origin", re.I)
 HISTORY_ROLE = re.compile(r"history|annotate|never rewrite|superseded", re.I)
 
 
@@ -199,6 +205,8 @@ def main():
         mb = sh(["git", "merge-base", "master", "HEAD"], root)
         ahead = sh(["git", "rev-list", "--count", f"{mb}..HEAD"], root) if mb else ""
         behind = sh(["git", "rev-list", "--count", "HEAD..master"], root) if mb else ""
+        # origin baseline: a count phrased "ahead of origin" is compared to origin/master..HEAD.
+        ahead_origin = sh(["git", "rev-list", "--count", "origin/master..HEAD"], root) or ""
         for path in surfaces:
             if path in history:
                 continue
@@ -208,8 +216,11 @@ def main():
                 continue
             for i, line in enumerate(lines):
                 m = COMMITS.search(line)
-                if m and ahead and m.group(1) != ahead:
-                    warns.append(f"[branch] {rel(path)}:{i+1}: prose pins '{m.group(1)} commits' but git ahead = {ahead} (counts drift — prefer qualitative)")
+                if not m:
+                    continue
+                baseline, blabel = (ahead_origin, "origin") if AHEAD_OF_ORIGIN.search(line) else (ahead, "master-base")
+                if baseline and m.group(1) != baseline:
+                    warns.append(f"[branch] {rel(path)}:{i+1}: prose pins '{m.group(1)} commits' but git ahead ({blabel}) = {baseline} (counts drift — prefer qualitative)")
         if behind and behind != "0":
             print(f"note: branch is 3-way (master has {behind} commit(s) HEAD lacks) — any 'clean FF' claim is a FAIL above.")
 

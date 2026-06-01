@@ -1,10 +1,10 @@
-# Next Session — Lotte Live2D Aliveness, Phase 1 (Rig the real Lotte) — EXECUTE the full build (W1–W5)
+# Next Session — Lotte Live2D Aliveness — Phase 1 COMPLETE; next = optional polish or Phase 2
 
-> Phase 0 = DONE/GO. **Phase 1.0 vertical-slice pilot = DONE/GO (2026-05-31)** — the whole
-> art→rig→runtime chain is proven. **Full-build W1 (base lock+upscale) + W2 (4 hidden-state patches)
-> + W3 (19-part separation → `lotte.psd`) + W4.1 (rig walkthrough + W4.3 checker staged) = DONE (2026-05-31).** Frontier = **W4.2** (USER
-> rigs the PSD in Cubism 5.3 FREE). This launcher is thin by design — substance lives in the spec + plan + `live2d/PIPELINE.md`
-> + auto-loaded memory.
+> Phase 0 = DONE/GO. Phase 1.0 pilot = DONE/GO. **Phase 1 FULL BUILD = DONE/PASS (W1–W5 + physics,
+> finished 2026-06-01).** The full Lotte rig drives end-to-end in pixi-live2d-display@0.4.0 + Cubism
+> Core 5.1. **`live2d-spike` was merged into `master` and removed — `master` is now the single
+> authority** (local-only, ~55 commits ahead of origin, NOT pushed). This launcher is thin by design —
+> substance lives in `live2d/PIPELINE.md` + the spec + auto-loaded memory.
 
 Paste the body below (inside the `---` block) into the next Claude session as the initial prompt.
 
@@ -12,47 +12,52 @@ Paste the body below (inside the `---` block) into the next Claude session as th
 
 ## Task
 
-**Phase 1 design is settled and the pilot already proved the chain — do NOT re-brainstorm or re-run the pilot.**
-Execute the full build: `docs/superpowers/plans/2026-05-31-lotte-live2d-full-build-w1-w5.md`, using
-`superpowers:executing-plans` (recommended — the plan interleaves agent scripts with user GUI work in
-ChatGPT/Cubism/Discord, so inline + user-verification fits better than autonomous subagents).
+**Phase 1 is COMPLETE — do NOT re-brainstorm, re-run the pilot, or re-execute W1–W5.** The rig is built,
+exported (moc3 v5), runtime-verified, and physics (hair + independent ribbon sway) is rigged and
+CDP-phase-verified. Read `live2d/PIPELINE.md` FIRST for live state.
 
-**W1 + W2 + W3 + W4.1 are DONE (2026-05-31).** Start at **W4.2** (full Cubism rig — USER GUI in Cubism 5.3 FREE).
-Read `live2d/PIPELINE.md` FIRST for live state. W3 produced the 19-part `live2d/lotte.psd` (on-disk,
-gitignored — regenerate via `full_segment.py` + `build_psd_full.py` if missing). **W4.1 DONE:** the full
-Tier-1 walkthrough is in `RIG_GUIDE.md` ("Full Build (W4)") and `check_model.py` (W4.3) is staged — do
-NOT re-write them. **Start at W4.2:** the USER rigs `lotte.cmo3` in Cubism 5.3 FREE and exports
-`model/lotte.model3.json` (+ `.moc3` **at version 5.0**), then the agent runs `check_model.py`. Carry the W3
-realities into W4: atlas — parts at full res are ~3× one FREE 2048 atlas, so pack into the **single**
-atlas via Auto Layout "set magnification automatically" (FREE = one atlas only, multi is PRO; BASE.md
-W3.4 / registry INV-7); part set — bangs are baked into face_base, hair is
-`hair_L`/`hair_R` (front side locks). **W3↔W4 loop:** if rigging needs a part split/merged, edit
-`full_segment.py` (`BOXES` dict / `col_layer` calls) and re-run. STOP at the W4 Cubism rig (USER) and
-W5 Discord verify, and at any decision that genuinely needs the user.
+There is no forced next step. Pick up one of these, per the user:
+- **W5 polish (OPTIONAL, USER art/tune calls — not blockers):** (a) dark hair-edge halo + faint circular
+  vignette around the character (W3 isnet-anime matte residue + face_base disc boundary) — the main
+  visual item; fix via the W3↔W4 loop (`full_segment.py` `BOXES`/matte → re-import → re-rig). (b)
+  eye-smile reads too strong (`Smile=1` nearly closes the eye) — re-tune the keyform in Cubism. (c) faint
+  rectangular seam near the viewer-right eye/forehead.
+- **Phase 2 — productionize the Discord delivery:** a persistent always-on background needs a Vencord
+  userplugin (dev Vencord + Node/git on Windows; themes/QuickCSS can't run JS). Feasibility already
+  proven in Phase 0 (CSP allows the CDN runtime, Electron has WebGL 2). This is the recommended real
+  next arc once polish is settled.
+- **Push `master`:** Tier-3, needs explicit user sign-off (never push yourself).
+
+**W3↔W4 loop (still valid for polish):** if a part needs split/merge, edit `full_segment.py`
+(`BOXES` / `col_layer`) → re-run `full_segment.py` + `build_psd_full.py` → re-import to Cubism → re-rig →
+re-export (moc3 5.0) → `check_model.py` → re-verify with `live2d/runtime-check-full.html`.
 
 ## Read first (substance, in order)
 
-1. `MEMORY.md` auto-loads → `lotte-live2d-aliveness-direction` (decided design + Phase 0 GO + **pilot
-   GO + the confirmed learnings**) and `bh-chrome-no-webgl` (no headless WebGL → use a SwiftShader
-   throwaway Chrome for any render check).
-2. **`live2d/PIPELINE.md`** — the live pipeline-state **authority**. Read it first for "where are we / what's next".
-3. **Plan:** `docs/superpowers/plans/2026-05-31-lotte-live2d-full-build-w1-w5.md` — W1–W5, complete
-   scripts + per-reference GPT prompts + guided rig + the W5 smile state machine.
-4. **Spec:** `docs/superpowers/specs/2026-05-31-lotte-live2d-phase1-rig-design.md` — goal, 8 locked
-   decisions, layer map, params, workstreams, success criteria.
-5. **Pilot record:** `live2d/pilot/RESULT.md` — what the pilot proved + the learnings the plan carries.
+1. `MEMORY.md` auto-loads → `lotte-live2d-aliveness-direction` (decided design + Phase 0 GO + pilot GO +
+   the confirmed learnings + **Phase 1 build DONE**) and `bh-chrome-no-webgl` (no headless WebGL → use a
+   SwiftShader throwaway Chrome for any render check).
+2. **`live2d/PIPELINE.md`** — the live pipeline-state **authority**. Read it first for "where are we / what's done / what's optional next".
+3. **Spec:** `docs/superpowers/specs/2026-05-31-lotte-live2d-phase1-rig-design.md` — goal, 8 locked
+   decisions, layer map, params, success criteria.
+4. **Plan (now history):** `docs/superpowers/plans/2026-05-31-lotte-live2d-full-build-w1-w5.md` — the
+   W1–W5 build, completed; useful as the record of how each stage was done (don't re-execute).
+5. **Runtime/physics evidence:** `live2d/w5-runtime-*.png` + the harness `live2d/runtime-check-full.html`
+   (`?autosine`/`?cinema` for motion); `live2d/pilot/RESULT.md` is the pilot record.
 
 ## Working directory
 
-This worktree: `/home/benjohnbill/dev/discord-theme-lotte/.worktrees/live2d-spike` (branch `live2d-spike`).
-**Branch state (2026-05-31): `live2d-spike` is 3-way DIVERGED from `master`** (NOT a clean fast-forward).
-`live2d-spike` carries all W1–W4.1 + the reconcile/skill work (many commits ahead, growing each pass);
-`master` carries only the STALE-redirect banner commit `336822a` that the worktree lacks. Merge-base =
-`a6674fb`; master tip = `336822a`. **`master` is NOT merged** and its Live2D docs are stale — the worktree
-is the authority. Do W4.2 here; merge (3-way, at W5) and push need sign-off. Under `live2d/`: `PIPELINE.md` (authority), `DECISIONS.md`,
-`BASE.md`, `RIG_GUIDE.md`, `source/` (rasters + SHA256SUMS), `gen/PROMPTS.md`, and `pilot/` (the
-complete Phase 1.0 pilot: scripts, layers, `lotte-pilot.psd`, `model/` moc3 v5, `RESULT.md`). Pilot
-Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifacts in
+`/home/benjohnbill/dev/discord-theme-lotte` on branch **`master`** (the live2d-spike worktree was merged
+and removed 2026-06-01 — do not look for it). **`master` is the single authority.** It is **local-only:
+~55 commits ahead of `origin/master`, NOT pushed** — pushing is Tier-3 (sign-off only; never push/force
+yourself). `master` also has one unrelated uncommitted change (a background-image swap in
+`src/base/background.css` + dist rebuild) that predates this work — leave it to the user.
+
+Under `live2d/`: `PIPELINE.md` (authority), `DECISIONS.md`, `BASE.md`, `RIG_GUIDE.md`, `lotte.cmo3`
+(editable rig master — committed), `model/` (runtime set: moc3 v5 + textures + physics3 + cdi3),
+`runtime-check-full.html` + `w5-runtime-*.png` (verify harness + evidence), `source/` (rasters +
+SHA256SUMS), `gen/PROMPTS.md`, `tools/` (separation + `check_model.py`), and `pilot/` (the Phase 1.0
+pilot). Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifacts in
 `experiments/live2d-spike/`.
 
 ## Carry-forward facts (do not re-derive)
@@ -81,11 +86,12 @@ Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifac
 
 ## Hard rules
 
-- **Shell:** prefix dev commands with `rtk`. **`master`:** the worktree is **NOT** merged into `master`
-  (3-way diverged per INV-5; merge deferred to W5 with sign-off); never merge, push, or force-push `master`
-  without sign-off; new commits only (no amend). **Aesthetic:** Tier 1 restraint is the whole game.
+- **Shell:** prefix dev commands with `rtk`. **`master`:** it is the authority now (spike merged in), but
+  **local-only and NOT pushed** — never push or force-push without sign-off; new commits only (no amend
+  of pushed history). **Aesthetic:** Tier 1 restraint is the whole game — for hair/ribbon physics the
+  liveness comes from phase *lag*, not amplitude (CDP-verified: ribbon trails the head ~5 frames).
 
 ## Stopping conditions
 
-Stop and report at: a user-action task (W4.2 Cubism rig, W5 Discord verify), any workstream
-gate, or any decision that genuinely needs the user.
+Stop and report at: any user-action task (a Cubism GUI edit for polish, a Discord verify), any decision
+that genuinely needs the user (esp. an art/tune call, or pushing `master`).
