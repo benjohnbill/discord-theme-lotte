@@ -8,6 +8,15 @@ buf = io.BytesIO(); atlas.save(buf, "PNG", optimize=True); tex = buf.getvalue()
 tex_b64 = base64.b64encode(tex).decode()
 moc_b64 = base64.b64encode(open(f"{D}/model/lotte.moc3","rb").read()).decode()
 phys_b64 = base64.b64encode(open(f"{D}/model/lotte.physics3.json","rb").read()).decode()
+# Cubism 5 Core inlined (only cubism.live2d.com serves v5; Discord CSP blocks that origin but allows
+# blob: scripts, so we load the core from an inlined blob). Cache to /tmp; download if absent.
+import urllib.request
+try:
+    core_bytes = open("/tmp/core_official.js","rb").read()
+except FileNotFoundError:
+    core_bytes = urllib.request.urlopen("https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js").read()
+    open("/tmp/core_official.js","wb").write(core_bytes)
+core_b64 = base64.b64encode(core_bytes).decode()
 groups = json.dumps(json.load(open(f"{D}/model/lotte.model3.json")).get("Groups", []))
 
 # ambient lavender sampled from version.png corner (so the halo fringe blends, no double-girl)
@@ -22,16 +31,17 @@ TEMPLATE = r"""/* Lotte Live2D - REAL rig, one-time in-Discord visual check (Dev
    STOP: __lotteStop()    RESET: Ctrl+R
 */
 (() => {
-  const SCRIPTS = [
-    // moc3 is v5 -> needs Core 5.x, which only the OFFICIAL origin serves (jsdelivr's npm core is 04.02 = v4 max).
-    // cubism.live2d.com was NOT in Phase 0's CSP test; if the console shows a CSP block on it, whitelist
-    // "cubism.live2d.com" -> script-src via Vencord customCspRules (native-settings.json) + restart Discord.
-    "https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js",
-    "https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js",       // jsdelivr (Phase-0 CSP-proven)
-    "https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js",  // jsdelivr (Phase-0 CSP-proven)
+  // Discord CSP script-src allows: 'unsafe-inline' 'unsafe-eval' blob: cdn.jsdelivr.net (+others).
+  // The Cubism-5 Core (needed for the v5 moc3) is only served by cubism.live2d.com, which CSP blocks
+  // as a script origin -> so it is INLINED here as base64 and loaded via a blob: script (blob: IS
+  // allowed). Zero external core origin, zero customCspRules edit. pixi + the cubism4 plugin come from
+  // jsdelivr (allowed).
+  const CDN_SCRIPTS = [
+    "https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js",
+    "https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js",
   ];
   const TAG = "[Lotte]", LAV = "__LAV__";
-  const B64 = { moc: "__MOC__", tex: "__TEX__", phys: "__PHYS__" };
+  const B64 = { core: "__CORE__", moc: "__MOC__", tex: "__TEX__", phys: "__PHYS__" };
   const GROUPS = __GROUPS__;
   if (window.__lotteStop) { try { window.__lotteStop(); } catch (e) {} }
 
@@ -79,7 +89,10 @@ TEMPLATE = r"""/* Lotte Live2D - REAL rig, one-time in-Discord visual check (Dev
       const canvas = document.createElement("canvas"); canvas.style.width = "100vw"; canvas.style.height = "100vh";
       container.appendChild(canvas); document.body.insertBefore(container, document.body.firstChild);
 
-      for (const s of SCRIPTS) await load(s);
+      // core first (inlined -> blob: script, CSP-allowed), then pixi + the cubism4 plugin from jsdelivr
+      await load(burl(B64.core, "text/javascript"));
+      if (!window.Live2DCubismCore) throw new Error("Live2DCubismCore missing after inline core load");
+      for (const s of CDN_SCRIPTS) await load(s);
       const PIXI = window.PIXI;
       if (!(PIXI && PIXI.live2d && PIXI.live2d.Live2DModel)) throw new Error("pixi-live2d-display not present after load");
 
@@ -108,7 +121,7 @@ TEMPLATE = r"""/* Lotte Live2D - REAL rig, one-time in-Discord visual check (Dev
 })();
 """
 
-snippet = (TEMPLATE.replace("__LAV__", lav).replace("__GROUPS__", groups)
+snippet = (TEMPLATE.replace("__LAV__", lav).replace("__GROUPS__", groups).replace("__CORE__", core_b64)
            .replace("__MOC__", moc_b64).replace("__PHYS__", phys_b64).replace("__TEX__", tex_b64))
 open(f"{D}/discord-lotte-probe.js", "w").write(snippet)
 # pre-test page (blank body + inline snippet) for SwiftShader verification
