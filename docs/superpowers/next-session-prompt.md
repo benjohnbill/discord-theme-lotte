@@ -1,10 +1,12 @@
-# Next Session — Lotte Live2D Aliveness — Phase 1 COMPLETE; next = optional polish or Phase 2
+# Next Session — Lotte Live2D — rig-strategy PIVOT decided; next = Phase A config tune
 
-> Phase 0 = DONE/GO. Phase 1.0 pilot = DONE/GO. **Phase 1 FULL BUILD = DONE/PASS (W1–W5 + physics,
-> finished 2026-06-01).** The full Lotte rig drives end-to-end in pixi-live2d-display@0.4.0 + Cubism
-> Core 5.1. **`live2d-spike` was merged into `master` and removed — `master` is now the single
-> authority** (local-only, ~55 commits ahead of origin, NOT pushed). This launcher is thin by design —
-> substance lives in `live2d/PIPELINE.md` + the spec + auto-loaded memory.
+> Phase 0 = DONE/GO. Phase 1.0 pilot = DONE/GO. **Phase 1 full build = mechanically DONE/PASS (W1–W5 +
+> physics, 2026-06-01) but SUPERSEDED on quality:** the first live Discord render exposed the
+> mesh-deform rig as "누더기" (patchwork). A **rig-strategy pivot is decided** (`docs/adr/0001-rig-strategy-pivot-deform-to-swap.md`):
+> face mesh-deform → **통짜 (whole-image warp) base + blink frame-swap + BG-scene + gaze = head-lean**. The
+> gate-ordered execution plan is **`live2d/ROI.md`**. **`live2d-spike` was merged into `master` and removed —
+> `master` is the single authority** (local-only, well ahead of origin, NOT pushed). This launcher is thin —
+> substance lives in `live2d/PIPELINE.md` + `live2d/ROI.md` + `live2d/CONTEXT.md` + the ADR + auto-loaded memory.
 
 Paste the body below (inside the `---` block) into the next Claude session as the initial prompt.
 
@@ -12,11 +14,23 @@ Paste the body below (inside the `---` block) into the next Claude session as th
 
 ## Task
 
-**Phase 1 is COMPLETE — do NOT re-brainstorm, re-run the pilot, or re-execute W1–W5.** The rig is built,
-exported (moc3 v5), runtime-verified, and physics (hair + independent ribbon sway) is rigged and
-CDP-phase-verified. Read `live2d/PIPELINE.md` FIRST for live state.
+**Phase 1's rig is mechanically complete but its QUALITY is superseded** — the live Discord render exposed
+the mesh-deform rig as "누더기" (patchwork). The **rig-strategy pivot (ADR-0001) is decided**; the next work
+is its gate-ordered execution, NOT "Phase 1 done → Phase 2". Read `live2d/PIPELINE.md` + `live2d/ROI.md` FIRST.
 
-There is no forced next step. Pick up one of these, per the user:
+**START HERE — Phase A (near-free: no new art, no re-export).** Config-tune the EXISTING rig/probe:
+1. gaze = head-lean — zero the eyeball weight in the `model.focus()` controller (the probe drives
+   `model.focus(clientX, clientY)`, which currently tracks the iris too); damp the lean amplitude.
+2. clamp head tilt/turn amplitude (the live swings read "too large" / 경박).
+3. confirm breath.
+Verify in the real Discord client or a SwiftShader throwaway Chrome (bh-chrome has no WebGL — memory
+`bh-chrome-no-webgl`). Then follow `live2d/ROI.md`'s gate order: B (scene-plate re-render) → C (blink band)
+→ D (core re-export).
+
+**Open / gate-dependent — do NOT pre-decide:** mouth keep vs drop · 2-state vs 3-state blink · blink
+survival at real scale.
+
+**Background (resolved/deferred — NOT the next step):**
 - **W5 polish (OPTIONAL, USER art/tune calls — not blockers):** (a) ~~hair-edge halo + circular vignette~~
   **CLOSED 2026-06-01 — non-issue on the real backdrop.** Re-verified the rig composited over the real
   `version` lavender background (not the dark navy W5 used): the matte fringe blends invisibly there, at
@@ -30,22 +44,25 @@ There is no forced next step. Pick up one of these, per the user:
   rectangular outline over face_base (located: forehead ~y0.31, under-eye ~y0.54, verticals between eyes + right
   face). Faint at real bg scale. Fix = feather the box alpha in `full_segment.py`, done **opportunistically at the
   next re-export** (not worth a standalone Cubism round-trip). Evidence `live2d/w5-c-seam-located.png`.
-- **Phase 2 — productionize the Discord delivery:** a persistent always-on background needs a Vencord
-  userplugin (dev Vencord + Node/git on Windows; themes/QuickCSS can't run JS). Feasibility already
-  proven in Phase 0 (CSP allows the CDN runtime, Electron has WebGL 2). This is the recommended real
-  next arc once polish is settled.
+- **Phase 2 — productionize the Discord delivery (DEFERRED behind the pivot — NOT next):** a persistent
+  always-on background needs a Vencord userplugin (dev Vencord + Node/git on Windows; themes/QuickCSS
+  can't run JS). Feasibility already proven in Phase 0. Schedulable only after the pivot lands.
 - **Push `master`:** Tier-3, needs explicit user sign-off (never push yourself).
 
-**W3↔W4 loop (still valid for polish):** if a part needs split/merge, edit `full_segment.py`
-(`BOXES` / `col_layer`) → re-run `full_segment.py` + `build_psd_full.py` → re-import to Cubism → re-rig →
-re-export (moc3 5.0) → `check_model.py` → re-verify with `live2d/runtime-check-full.html`.
+**W3↔W4 re-export loop (Phase D):** edit `full_segment.py` (`BOXES` / `col_layer` / box-alpha feather) →
+re-run `full_segment.py` + `build_psd_full.py` → re-import to Cubism → re-rig → re-export (moc3 5.0) →
+`check_model.py` → re-verify with `live2d/runtime-check-full.html`. The deferred W5 seam-fix (feather)
+rides along here.
 
 ## Read first (substance, in order)
 
 1. `MEMORY.md` auto-loads → `lotte-live2d-aliveness-direction` (decided design + Phase 0 GO + pilot GO +
    the confirmed learnings + **Phase 1 build DONE**) and `bh-chrome-no-webgl` (no headless WebGL → use a
    SwiftShader throwaway Chrome for any render check).
-2. **`live2d/PIPELINE.md`** — the live pipeline-state **authority**. Read it first for "where are we / what's done / what's optional next".
+2. **`live2d/PIPELINE.md`** — the live pipeline-state **authority** (where are we / what's done / what's next).
+2b. **`live2d/ROI.md`** — the rig-strategy pivot's gate-ordered plan (Phase A→D) + cost/feasibility table;
+   **`docs/adr/0001-rig-strategy-pivot-deform-to-swap.md`** = the pivot decision; **`live2d/CONTEXT.md`** =
+   glossary (통짜 base / scene plate / doubling / patchwork).
 3. **Spec:** `docs/superpowers/specs/2026-05-31-lotte-live2d-phase1-rig-design.md` — goal, 8 locked
    decisions, layer map, params, success criteria.
 4. **Plan (now history):** `docs/superpowers/plans/2026-05-31-lotte-live2d-full-build-w1-w5.md` — the
@@ -57,7 +74,7 @@ re-export (moc3 5.0) → `check_model.py` → re-verify with `live2d/runtime-che
 
 `/home/benjohnbill/dev/discord-theme-lotte` on branch **`master`** (the live2d-spike worktree was merged
 and removed 2026-06-01 — do not look for it). **`master` is the single authority.** It is **local-only:
-~55 commits ahead of `origin/master`, NOT pushed** — pushing is Tier-3 (sign-off only; never push/force
+well ahead of `origin/master`, NOT pushed** — pushing is Tier-3 (sign-off only; never push/force
 yourself). `master` also has one unrelated uncommitted change (a background-image swap in
 `src/base/background.css` + dist rebuild) that predates this work — leave it to the user.
 

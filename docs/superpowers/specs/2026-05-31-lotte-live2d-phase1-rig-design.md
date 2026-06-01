@@ -1,5 +1,7 @@
 # Lotte Live2D — Phase 1 (Rig the Real Lotte) Design
 
+> ⚠️ **PIVOT NOTE (2026-06-01):** the face-rigging *mechanism* here (mesh-deform of separated parts) is superseded on quality — see `docs/adr/0001-rig-strategy-pivot-deform-to-swap.md` + `live2d/ROI.md`. The flat-rig discipline, base/source decisions (INV-2), success criteria, and Tier-1 restraint still hold; only the face mechanism changed (mesh-deform → 통짜 base + blink frame-swap + BG-scene + gaze=head-lean). The spec anticipated this "art-pipeline rethink" branch. Decisions are NOT rewritten here; the ADR is the current authority.
+
 > Status: validated in the 2026-05-31 brainstorm; **revised 2026-05-31 after an independent Codex design review** (gstack-codex consult) — accepted findings folded in. Pending user review before the implementation plan (writing-plans).
 > Builds on Phase 0 (feasibility spike), which reached **GO**: Discord's Electron client renders `pixi-live2d-display` full-window behind the translucent UI, allows the CDN runtime with zero CSP violations, reports WebGL 2, and tracks the cursor via `model.focus(x, y)`. See `experiments/live2d-spike/FINDINGS.md`.
 

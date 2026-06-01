@@ -1,5 +1,7 @@
 # Lotte Live2D — Full Build (W1–W5) Implementation Plan
 
+> ⚠️ **SUPERSEDED ON APPROACH (2026-06-01) → see `docs/adr/0001-rig-strategy-pivot-deform-to-swap.md` + `live2d/ROI.md`.** This plan built the Phase 1 mesh-deform rig (W1–W5, completed). The first live Discord render exposed that approach as 누더기 (patchwork); the rig-strategy pivot replaced face mesh-deform with a 통짜 base + blink frame-swap + BG-scene + gaze=head-lean. This file is **completed history** — read it for *how W1–W5 was done*, NOT for the current approach or next steps.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans (recommended for this plan — it interleaves agent scripts with user GUI work in ChatGPT/Cubism) or superpowers:subagent-driven-development. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
 > **Plan type note:** Like the Phase 1.0 pilot plan, this mixes (a) agent-written Python/JS (testable where there is real logic), (b) user actions in external tools (ChatGPT/GPT-image-2, Cubism 5 FREE — verified by handoff artifact + agent sanity scripts), and (c) browser render checks (run/observe/screenshot under a SwiftShader Chrome, because `bh-chrome` has no WebGL — memory `bh-chrome-no-webgl`). The genuinely exploratory links (segmentation refinement, generative drift, rig posing) are written as **explicit inspect-and-iterate loops with complete starting-point code and named fallbacks**, not vague TODOs — this is the same style the pilot plan used and is intentional (spec §7 declares W2/W3/W4 an iterative core).

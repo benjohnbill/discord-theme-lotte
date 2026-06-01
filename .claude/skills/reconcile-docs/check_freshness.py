@@ -54,13 +54,19 @@ DENYLIST = [
      "worktree-authority / active split-brain (RESOLVED — master is the authority)"),
     ("INV-5", re.compile(r"`?master`?\s+is\s+NOT\s+merged", re.I),
      "'master is NOT merged' (spike WAS merged into master 2026-06-01)"),
+    # INV-3 PIVOT 2026-06-01: Phase 1 quality superseded → rig-strategy pivot (ADR-0001) is the frontier.
+    # "Phase 2 / Vencord userplugin as the next/larger arc" is now the superseded value. ("deferred"/"pivot"
+    # near the mention whitelist the correct "Phase 2 is DEFERRED behind the pivot" phrasing.)
+    ("INV-3", re.compile(r"(?:real|larger|next)\s+arc\s*=?\s*(?:is\s+)?Phase\s*2", re.I),
+     "Phase 2 as the next/larger arc (DEFERRED behind the rig-strategy pivot, ADR-0001)"),
 ]
 
 # Hit line or up to 2 preceding non-blank lines mark it superseded/correct.
 ANNOTATED = re.compile(
     r"superseded|⚠️|was wrong|\bstale\b|there is no|no standard|not merged|"
     r"originally named|renamed|correction|corrected|\bresolved\b|supersed|"
-    r"pro[\s-]?only|harmless|lacks it|\bsample\b|shizuku|phase 0",
+    r"pro[\s-]?only|harmless|lacks it|\bsample\b|shizuku|phase 0|"
+    r"deferred|\bpivot\b|gate-dependent|gate-ordered",
     re.I,
 )
 # Negation immediately before the token => it's stating the correct rule.
