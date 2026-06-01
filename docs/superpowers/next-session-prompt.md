@@ -23,8 +23,13 @@ There is no forced next step. Pick up one of these, per the user:
   rest and tilted. The "halo" is the `original` 1×1 avatar's decorative circular frame; it only stood out
   on dark navy. Environment-alignment artifact, not a rig bug — defringe NOT needed (reopen only for a
   dark/non-lavender backdrop). Evidence `live2d/w5-halo-*.png`; spec `docs/superpowers/specs/2026-06-01-lotte-live2d-w5-halo-defringe-design.md`.
-  (b) eye-smile reads too strong (`Smile=1` nearly closes the eye) — re-tune the keyform in Cubism. (c) faint
-  rectangular seam near the viewer-right eye/forehead.
+  (b) ~~eye-smile too strong~~ **CLOSED 2026-06-01 — not real (measurement conflation).** Smile alone barely
+  closes the eye (iris retained L96.7% / R93.5% at Smile=1, EyeOpen=1); closing is `ParamEyeOpen`'s job, so the
+  prior "Smile=1 ≈ blink" was a blink-panel mislabel. If anything the crescent is subtle. Evidence `live2d/w5-b-*.png`.
+  (c) rectangular seam **REAL but faint, DEFERRED 2026-06-01.** `full_segment.py` hard crop-box edges show a faint
+  rectangular outline over face_base (located: forehead ~y0.31, under-eye ~y0.54, verticals between eyes + right
+  face). Faint at real bg scale. Fix = feather the box alpha in `full_segment.py`, done **opportunistically at the
+  next re-export** (not worth a standalone Cubism round-trip). Evidence `live2d/w5-c-seam-located.png`.
 - **Phase 2 — productionize the Discord delivery:** a persistent always-on background needs a Vencord
   userplugin (dev Vencord + Node/git on Windows; themes/QuickCSS can't run JS). Feasibility already
   proven in Phase 0 (CSP allows the CDN runtime, Electron has WebGL 2). This is the recommended real
