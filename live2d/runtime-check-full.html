@@ -20,7 +20,13 @@
     const status = document.getElementById('status');
     const q = new URLSearchParams(location.search);
     const bg = '#' + (q.get('bg') || '2b2d42');
-    document.body.style.background = bg;
+    // ?imgbg=source/lotte-discord-version.png : composite the model over a real
+    // background image (the intended `version` ambient backdrop) instead of a flat
+    // color, so halo/fringe is judged against the REAL environment, not dark navy.
+    const imgbg = q.get('imgbg');
+    document.body.style.background = imgbg
+      ? `${bg} url('${imgbg}') center/cover no-repeat`
+      : bg;
     // pins: ?p=ParamAngleZ:25,ParamEyeBallX:1  -> [["ParamAngleZ","25"],...]
     const pins = (q.get('p') || '').split(',').filter(Boolean).map(s => s.split(':'));
     const blinkoff  = q.has('blinkoff');

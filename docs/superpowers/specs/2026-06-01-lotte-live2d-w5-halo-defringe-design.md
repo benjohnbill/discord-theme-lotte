@@ -1,10 +1,28 @@
 # W5 Polish — Halo / Vignette Defringe (item a)
 
 Date: 2026-06-01
-Status: design (approved direction A3)
+Status: **SUPERSEDED / CLOSED (2026-06-01)** — re-verification against the real backdrop showed the halo is a non-issue; the defringe below is NOT being implemented. See the verification banner. The original design is retained for reference.
 Scope: W5 open-polish item **(a)** only. Items (b) eye-smile-too-strong and (c) eye/forehead seam are deferred to their own passes.
 
+## ⊘ VERIFICATION RESULT (2026-06-01) — (a) CLOSED, NOT IMPLEMENTED
+
+Before building the defringe, the halo was re-verified against the **real** composite backdrop — `source/lotte-discord-version.png`, the in-active-use Discord background — instead of the dark navy (`#2b2d42`) that W5 used. This is the environment-alignment check (`~/.claude/rules/agent-operating-model.md` §환경 alignment): the W5 measurement did not match the user's real target environment.
+
+**Finding: the halo is a measurement artifact of the dark-navy W5 backdrop. On the real lavender `version` background it is essentially invisible** — the lavender matte fringe sits over lavender bokeh and blends — at rest **and** with the head tilted.
+
+Method: added an `imgbg` param to `runtime-check-full.html`; rendered the live moc3 over `version.png` via a persistent SwiftShader Chrome + CDP capture (ticker kept running — `freeze` blanks SwiftShader), matched framing (`scale=0.831`) against a dark-bg render.
+
+Evidence (committed): `live2d/w5-halo-ab-darkvs-version.png` (matched-framing dark-vs-version A/B) and `live2d/w5-halo-edge-zoom.png` (2× silhouette-edge crop — the clearest read).
+
+**Consequence:** item (a) defringe is **not needed** for the intended composite (YAGNI). Reopen only if the rig is ever composited over a **dark / non-lavender** backdrop. The genuine downstream task for a clean composite is the **ambient-layer architecture** (a girl-removed `version` background as the rig's backdrop, so the static background girl does not peek out behind the moving rig) — that is Phase 2, not this item. Remaining real W5 polish: **(b) eye-smile too strong** (character-intrinsic, background-independent) and (c) the faint seam.
+
+---
+
+_Original design below — retained for reference, NOT implemented._
+
 ## Problem
+
+> Correction (post-verification): the "circular vignette ring" is not matte residue — it is the **decorative circular frame of the `original` 1×1 Discord avatar** (a lavender ring + bokeh + clovers). The halo is that frame's color bleeding into the `isnet-anime` matte edge. Both vanish on the `version` backdrop (see banner).
 
 The runtime render (`live2d/w5-runtime-fullbody.png`) shows a dark/lavender **halo** along the character's outer hair edge and a faint **circular vignette ring** around the figure. Source: the W3 `isnet-anime` matte left a soft, anti-aliased, lavender-tinted fringe at the character silhouette boundary — the original art's bokeh/clover background color bleeding into the matte edge. This fringe is **baked into the exported atlas** `live2d/model/lotte.2048/texture_00.png` (visible as a lavender ring around the `face_base` disc and the `hair_L`/`hair_R` column parts).
 
