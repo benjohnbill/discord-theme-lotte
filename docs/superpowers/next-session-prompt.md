@@ -17,10 +17,13 @@ exported (moc3 v5), runtime-verified, and physics (hair + independent ribbon swa
 CDP-phase-verified. Read `live2d/PIPELINE.md` FIRST for live state.
 
 There is no forced next step. Pick up one of these, per the user:
-- **W5 polish (OPTIONAL, USER art/tune calls — not blockers):** (a) dark hair-edge halo + faint circular
-  vignette around the character (W3 isnet-anime matte residue + face_base disc boundary) — the main
-  visual item; fix via the W3↔W4 loop (`full_segment.py` `BOXES`/matte → re-import → re-rig). (b)
-  eye-smile reads too strong (`Smile=1` nearly closes the eye) — re-tune the keyform in Cubism. (c) faint
+- **W5 polish (OPTIONAL, USER art/tune calls — not blockers):** (a) ~~hair-edge halo + circular vignette~~
+  **CLOSED 2026-06-01 — non-issue on the real backdrop.** Re-verified the rig composited over the real
+  `version` lavender background (not the dark navy W5 used): the matte fringe blends invisibly there, at
+  rest and tilted. The "halo" is the `original` 1×1 avatar's decorative circular frame; it only stood out
+  on dark navy. Environment-alignment artifact, not a rig bug — defringe NOT needed (reopen only for a
+  dark/non-lavender backdrop). Evidence `live2d/w5-halo-*.png`; spec `docs/superpowers/specs/2026-06-01-lotte-live2d-w5-halo-defringe-design.md`.
+  (b) eye-smile reads too strong (`Smile=1` nearly closes the eye) — re-tune the keyform in Cubism. (c) faint
   rectangular seam near the viewer-right eye/forehead.
 - **Phase 2 — productionize the Discord delivery:** a persistent always-on background needs a Vencord
   userplugin (dev Vencord + Node/git on Windows; themes/QuickCSS can't run JS). Feasibility already
