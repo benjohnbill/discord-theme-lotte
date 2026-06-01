@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    #c { display: block; width: 100vw; height: 100vh; }
+    #status { position: fixed; top: 6px; left: 8px; right: 8px; color: #0f0;
+              font: 12px monospace; white-space: pre-wrap; text-shadow: 0 0 3px #000; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <div id="status">loading…</div>
+  <canvas id="c"></canvas>
+  <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js"></script>
+  <script>
+  (async () => {
+    const status = document.getElementById('status');
+    const q = new URLSearchParams(location.search);
+    const bg = '#' + (q.get('bg') || '2b2d42');
+    document.body.style.background = bg;
+    // pins: ?p=ParamAngleZ:25,ParamEyeBallX:1  -> [["ParamAngleZ","25"],...]
+    const pins = (q.get('p') || '').split(',').filter(Boolean).map(s => s.split(':'));
+    const blinkoff  = q.has('blinkoff');
+    const breathoff = q.has('breathoff');
+    const log = (m) => { status.textContent += '\n' + m; };
+    try {
+      let coreMax = '?';
+      try { coreMax = window.Live2DCubismCore.Version.csmGetLatestMocVersion(); } catch (e) {}
+      status.textContent = 'core latest moc3 = ' + coreMax + ' | bg=' + bg +
+        (pins.length ? ' | pins=' + pins.map(p => p.join('=')).join(',') : ' | pins=none') +
+        (blinkoff ? ' | blink OFF' : '') + (breathoff ? ' | breath OFF' : '');
+
+      const app = new PIXI.Application({
+        view: document.getElementById('c'), resizeTo: window,
+        backgroundAlpha: 0, antialias: true, autoStart: true,
+      });
+      const model = await PIXI.live2d.Live2DModel.from('./model/lotte.model3.json');
+      app.stage.addChild(model);
+      const im = model.internalModel;
+
+      // intrinsic canvas (pixels) from the moc3 — independent of current scale
+      const cw = im.originalWidth || model.width, ch = im.originalHeight || model.height;
+      const fit = () => {
+        // ?scale= absolute model scale; else fit the intrinsic canvas with margin
+        const base = Math.min(window.innerWidth / cw, window.innerHeight / ch);
+        const s = q.has('scale') ? parseFloat(q.get('scale')) : base * (parseFloat(q.get('fit')) || 0.92);
+        model.scale.set(s);
+        model.anchor.set(parseFloat(q.get('ax') ?? 0.5), parseFloat(q.get('ay') ?? 0.5));
+        model.position.set(window.innerWidth * (parseFloat(q.get('ox')) || 0.5),
+                           window.innerHeight * (parseFloat(q.get('oy')) || 0.5));
+      };
+      fit(); window.addEventListener('resize', fit);
+
+      if (blinkoff)  im.eyeBlink = null;
+      if (breathoff) im.breath = null;
+
+      // expose for interactive driving (CDP / console)
+      window.__lotte = model;
+      window.setParam = (id, v) => im.coreModel.setParameterValueById(id, v);
+      window.__z = 0;            // CDP can poke this; autosine writes it
+      window.__frames = 0;       // tick counter for liveness probing via CDP
+
+      // ?autosine=1 : drive ParamAngleZ as a real-time sine AFTER the model's own update each
+      // frame, so the physics pendulum (which reads ParamAngleZ as input) swings the hair.
+      // Requires real wall-clock (run under a PERSISTENT CDP chrome WITHOUT
+      // --virtual-time-budget; that flag freezes performance.now and kills this). Keep
+      // physics + auto-blink + auto-breath ON for a realistic read. CDP captures frames.
+      if (q.has('autosine')) {
+        const amp    = parseFloat(q.get('amp')    || '18');   // deg
+        const period = parseFloat(q.get('period') || '2.0');  // s
+        const t0 = performance.now();
+        const drive = () => {
+          const t = (performance.now() - t0) / 1000;
+          window.__z = amp * Math.sin(2*Math.PI * t / period);
+          im.coreModel.setParameterValueById('ParamAngleZ', window.__z);
+          window.__frames++;
+        };
+        app.ticker.add(drive);   // added last → runs after the model update
+        console.log('LOTTE_AUTOSINE amp=' + amp + ' period=' + period);
+      }
+
+      // Pin requested params AFTER the model's own update each frame so they win.
+      if (pins.length) {
+        app.ticker.add(() => {
+          const cm = im.coreModel;
+          for (const [id, v] of pins) cm.setParameterValueById(id, parseFloat(v));
+        });
+      } else {
+        // no pins -> drive a gentle focus so tilt/gaze show some life
+        model.focus(window.innerWidth * 0.62, window.innerHeight * 0.35);
+        window.addEventListener('mousemove', e => model.focus(e.clientX, e.clientY));
+      }
+
+      log('MODEL LOADED ok — canvas ' + Math.round(cw) + 'x' + Math.round(ch) +
+          ' | scale ' + model.scale.x.toFixed(3) + ' | PIXI ' + PIXI.VERSION);
+      // marker for the screenshot harness to grep in --enable-logging
+      console.log('LOTTE_RUNTIME_OK canvas=' + Math.round(cw) + 'x' + Math.round(ch));
+
+      // ?cinema=1 : drive ParamAngleZ as a slow sine (amp deg, period s) so the physics
+      // pendulum swings the hair, sampling N tiles into one contact montage that the
+      // --screenshot grabs. This shows lag/inertia/settle that a single frame can't.
+      // physics + auto-blink + auto-breath stay ON (do NOT pass blinkoff/breathoff) so it
+      // reads like the real runtime. Captures over `dur` seconds, then paints the grid.
+      if (q.has('cinema')) {
+        // FRAME-COUNT driven (NOT performance.now()): headless --virtual-time-budget freezes
+        // wall-clock, so we advance phase per ticker tick. framesPerCycle ticks = one full
+        // sine swing; sample one tile every `stride` ticks. physics + auto-blink + breath
+        // stay ON so it reads like the real runtime.
+        const amp    = parseFloat(q.get('amp')    || '18');   // deg of head tilt
+        const fpc    = parseInt(q.get('fpc')     || '90', 10); // frames per swing cycle
+        const tiles  = parseInt(q.get('tiles')   || '12', 10);
+        const stride = parseInt(q.get('stride')  || '11', 10); // ticks between captures
+        const warm   = parseInt(q.get('warm')    || '8', 10);  // warmup ticks before capture
+        const tcol   = parseInt(q.get('tcol')    || '6', 10);
+        const view = document.getElementById('c');
+        const shots = [];
+        let tick = 0;
+        const cap = () => {
+          const tw = 260, th = 260;
+          const off = document.createElement('canvas'); off.width = tw; off.height = th;
+          const cx = off.getContext('2d');
+          cx.fillStyle = bg; cx.fillRect(0,0,tw,th);
+          const sw = view.width, sh = view.height;
+          const cropW = sw*0.46, cropH = sh*0.46, sx = sw*0.27, sy = sh*0.06;
+          cx.drawImage(view, sx, sy, cropW, cropH, 0, 0, tw, th);
+          shots.push(off);
+        };
+        const driver = () => {
+          const z = amp * Math.sin(2*Math.PI * tick / fpc);
+          im.coreModel.setParameterValueById('ParamAngleZ', z);
+          if (tick >= warm && (tick - warm) % stride === 0 && shots.length < tiles) cap();
+          tick++;
+          if (shots.length >= tiles) {
+            app.ticker.remove(driver);
+            const trow = Math.ceil(tiles / tcol), pad = 4, ts = 260;
+            const gw = tcol*ts + (tcol+1)*pad, gh = trow*ts + (trow+1)*pad;
+            const grid = document.createElement('canvas'); grid.width = gw; grid.height = gh;
+            const gcx = grid.getContext('2d');
+            gcx.fillStyle = '#111'; gcx.fillRect(0,0,gw,gh);
+            gcx.font = '12px monospace'; gcx.fillStyle = '#0f0';
+            shots.forEach((s,i) => {
+              const r = Math.floor(i/tcol), cc = i%tcol;
+              const x = pad+cc*(ts+pad), y = pad+r*(ts+pad);
+              gcx.drawImage(s, x, y);
+              gcx.fillStyle = '#0f0'; gcx.fillText('t'+(i+1), x+3, y+13);
+            });
+            document.body.innerHTML = '';
+            const out = document.createElement('img');
+            out.src = grid.toDataURL('image/png');
+            out.style.cssText = 'display:block;max-width:100vw;';
+            document.body.style.background = '#111';
+            document.body.appendChild(out);
+            console.log('LOTTE_CINEMA_DONE tiles=' + shots.length + ' ticks=' + tick);
+          }
+        };
+        app.ticker.add(driver);
+      }
+
+      // NOTE: keep the ticker RUNNING by default — SwiftShader software raster needs real
+      // wall-clock frames to paint a clean image; freezing early captures a blank canvas.
+      // The capture script waits for a good-size PNG then kills the process by PID.
+      // ?freeze=1 stops the ticker (only for cases that need a frozen idle page).
+      if (q.has('freeze')) {
+        setTimeout(() => { try { app.ticker.stop(); } catch (e) {} console.log('LOTTE_FROZEN'); },
+                   parseInt(q.get('settle') || '2500', 10));
+      }
+    } catch (e) {
+      log('ERROR: ' + (e && e.message ? e.message : e));
+      console.error('LOTTE_RUNTIME_ERROR', e);
+    }
+  })();
+  </script>
+</body>
+</html>

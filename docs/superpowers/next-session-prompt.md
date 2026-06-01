@@ -10,8 +10,10 @@
 # Next Session — Lotte Live2D Aliveness, Phase 1 (Rig the real Lotte) — EXECUTE the full build (W1–W5)
 
 > Phase 0 = DONE/GO. **Phase 1.0 vertical-slice pilot = DONE/GO (2026-05-31)** — the whole
-> art→rig→runtime chain is proven. The full-build plan is written. This launcher is thin by
-> design — substance lives in the spec + plan + `live2d/PIPELINE.md` + auto-loaded memory.
+> art→rig→runtime chain is proven. **Full-build W1 (base lock+upscale) + W2 (4 hidden-state patches)
+> + W3 (19-part separation → `lotte.psd`) + W4.1 (rig walkthrough + W4.3 checker staged) = DONE (2026-05-31).** Frontier = **W4.2** (USER
+> rigs the PSD in Cubism 5.3 FREE). This launcher is thin by design — substance lives in the spec + plan + `live2d/PIPELINE.md`
+> + auto-loaded memory.
 
 Paste the body below (inside the `---` block) into the next Claude session as the initial prompt.
 
@@ -24,9 +26,18 @@ Execute the full build: `docs/superpowers/plans/2026-05-31-lotte-live2d-full-bui
 `superpowers:executing-plans` (recommended — the plan interleaves agent scripts with user GUI work in
 ChatGPT/Cubism/Discord, so inline + user-verification fits better than autonomous subagents).
 
-Start at **W1 Task 1.1** (confirm + checksum the locked base — agent-only). Read `live2d/PIPELINE.md`
-FIRST for live state. STOP at the user-action tasks (W2 GPT-image-2 edits, W4 Cubism rig, W5 Discord
-verify) and at any decision that genuinely needs the user.
+**W1 + W2 + W3 + W4.1 are DONE (2026-05-31).** Start at **W4.2** (full Cubism rig — USER GUI in Cubism 5.3 FREE).
+Read `live2d/PIPELINE.md` FIRST for live state. W3 produced the 19-part `live2d/lotte.psd` (on-disk,
+gitignored — regenerate via `full_segment.py` + `build_psd_full.py` if missing). **W4.1 DONE:** the full
+Tier-1 walkthrough is in `RIG_GUIDE.md` ("Full Build (W4)") and `check_model.py` (W4.3) is staged — do
+NOT re-write them. **Start at W4.2:** the USER rigs `lotte.cmo3` in Cubism 5.3 FREE and exports
+`model/lotte.model3.json` (+ `.moc3` **at version 5.0**), then the agent runs `check_model.py`. Carry the W3
+realities into W4: atlas — parts at full res are ~3× one FREE 2048 atlas, so pack into the **single**
+atlas via Auto Layout "set magnification automatically" (FREE = one atlas only, multi is PRO; BASE.md
+W3.4 / registry INV-7); part set — bangs are baked into face_base, hair is
+`hair_L`/`hair_R` (front side locks). **W3↔W4 loop:** if rigging needs a part split/merged, edit
+`full_segment.py` (`BOXES` dict / `col_layer` calls) and re-run. STOP at the W4 Cubism rig (USER) and
+W5 Discord verify, and at any decision that genuinely needs the user.
 
 ## Read first (substance, in order)
 
@@ -42,8 +53,12 @@ verify) and at any decision that genuinely needs the user.
 
 ## Working directory
 
-This worktree: `/home/benjohnbill/dev/discord-theme-lotte/.worktrees/live2d-spike` (branch `live2d-spike`,
-**FF-merged into `master` on 2026-05-31, not pushed** — the two are even). Under `live2d/`: `PIPELINE.md` (authority), `DECISIONS.md`,
+This worktree: `/home/benjohnbill/dev/discord-theme-lotte/.worktrees/live2d-spike` (branch `live2d-spike`).
+**Branch state (2026-05-31): `live2d-spike` is 3-way DIVERGED from `master`** (NOT a clean fast-forward).
+`live2d-spike` carries all W1–W4.1 + the reconcile/skill work (many commits ahead, growing each pass);
+`master` carries only the STALE-redirect banner commit `336822a` that the worktree lacks. Merge-base =
+`a6674fb`; master tip = `336822a`. **`master` is NOT merged** and its Live2D docs are stale — the worktree
+is the authority. Do W4.2 here; merge (3-way, at W5) and push need sign-off. Under `live2d/`: `PIPELINE.md` (authority), `DECISIONS.md`,
 `BASE.md`, `RIG_GUIDE.md`, `source/` (rasters + SHA256SUMS), `gen/PROMPTS.md`, and `pilot/` (the
 complete Phase 1.0 pilot: scripts, layers, `lotte-pilot.psd`, `model/` moc3 v5, `RESULT.md`). Pilot
 Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifacts in
@@ -57,9 +72,10 @@ Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifac
 - **moc3 export MUST target ≤ v5.** Cubism Editor 5.3 exports moc3 **v6** by default; the pinned web
   Core reports `csmGetLatestMocVersion()=5` and **rejects v6**. Export at `.moc3 file version` **5.0**
   (or 4.2). Fallback: bump the Core / use the `pixi-live2d-display-lipsyncpatch` fork. *(Pilot-confirmed.)*
-- **Texture atlas: Cubism FREE caps it at 2048×2048** (NOT 4096). Keep hi-res masters in
-  `live2d/assets/`, but scale the Cubism source so ~20 tight-bounded parts fit one 2048 atlas (or use
-  2 atlases / lower upscale). *(Pilot-confirmed — supersedes BASE.md's earlier 4096 assumption.)*
+- **Texture atlas: Cubism FREE = a SINGLE 2048×2048 atlas** (NOT 4096; multiple atlases are PRO-only —
+  web-verified W4.1). Keep hi-res masters in `live2d/assets/`, and pack the ~19 parts into the one atlas
+  via Auto Layout "set magnification automatically" (≈0.5× on layout). *(Supersedes BASE.md's earlier
+  4096 assumption and any "2-atlas" wording.)*
 - **Base:** rig the character from `lotte-discord-original.png` (more facial px); ambient background
   from `lotte-discord-version.png` (pixel-aligned outpaint). Rasters in `live2d/source/`, never `src/`.
 - **Eye-smile param:** use the Cubism template's standard **`EyeL Smile` / `EyeR Smile`** — **there is
@@ -74,11 +90,11 @@ Python = `live2d/pilot/.venv` (Pillow/rembg/psd-tools/pytoshop). Phase 0 artifac
 
 ## Hard rules
 
-- **Shell:** prefix dev commands with `rtk`. **`master`:** the worktree is already merged into `master`
-  locally (2026-05-31, **not pushed** — pushing needs sign-off); never push or force-push without sign-off;
-  new commits only (no amend). **Aesthetic:** Tier 1 restraint is the whole game.
+- **Shell:** prefix dev commands with `rtk`. **`master`:** the worktree is **NOT** merged into `master`
+  (3-way diverged per INV-5; merge deferred to W5 with sign-off); never merge, push, or force-push `master`
+  without sign-off; new commits only (no amend). **Aesthetic:** Tier 1 restraint is the whole game.
 
 ## Stopping conditions
 
-Stop and report at: a user-action task (W2 GPT edits, W4 Cubism rig, W5 Discord verify), any workstream
+Stop and report at: a user-action task (W4.2 Cubism rig, W5 Discord verify), any workstream
 gate, or any decision that genuinely needs the user.
