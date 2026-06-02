@@ -49,6 +49,17 @@ under-drawing and produces no patchwork (it replaces exactly the W4 mesh-deform 
 swap blink passed). The cross-fade ghosts mid-transition, so it suits fast / discrete states (blink, a settled
 ^^, a snap to closed-mouth) — NOT a smooth morph or lip-sync, which a flat source cannot do cleanly.
 
+### Under-fill backing
+The fix for the **Fundamental half** of patchwork (no under-drawing) under a 통짜 cut. When a moving part
+(front hair-lock, ribbon) is carved out of the `base` so it does not double on sway, the flat source leaves
+no art behind it — a sway would reveal a hole (the scene plate). The under-fill is a heavily-blurred, opaque
+copy of the character matte, bounded to the silhouette, composited *beneath* the sharp base; real cheek/jaw
+skin (the W2 `cheekjaw` patch) is laid over it where the side-locks sway most. It is **fully hidden at rest**
+(the sharp layers cover it) and only a sway reveals it — as soft local colour instead of a hole. Introduced in
+the Phase C+D 통짜 re-cut (`full_segment.py`, 2026-06-02). Cheap, invisible-at-rest, robust to small-amplitude
+physics — pairs with feathered carve edges. NOT a substitute for real under-drawing (it is a soft smear), so
+it only holds at the small physics amplitudes the rig actually uses.
+
 ### Character consistency
 Fidelity of the rigged result to **the original Lotte illustration the user presented** (its exact look and
 feel). A first-class success criterion alongside aliveness. Every AI-synthesized or AI-harvested part is a fresh

@@ -1,4 +1,4 @@
-# Next Session — Lotte Live2D — Phase A + B DONE; NEXT = 통짜 re-segment → Cubism re-rig (Phase C+D)
+# Next Session — Lotte Live2D — Phase A+B + Phase C+D agent-prep DONE; NEXT = USER Cubism re-rig (Phase C+D)
 
 > Phase 0 = DONE/GO. Phase 1.0 pilot = DONE/GO. **Phase 1 full build = mechanically DONE/PASS (W1–W5 +
 > physics, 2026-06-01) but SUPERSEDED on quality:** the first live Discord render exposed the
@@ -18,7 +18,9 @@ Paste the body below (inside the `---` block) into the next Claude session as th
 the mesh-deform rig as "누더기" (patchwork). The **rig-strategy pivot (ADR-0001) is decided**; the next work
 is its gate-ordered execution, NOT "Phase 1 done → Phase 2". Read `live2d/PIPELINE.md` + `live2d/ROI.md` FIRST.
 
-**START HERE — Phase A + B are DONE (committed `3228a2a`). NEXT = the Phase C+D 통짜 re-export.** Read
+**START HERE — Phase A + B DONE (committed `3228a2a`) + Phase C+D AGENT-PREP DONE (2026-06-02:
+`full_segment.py` rewritten to the 통짜 cut + new `lotte.psd`, agent-verified). NEXT = the USER
+Cubism re-rig (Tier-3) that completes Phase C+D.** Read
 `live2d/PIPELINE.md` FIRST (authority; carries the A/B outcomes + the next-action). Phase A (config tune)
 **PASS**: head-lean gaze (`im.updateFocus` override, `GAZE={eye:0,xy:8,z:6,body:5}`, eyeball 0 = no iris
 cut) shipped in `build_discord_probe.py` + `runtime-check-full.html`; USER-confirmed in real Discord.
@@ -29,14 +31,23 @@ BUT at that scale the rectangular patchwork seams are clearly visible ⇒ **Phas
 통짜 base + feather) is confirmed NECESSARY.** Evidence `live2d/phase{A,B}-*.png`.
 
 **NEXT — the work (Phase C+D collapse into ONE Cubism re-export):**
-1. **AGENT (Tier-1, no re-export):** rewrite `tools/full_segment.py` to a **통짜 cut** — drop the
-   brow/sclera/iris/lid/mouth box crops → `head` (whole face, NO internal cuts) + `body` (head/body split
-   at the hidden neckline) + `hair_L/R` + `ribbon` + feathered swap bands (`eyeband_closed` for blink,
-   `eyeband_smile` for ^^, `mouthband_closed`); feather all carved/band alpha edges (rides the deferred
-   W5 (c) seam-fix). Re-run `full_segment.py` + `build_psd_full.py` → new clean PSD.
-2. **USER (Tier-3, Cubism GUI — `live2d-authoring` boundary):** re-import → rig as whole-warp +
-   eye-band **opacity-swap** blink (NOT mesh-deform) → re-export (moc3 5.0) → `check_model.py` → verify
-   over `scene-plate.png`.
+1. **AGENT (Tier-1, no re-export) — DONE (2026-06-02).** `tools/full_segment.py` rewritten to the
+   **통짜 cut** + `build_psd_full.py` DEPTH updated → new `live2d/lotte.psd`, agent-verified (no
+   holes/doubling; a hair/ribbon sway reveals soft colour not a hole; blink/eye-smile/closed-mouth
+   swaps read; edge-detect shows NO band rectangle — the feather killed the seam). **As-built = 7
+   layers:** `base` (통짜 whole character, open eyes + open mouth baked in; front hair-locks + ribbon
+   carved feathered over a soft under-fill backing + real cheek skin) + `mouthband_closed` +
+   `eyeband_smile` + `eyeband_closed` + `hair_L` + `hair_R` + `ribbon`. Resolved the open choice →
+   **SINGLE `base`, no head/body PSD split** (head-tilt + body-lean = whole-warp deformers in Cubism;
+   a neckline cut would re-add a seam). Band coords: eyeband x0.27–0.72 y0.36–0.56, mouthband
+   x0.42–0.60 y0.575–0.68; FEATHER=30.
+2. **USER (Tier-3, Cubism GUI — `live2d-authoring` boundary) — THE IMMEDIATE NEXT STEP:** re-import
+   `lotte.psd` → rig as **whole-image warp** (`base` under `ParamBreath` / `ParamAngleX/Y/Z` /
+   `ParamBodyAngleX`; a head-region warp gives tilt) + `hair_L/R` + `ribbon` on physics deformers
+   (reuse `model/lotte.physics3.json` feel) + **blink = `eyeband_closed` drawable OPACITY keyed to
+   `ParamEyeLOpen/ROpen`** (0 = open base shows, 1 = closed band covers; 2-state first) + optional
+   `eyeband_smile` (^^) / `mouthband_closed` (snap) opacity, decided on-screen (blink overrides smile)
+   → export **moc3 5.0** → `check_model.py` → verify over `gen/scene-plate.png` at real Discord scale.
 
 APPROVED part-list + per-band feasibility + step-by-step are in the 통짜 handoff doc (this session's
 `/handoff` output) and PIPELINE. **Feasibility (decided this session):** on a flat source ALL expression
@@ -68,8 +79,8 @@ optional, decide on-screen) · 2-state vs 3-state blink · blink survival at rea
   can't run JS). Feasibility already proven in Phase 0. Schedulable only after the pivot lands.
 - **Push `master`:** Tier-3, needs explicit user sign-off (never push yourself).
 
-**W3↔W4 re-export loop (Phase D):** edit `full_segment.py` (`BOXES` / `col_layer` / box-alpha feather) →
-re-run `full_segment.py` + `build_psd_full.py` → re-import to Cubism → re-rig → re-export (moc3 5.0) →
+**W3↔W4 re-export loop (Phase D):** edit `full_segment.py` (band coords / `feather_col` / `FEATHER` /
+under-fill) → re-run `full_segment.py` + `build_psd_full.py` → re-import to Cubism → re-rig → re-export (moc3 5.0) →
 `check_model.py` → re-verify with `live2d/runtime-check-full.html`. The deferred W5 seam-fix (feather)
 rides along here.
 

@@ -54,8 +54,13 @@ Contribution shown with *confidence*; cost grounded in the reuse basis below.
   `live2d/phaseB-*.png`.
 - **Phase C — gated high-value, medium cost.** Re-align the closed-eye band at full base + feather; rig as
   opacity-swap. Gate at **real Discord scale**: does it read as a blink or a glitch (2-state first)?
-- **Phase D — core re-export (commit only after B/C signal).** Re-segment with fewer cuts + bake eyebrows into
-  `face_base` + feather + the eye-band swap + the deferred W5 seam-fix → re-import to Cubism → re-export.
+- **Phase D — core re-export (commit only after B/C signal). AGENT PREP DONE (2026-06-02).** `full_segment.py`
+  rewritten to the 통짜 cut + `build_psd_full.py` updated → new `lotte.psd`, agent-verified (no holes/doubling,
+  soft sway reveal, swaps read, edge-detect = no band rectangle). As-built = 7 layers: a SINGLE feathered
+  `base` (no head/body PSD split; eyebrows baked in; front locks + ribbon carved over a soft under-fill backing)
+  + `eyeband_closed`/`eyeband_smile`/`mouthband_closed` swap bands + `hair_L/R` + `ribbon`. The deferred W5 (c)
+  seam-fix (FEATHER=30) rides along. **Remaining = the USER Cubism re-rig (whole-warp + opacity-swap blink) →
+  re-export (moc3 5.0) → verify over the scene plate.**
 - **mouth (#7) + eye-smile — feasibility decided (2026-06-02):** on a flat source all expression = an opacity
   frame-swap of baked art (same trick as blink; refs in `gen/refs/`). **eye-smile ^^ and closed-mouth-SNAP are
   cheap + feasible** (one band + one opacity binding each); **smooth / talking mouth is INFEASIBLE** (would need

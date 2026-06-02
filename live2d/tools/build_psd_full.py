@@ -1,9 +1,14 @@
-"""W3: assemble live2d/layers/*.png into live2d/lotte.psd (psd-tools), depth-ordered back->front
-per spec §4. Each layer is full-canvas (2508^2) so they import in register. Cubism's documented
+"""W3/Phase C+D: assemble live2d/layers/*.png into live2d/lotte.psd (psd-tools), depth-ordered
+back->front. Each layer is full-canvas (2508^2) so they import in register. Cubism's documented
 import path is a layered PSD; loose PNGs are not. Mirrors the pilot's build_psd.py (PixelLayer.frompil).
 
-Part set reflects the W3.2 USER decisions (2026-05-31): bangs merged into face_base; hair merged to one
-mass per side (hair_L / hair_R, front side locks). 19 layers."""
+Part set = the 통짜 (whole-image) re-cut (ADR-0001, 2026-06-02): one feathered `base` (open eyes +
+open mouth baked in) + three feathered opacity-SWAP bands + the moving hair/ribbon physics locks.
+NO face-interior cuts -> no patchwork. See full_segment.py for how each layer is built. 7 layers.
+
+Draw order rationale: bands sit OVER the base (they swap over the open eyes/mouth) but UNDER the
+hair locks (hair frames the face over the outer eye corner); eyeband_closed is above eyeband_smile
+so a blink wins visually if both ever open (param priority: blink overrides smile)."""
 import pathlib
 from PIL import Image
 from psd_tools import PSDImage
@@ -11,16 +16,14 @@ from psd_tools.api.layers import PixelLayer
 
 LAYERS = pathlib.Path("live2d/layers")
 OUT = "live2d/lotte.psd"
-# back -> front (spec §4). Names must match files in live2d/layers/.
+# back -> front. Names must match files in live2d/layers/ (full_segment.py output).
 DEPTH = [
-    "body", "scarf", "neck", "face_base",
-    "brow_L", "brow_R",
-    "sclera_L", "iris_L", "sclera_R", "iris_R",
-    "upperlid_L", "upperlid_R", "lowerlid_L", "lowerlid_R",
-    "mouth_inner", "mouth_outer",
+    "base",
+    "mouthband_closed",
+    "eyeband_smile", "eyeband_closed",
     "hair_L", "hair_R", "ribbon",
 ]
-size = Image.open(LAYERS / "face_base.png").size
+size = Image.open(LAYERS / "base.png").size
 psd = PSDImage.new(mode="RGBA", size=size)
 for name in DEPTH:
     f = LAYERS / f"{name}.png"
