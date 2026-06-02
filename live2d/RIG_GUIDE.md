@@ -155,6 +155,13 @@ confirms blink / gaze / smile / sway. Keep the rig rough — this proves the cha
 
 ## Full Build (W4) — the real Tier-1 rig
 
+> ⚠️ SUPERSEDED for the FACE (2026-06-02, ADR-0001) → see **"Phase C+D — 통짜 re-rig"** at the
+> bottom of this file. The live Discord render exposed this mesh-deform rig as 누더기 (patchwork).
+> The face is no longer cut: blink/smile/mouth are now **opacity-swap bands** over one 통짜 `base`,
+> and tilt/turn/breath are **whole-image warp**, not mesh deform. The W4 steps below are kept as the
+> record of the first build + the still-valid procedures (import, atlas, physics, moc3 export); the
+> 통짜 section reuses those and replaces the face-cut / clipping / mesh-blink / iris-gaze steps.
+
 This is the production rig. Do it in **Cubism 5.3 FREE**. It carries the pilot's learnings and
 the W3 separation decisions. Keep everything **Tier-1 restrained** — start under-animated; you
 can always add motion later. The param IDs/ranges are the verified table in **Pilot Step 5** above
@@ -279,3 +286,108 @@ Compatibility ref: https://docs.live2d.com/en/cubism-sdk-manual/compatibility-wi
 - If a part is too rough to rig cleanly, **merging it is an allowed outcome** (`DECISIONS.md` §6, spec
   §4) — and the W3↔W4 loop lets you re-cut: edit `live2d/tools/full_segment.py` (`BOXES` / `col_layer`)
   and re-run `full_segment.py` + `build_psd_full.py`.
+
+---
+
+## Phase C+D — 통짜 re-rig (CURRENT procedure)
+
+The rig-strategy pivot (ADR-0001). Replaces the W4 mesh-deform of face parts with **one whole-image
+`base` + opacity-swap bands**. The hard part is intentionally SMALL now — most face work is gone.
+
+**Inputs (Phase C+D agent-prep, 2026-06-02):** `live2d/lotte.psd` — **7 full-canvas aligned layers**
+(2508²), back→front: `base, mouthband_closed, eyeband_smile, eyeband_closed, hair_L, hair_R, ribbon`.
+`base` is the WHOLE character with **open eyes + open mouth baked in**. The three bands are feathered
+*baked alternate-state* art (closed eyes / ^^ / closed mouth) that you reveal by **opacity**, not deform.
+(PSD is gitignored — regenerate via `live2d/pilot/.venv/bin/python live2d/tools/full_segment.py` then
+`… build_psd_full.py`.)
+
+**What is DIFFERENT from the W4 mesh-deform rig (read first):**
+- `base` is ONE ArtMesh — no face cuts, **no clipping masks**, no mesh-deform blink.
+- Tilt / turn / breath / lean = **whole-image WARP** over `base` (+ bands), not part deform.
+- Blink / smile / mouth = a band drawable's **opacity** keyed to a param (frame-swap), not geometry.
+- Gaze = **head-lean only** (the runtime probe drives Angle/Body with eyeball weight 0) → **NO**
+  `ParamEyeBallX/Y` or iris keys. One less thing to rig.
+
+### CD-1 Import + auto-mesh
+File ▸ Open `live2d/lotte.psd`. 7 layers → 7 ArtMeshes in register; names in the Parts palette. Select
+all (Ctrl+A) ▸ **Automatic Mesh generator** (Ctrl+Shift+A) ▸ default preset. Give `base` a **fairly dense
+mesh** (more control points → a smoother warp tilt with no creasing); the bands can stay light.
+Manual: https://docs.live2d.com/en/cubism-editor-manual/reimport-psd/
+
+### CD-2 Deformer nest (two nested warps)
+Build this with **[Create Warp Deformer]**, then drag each part into its deformer in the Parts/Deformer
+palette:
+```
+root
+└─ body_warp  (Warp, ~6×6, covers the WHOLE character)   ← ParamBreath, ParamBodyAngleX
+   ├─ head_warp (Warp, ~5×5, covers head→shoulders)      ← ParamAngleX, ParamAngleY, ParamAngleZ
+   │    ├─ base              (the 통짜 character mesh)
+   │    ├─ eyeband_closed    (opacity-swap — blink)
+   │    ├─ eyeband_smile     (opacity-swap — ^^)
+   │    └─ mouthband_closed  (opacity-swap — closed mouth)
+   ├─ hair_L   (Rotation/Warp, physics-driven)           ← ParamHairSide
+   ├─ hair_R   (Rotation/Warp, physics-driven)           ← ParamHairSide
+   └─ ribbon   (Warp, physics-driven)                    ← ParamHairFront
+```
+The bands sit INSIDE `head_warp` next to `base` so they stay registered over the face when the head tilts.
+Warp-deformer help: https://docs.live2d.com/en/cubism-editor-manual/deformer-warp/
+
+### CD-3 Head tilt/turn = warp the HEAD ROWS only (the key 통짜 trick)
+Because `base` is one mesh, the warp must move the head WITHOUT dragging the body.
+1. On `ParamAngleZ` (−30..30) ▸ **[Add 2 Keyforms]**. At +30, in `head_warp` move only the **upper
+   (head) control points** to rotate the head a little — **leave the bottom (neck/shoulder) rows at their
+   default position** so the body stays put. Mirror for −30. Keep it gentle (Tier-1: ±8 is the live-tuned
+   feel from Phase A, not the full ±30).
+2. `ParamAngleX` / `ParamAngleY` (−30..30): the same head-rows-only idea but a tiny **planar** shift +
+   slight rotation. **FLAT ONLY — no cheek/nose parallax** (`DECISIONS.md` §6).
+> Tip: anchor the neck row first (don't move it across any AngleZ/X/Y keyform). If the shoulders tilt with
+> the head, you moved a row too low.
+
+### CD-4 Blink = opacity-swap (the new mechanism)
+1. Select **`eyeband_closed`** (the drawable, in the Parts palette).
+2. Select `ParamEyeLOpen` (0..1; 1 = open, 0 = closed) ▸ **[Add 2 Keyforms]**.
+3. At param **= 1 (open)** set this drawable's **Opacity = 0** (hidden → base's open eyes show).
+   At param **= 0 (closed)** set **Opacity = 100** (the closed-eye band covers the open eyes).
+4. That's the whole blink. Runtime auto-blink drives `ParamEyeLOpen` 1→0→1, fading the band in/out.
+   *2-state first.* Both eyes blink together (one band over both); an independent wink would need the
+   band split L/R (a re-cut — out of scope now).
+Facial-expression / opacity keying: https://docs.live2d.com/en/cubism-editor-manual/facial-expression-system/
+
+### CD-5 (optional, decide on-screen) eye-smile ^^ + closed-mouth
+Same opacity pattern; wire only if you want them. Draw order already gives blink priority (`eyeband_closed`
+is above `eyeband_smile`).
+- **`eyeband_smile`** opacity on a smile param (`EyeL Smile` 0..1, or a custom `ParamSmile`): 0 → Opacity 0,
+  1 → Opacity 100. (No runtime smile driver yet — this is for a manual/expression preset.)
+- **`mouthband_closed`** opacity for a closed-mouth SNAP: bind to `ParamMouthOpenY` **inverted**
+  (OpenY 0 → Opacity 100 = mouth looks closed; OpenY 1 → Opacity 0 = base's open mouth shows), OR a custom
+  `ParamMouthClose`. This also sets the **resting mouth**: opaque-at-rest = gentle closed; off-at-rest =
+  the baked open smile. Pick what reads calmer on-screen. (Smooth/talking mouth is INFEASIBLE on flat —
+  that's the speech-bubble's job, not this rig.)
+
+### CD-6 Breath + lean (whole-character warp)
+On `body_warp`: `ParamBreath` (0..1) → a gentle vertical rise/scale of the whole grid; `ParamBodyAngleX`
+(−10..10) → a subtle horizontal lean. Runtime auto-breath drives `ParamBreath`; the Phase-A probe drives
+`ParamBodyAngleX` for the head-lean gaze.
+
+### CD-7 Physics (hair + ribbon) — reuse the validated feel
+Same as W4 Step 9B (CDP-verified): `hair_L`/`hair_R` on a low-scale pendulum → `ParamHairSide`; `ribbon`
+on its own warp → `ParamHairFront` (Delay ~0.7, lighter/faster — it should trail the head ~5 frames; the
+liveness is the **lag**, not the amplitude). You can re-use `live2d/model/lotte.physics3.json` as the
+starting physics file.
+
+### CD-8 Atlas (single 2048 — now roomy)
+**[Edit Texture Atlas]** ▸ size **2048×2048** ▸ **Auto Layout** ▸ **"Set magnification automatically."**
+Only **7 parts** now (vs 19) → far more room, so the auto-magnification can stay **higher = sharper** than
+the old ~0.5×. FREE = one atlas, ≤100 pieces (INV-7).
+
+### CD-9 Export (moc3 5.0) + verify
+File ▸ **Export embedded file** ▸ moc3. Include `.moc3`, `.model3.json`, **textures**, `physics3.json`,
+`.cdi3.json`. **Set `.moc3 file version` to 5.0** (NOT the v6 default — INV-6). Export to `live2d/model/`
+as `lotte.model3.json`; save the project as `live2d/lotte.cmo3`. Then ping me — I run `check_model.py`
+(asserts v≤5 + populates the EyeBlink group) and render it over `gen/scene-plate.png` at real Discord
+scale to gate the blink + the seam.
+
+### Tier-1 restraint (unchanged)
+Tilt ±8 (Phase-A feel), not ±30. Breath/lean subtle. Hair low scale. Most life is FREE from auto-blink +
+auto-breath + physics + the head-lean gaze. If a band sits wrong at real scale, it's a one-line fix in
+`full_segment.py` (band coords / `FEATHER`) → re-run → re-import (the W3↔W4 loop).
