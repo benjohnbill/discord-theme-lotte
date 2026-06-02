@@ -42,21 +42,26 @@ Contribution shown with *confidence*; cost grounded in the reuse basis below.
 
 ## Gate-ordered execution (cheap measurements gate expensive commits)
 
-- **Phase A — DONE (2026-06-02, in working tree, uncommitted).** Clamp tilt/turn amplitude + gaze = head-lean,
-  wired in `build_discord_probe.py` (`im.updateFocus` override; `GAZE = {eye:0, xy:8, z:6, body:5}` — eyeball
-  weight 0 = no iris cut; Angle/Body gains clamped from the lib default 30/30/10 → 8/6/5; FocusController spring
-  still damps); `runtime-check-full.html` updated to match. Gate accepted (read calmer / less 경박) → advanced
-  to Phase B.
-- **Phase B — IN PROGRESS (2026-06-02): scene-plate generation.** Cheap, high-information gate. Produce the
-  scene plate (#5, one inpaint — prompts in `gen/PROMPTS.md`), then **re-render the existing rig over the scene
-  plate.** Measures: (1) does ribbon/hair-tail sway (#4) read clean over a congruent backdrop? (2) how much of
-  the "누더기" was alien-gray-bg unfairness vs class-B face cuts? **No re-export needed.**
+- **Phase A — PASS (2026-06-02, committed `3228a2a`).** Clamp tilt/turn amplitude + gaze = head-lean,
+  wired in `build_discord_probe.py` + `runtime-check-full.html` (`im.updateFocus` override; `GAZE = {eye:0, xy:8,
+  z:6, body:5}` — eyeball weight 0 = no iris cut; Angle/Body gains clamped from the lib default 30/30/10 → 8/6/5;
+  FocusController spring still damps). USER-confirmed in real Discord (calmer / less 경박, iris steady) → Phase B.
+- **Phase B — DONE (2026-06-02): verdict = Phase D NEEDED.** Scene plate `gen/scene-plate.png` (USER GPT-image-2;
+  character removed + halo completed) ACCEPTED; rendered the existing rig over it (harness `?imgbg=`, **no
+  re-export**). Result: (1) ✅ congruent-backdrop hypothesis confirmed — coherent wallpaper, no floating-sticker /
+  no fringe; (2) natural BIG framing chosen (body fills frame, matches `version`); (3) ⚠️ at that scale the
+  rectangular patchwork seams are clearly visible ⇒ **Phase D confirmed NECESSARY** (element #8). Evidence
+  `live2d/phaseB-*.png`.
 - **Phase C — gated high-value, medium cost.** Re-align the closed-eye band at full base + feather; rig as
   opacity-swap. Gate at **real Discord scale**: does it read as a blink or a glitch (2-state first)?
 - **Phase D — core re-export (commit only after B/C signal).** Re-segment with fewer cuts + bake eyebrows into
   `face_base` + feather + the eye-band swap + the deferred W5 seam-fix → re-import to Cubism → re-export.
-- **mouth (#7):** sanity-check the "speech-bubble carries talking" claim (even a mock) before formally
-  dropping; default = DROP.
+- **mouth (#7) + eye-smile — feasibility decided (2026-06-02):** on a flat source all expression = an opacity
+  frame-swap of baked art (same trick as blink; refs in `gen/refs/`). **eye-smile ^^ and closed-mouth-SNAP are
+  cheap + feasible** (one band + one opacity binding each); **smooth / talking mouth is INFEASIBLE** (would need
+  mesh-deform = patchwork, or many visemes) → revises #7: DROP *smooth* mouth, speech-bubble carries talking
+  (still unverified). Plan: include all candidate bands in the 통짜 PSD; USER wires blink (definite) + ^^ /
+  closed-mouth (optional) in Cubism, deciding on-screen.
 
 ### Why this order
 Phase A + B need no heavy work and no re-export — config tuning + one inpaint + a re-render. They are the

@@ -38,6 +38,17 @@ The whole-image-warp foundation that realises the **Living illustration** strate
 collar) held as one cohesive surface, animated by whole-image warp + physics rather than cut into deforming parts.
 The agreed floor for the rig (2026-06-01); anything separated from it must earn its place on feasibility × ROI.
 
+### Band / frame-swap (opacity-swap)
+The mechanism that adds expression to a 통짜 base WITHOUT cutting deforming face parts. A **band** is a thin,
+**feathered** strip of a *baked alternate-state* art (closed eyes, smiling eyes ^^, closed mouth — the
+`gen/refs/*` keyforms) covering one feature: its interior is opaque (covers the feature), its edges fade to
+transparent so it blends into the base with no rectangular seam. A **frame-swap (opacity-swap)** drives that
+band's opacity 0→1 on a param (e.g. `ParamEyeLOpen/ROpen` for blink) — at 0 the base's drawn state shows, at 1
+the band covers it with the baked alternate. It is a *frame replacement*, not a geometry deform, so it needs no
+under-drawing and produces no patchwork (it replaces exactly the W4 mesh-deform of hard lid crops; the pilot's
+swap blink passed). The cross-fade ghosts mid-transition, so it suits fast / discrete states (blink, a settled
+^^, a snap to closed-mouth) — NOT a smooth morph or lip-sync, which a flat source cannot do cleanly.
+
 ### Character consistency
 Fidelity of the rigged result to **the original Lotte illustration the user presented** (its exact look and
 feel). A first-class success criterion alongside aliveness. Every AI-synthesized or AI-harvested part is a fresh

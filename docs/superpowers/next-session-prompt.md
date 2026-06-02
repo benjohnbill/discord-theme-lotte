@@ -1,4 +1,4 @@
-# Next Session — Lotte Live2D — Phase A DONE; Phase B (scene plate) IN PROGRESS
+# Next Session — Lotte Live2D — Phase A + B DONE; NEXT = 통짜 re-segment → Cubism re-rig (Phase C+D)
 
 > Phase 0 = DONE/GO. Phase 1.0 pilot = DONE/GO. **Phase 1 full build = mechanically DONE/PASS (W1–W5 +
 > physics, 2026-06-01) but SUPERSEDED on quality:** the first live Discord render exposed the
@@ -18,18 +18,36 @@ Paste the body below (inside the `---` block) into the next Claude session as th
 the mesh-deform rig as "누더기" (patchwork). The **rig-strategy pivot (ADR-0001) is decided**; the next work
 is its gate-ordered execution, NOT "Phase 1 done → Phase 2". Read `live2d/PIPELINE.md` + `live2d/ROI.md` FIRST.
 
-**START HERE — Phase B (scene plate) IS IN PROGRESS.** Phase A (config tune) is DONE in the working tree
-(uncommitted): gaze = head-lean (`build_discord_probe.py` overrides `im.updateFocus` with
-`GAZE = {eye:0, xy:8, z:6, body:5}` — eyeball weight 0 = no iris cut; Angle/Body gains clamped from the
-lib default 30/30/10 → 8/6/5) + `runtime-check-full.html` updated to match. **Phase B now:** produce the
-scene-plate inpaint (character removed from `version`; prompts in `gen/PROMPTS.md`), then re-render the
-EXISTING rig over it (the B gate — does ribbon/hair-tail sway read over a congruent backdrop? how much
-"누더기" was alien-gray-bg unfairness vs class-B face cuts? **no re-export**). Verify in the real Discord
-client or a SwiftShader throwaway Chrome (bh-chrome has no WebGL — memory `bh-chrome-no-webgl`). Then
-follow `live2d/ROI.md`'s gate order: C (blink band) → D (core re-export).
+**START HERE — Phase A + B are DONE (committed `3228a2a`). NEXT = the Phase C+D 통짜 re-export.** Read
+`live2d/PIPELINE.md` FIRST (authority; carries the A/B outcomes + the next-action). Phase A (config tune)
+**PASS**: head-lean gaze (`im.updateFocus` override, `GAZE={eye:0,xy:8,z:6,body:5}`, eyeball 0 = no iris
+cut) shipped in `build_discord_probe.py` + `runtime-check-full.html`; USER-confirmed in real Discord.
+Phase B (scene plate) **measured**: USER's GPT-image-2 plate `live2d/gen/scene-plate.png` ACCEPTED; the rig
+composited over it (harness `?imgbg=`, **no re-export**) reads as a coherent wallpaper at the **natural BIG
+framing** (scale≈0.58 over the 1586×992 plate, body fills the lower frame — matches the `version` wallpaper),
+BUT at that scale the rectangular patchwork seams are clearly visible ⇒ **Phase D (collapse face cuts into a
+통짜 base + feather) is confirmed NECESSARY.** Evidence `live2d/phase{A,B}-*.png`.
 
-**Open / gate-dependent — do NOT pre-decide:** mouth keep vs drop · 2-state vs 3-state blink · blink
-survival at real scale.
+**NEXT — the work (Phase C+D collapse into ONE Cubism re-export):**
+1. **AGENT (Tier-1, no re-export):** rewrite `tools/full_segment.py` to a **통짜 cut** — drop the
+   brow/sclera/iris/lid/mouth box crops → `head` (whole face, NO internal cuts) + `body` (head/body split
+   at the hidden neckline) + `hair_L/R` + `ribbon` + feathered swap bands (`eyeband_closed` for blink,
+   `eyeband_smile` for ^^, `mouthband_closed`); feather all carved/band alpha edges (rides the deferred
+   W5 (c) seam-fix). Re-run `full_segment.py` + `build_psd_full.py` → new clean PSD.
+2. **USER (Tier-3, Cubism GUI — `live2d-authoring` boundary):** re-import → rig as whole-warp +
+   eye-band **opacity-swap** blink (NOT mesh-deform) → re-export (moc3 5.0) → `check_model.py` → verify
+   over `scene-plate.png`.
+
+APPROVED part-list + per-band feasibility + step-by-step are in the 통짜 handoff doc (this session's
+`/handoff` output) and PIPELINE. **Feasibility (decided this session):** on a flat source ALL expression
+is an opacity frame-swap of baked art (same trick as blink; refs already exist in `gen/refs/`). blink =
+ideal; **eye-smile ^^ = cheap + good**; **closed-mouth = cheap as a fast SNAP**; **smooth/talking mouth =
+INFEASIBLE on flat** (would need mesh-deform = patchwork, or many visemes) → that is the speech-bubble's job.
+Plan: include ALL candidate bands in the PSD (cheap), USER wires blink (definite) + ^^/mouth (optional)
+in Cubism, deciding on-screen. Verify only in the real Discord client or a SwiftShader throwaway Chrome.
+
+**Open / decided-live-in-Cubism:** which swap bands to actually WIRE (blink definite; ^^ / closed-mouth
+optional, decide on-screen) · 2-state vs 3-state blink · blink survival at real scale.
 
 **Background (resolved/deferred — NOT the next step):**
 - **W5 polish (OPTIONAL, USER art/tune calls — not blockers):** (a) ~~hair-edge halo + circular vignette~~

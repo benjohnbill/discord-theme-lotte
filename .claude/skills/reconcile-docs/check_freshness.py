@@ -76,6 +76,14 @@ FRONTIER = re.compile(
     r"(?:next\s*=\s*|Start at\s*\*{0,2}|Frontier\s*=\s*\*{0,2}|EXECUTE\s+|rig(?:s)? .*?\bin\s+)"
     r"\bW(\d+(?:\.\d+)?)\b"
 )
+# Pivot phase frontier (A/B/C/D). The W-token regex above is BLIND to the pivot naming,
+# so without this the frontier check is a no-op for the CURRENT frontier — which is exactly
+# how a stale "next = Phase B" slipped past a clean run (all surfaces consistently stale, but
+# the checker never looked at phase letters). Captures the phase token in a "next" context.
+PHASE_FRONTIER = re.compile(
+    r"(?:NEXT|next\s+action|next\s+arc|next\s+step)\b[^.\n]{0,30}?\bPhase\s*([A-D](?:\s*\+\s*[A-D])*)\b",
+    re.I,
+)
 COMMITS = re.compile(r"\b(\d+)\s+commits\b")
 # A commit-count phrased against origin is compared to origin..HEAD, not master..HEAD.
 AHEAD_OF_ORIGIN = re.compile(r"ahead of\s+`?origin", re.I)
@@ -205,6 +213,32 @@ def main():
                 warns.append(f"[frontier] {rel(path)}: says 'W{t}' but authority frontier = 'W{auth_max}' (granularity lag)")
             elif auth_tokens and t not in auth_tokens and "." not in t:
                 warns.append(f"[frontier] {rel(path)}: 'W{t}' not among authority tokens {sorted(auth_tokens)}")
+
+    # ---- B2. pivot phase-frontier agreement (Phase A/B/C/D) ----
+    # A surface whose next-action phase letters are DISJOINT from the authority's is stale
+    # (e.g. "next = Phase B" vs authority "Phase C+D"). Overlap (C / D / C+D phrasings) passes;
+    # this is a FAIL, not a warn — it is the consistently-stale-frontier lapse we want to block.
+    def phase_letters(path):
+        out = set()
+        try:
+            txt = open(path, encoding="utf-8").read()
+        except OSError:
+            return out
+        for tok in PHASE_FRONTIER.findall(txt):
+            out |= set(re.findall(r"[A-D]", tok.upper()))
+        return out
+
+    auth_letters = phase_letters(authority) if authority else set()
+    if auth_letters:
+        for path in surfaces:
+            ap_ = os.path.abspath(path)
+            if ap_ == reg_abs or ap_.startswith(skill_dir) or path in history:
+                continue  # registry enumerates stale-triggers; history keeps old frontiers
+            sl = phase_letters(path)
+            if sl and sl.isdisjoint(auth_letters):
+                fails.append(
+                    f"[phase-frontier] {rel(path)}: next-action names Phase {sorted(sl)} "
+                    f"but authority frontier = Phase {sorted(auth_letters)} (stale phase frontier — reconcile to the authority)")
 
     # ---- C. branch-state vs git ----
     if sh(["git", "rev-parse", "--git-dir"], root):
