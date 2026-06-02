@@ -1,0 +1,103 @@
+<!doctype html>
+<html><head><meta charset="utf-8" />
+<!--
+  Phase C+D 통짜-rig verification harness (sibling of runtime-check-full.html).
+  Loads the TOP-LEVEL export (./lotte.model3.json — the new 통짜 rig) and renders a pose
+  montage over the scene plate: real-amplitude (±8, the runtime clamp) + extreme (±30) +
+  the diagonal that the 1-param-per-deformer split fixed. Drive with live2d/tools/cd_capture.py
+  (SwiftShader CDP). HARD-WON GOTCHAS baked in:
+    * preserveDrawingBuffer:true + an explicit app.renderer.render() before drawImage(view) —
+      WITHOUT both, reading the WebGL canvas returns a BLANK buffer (the model is invisible).
+    * Runtime band-hiding does NOT work: pixi-live2d-display reads drawable opacities from a
+      cached path, so setPartOpacityById / a getDrawableOpacities monkeypatch / a coreModel.update
+      wrap all fail to hide eyeband_closed. Eyes therefore read CLOSED here until blink opacity is
+      keyed in Cubism (CD-4). That is expected — judge the HEAD-LEAN motion, not the eyes.
+    * SwiftShader needs real wall-clock frames (run the capture WITHOUT --virtual-time-budget).
+  Params: ?hold=18 (frames held per pose) ?tw=520 ?cols=4 ?scale=0.58 ?oy=0.61
+-->
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#bcaecf}#c{display:block;width:100vw;height:100vh}
+#s{position:fixed;top:4px;left:6px;color:#0a0;font:11px monospace;white-space:pre-wrap;pointer-events:none}</style>
+</head><body>
+<div id="s">loading…</div><canvas id="c"></canvas>
+<script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js"></script>
+<script>
+(async () => {
+  const q = new URLSearchParams(location.search);
+  const s = document.getElementById('s');
+  try {
+    const plateImg = new Image(); plateImg.src = q.get('plate') || 'gen/scene-plate.png';
+    try { await plateImg.decode(); } catch(e) {}
+    const app = new PIXI.Application({view:document.getElementById('c'), resizeTo:window,
+      backgroundAlpha:0, antialias:true, autoStart:true, preserveDrawingBuffer:true});
+    const model = await PIXI.live2d.Live2DModel.from(q.get('model') || './lotte.model3.json');
+    app.stage.addChild(model);
+    const im = model.internalModel, cm = im.coreModel;
+    model.scale.set(parseFloat(q.get('scale') || '0.58'));
+    model.anchor.set(0.5, 0.5);
+    model.position.set(window.innerWidth * 0.5, window.innerHeight * (parseFloat(q.get('oy') || '0.61')));
+
+    const POSES = [
+      ['neutral 0,0,0', 0,0,0],
+      ['real X+8', 8,0,0], ['real X-8', -8,0,0],
+      ['real Y+8', 0,8,0], ['real Y-8', 0,-8,0],
+      ['real corner 8,8,-6', 8,8,-6],
+      ['ext X+30', 30,0,0], ['ext Y+30', 0,30,0], ['ext Z+30', 0,0,30],
+      ['ext X30 Y30 (diag)', 30,30,0], ['ext all+30', 30,30,30],
+    ];
+    const hold = parseInt(q.get('hold') || '18', 10);
+    const tw = parseInt(q.get('tw') || '520', 10);
+    const th = Math.round(tw * window.innerHeight / window.innerWidth);
+    const view = document.getElementById('c');
+    const shots = []; let pi = 0, tk = 0;
+    const drawCover = (cx,img,W,H) => {
+      const ir = img.width/img.height, r = W/H; let dw,dh;
+      if (ir>r){ dh=H; dw=H*ir; } else { dw=W; dh=W/ir; }
+      cx.drawImage(img,(W-dw)/2,(H-dh)/2,dw,dh);
+    };
+    const cap = (label) => {
+      app.renderer.render(app.stage);   // fresh render into the preserved buffer (else blank)
+      const off = document.createElement('canvas'); off.width=tw; off.height=th;
+      const cx = off.getContext('2d');
+      cx.fillStyle='#bcaecf'; cx.fillRect(0,0,tw,th);
+      if (plateImg.complete && plateImg.naturalWidth) drawCover(cx,plateImg,tw,th);
+      cx.drawImage(view, 0,0,view.width,view.height, 0,0,tw,th);
+      cx.fillStyle='rgba(0,0,0,.6)'; cx.fillRect(0,th-17,tw,17);
+      cx.fillStyle='#fff'; cx.font='12px monospace'; cx.fillText(label,5,th-5);
+      shots.push(off);
+    };
+    const drive = () => {
+      const [label,x,y,z] = POSES[pi];
+      cm.setParameterValueById('ParamAngleX', x);
+      cm.setParameterValueById('ParamAngleY', y);
+      cm.setParameterValueById('ParamAngleZ', z);
+      tk++;
+      if (tk >= hold) {
+        cap(label); pi++; tk = 0; s.textContent = 'captured ' + pi + '/' + POSES.length;
+        if (pi >= POSES.length) {
+          app.ticker.remove(drive);
+          const cols = parseInt(q.get('cols') || '4', 10), pad = 4;
+          const rows = Math.ceil(shots.length / cols);
+          const gw = cols*tw + (cols+1)*pad, gh = rows*th + (rows+1)*pad;
+          const grid = document.createElement('canvas'); grid.width=gw; grid.height=gh;
+          const gc = grid.getContext('2d'); gc.fillStyle='#222'; gc.fillRect(0,0,gw,gh);
+          shots.forEach((sh,i)=>{ const r=Math.floor(i/cols), c=i%cols;
+            gc.drawImage(sh, pad+c*(tw+pad), pad+r*(th+pad)); });
+          document.body.innerHTML=''; document.body.style.background='#222';
+          const out = document.createElement('img'); out.src = grid.toDataURL('image/png');
+          out.style.cssText='display:block'; document.body.appendChild(out);
+          window.__cdDone = true; console.log('LOTTE_CD_DONE tiles=' + shots.length);
+        }
+      }
+    };
+    app.ticker.add(drive);   // after the model's own update → my params win (1-frame lag)
+    let ids = []; try { ids = Array.from(cm.getDrawableIds ? cm.getDrawableIds() : []); } catch(e){}
+    console.log('LOTTE_CD_READY parts=' + JSON.stringify(ids));
+    s.textContent = 'ready';
+  } catch (e) {
+    s.textContent = 'ERROR ' + (e && e.message ? e.message : e);
+    console.error('LOTTE_CD_ERROR', e);
+  }
+})();
+</script></body></html>

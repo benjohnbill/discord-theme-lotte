@@ -1,4 +1,4 @@
-# Next Session — Lotte Live2D — Phase A+B + Phase C+D agent-prep DONE; NEXT = USER Cubism re-rig (Phase C+D)
+# Next Session — Lotte Live2D — Phase C+D re-rig: Angle channel DONE+GO; NEXT = ④ blink (opacity-swap)
 
 > Phase 0 = DONE/GO. Phase 1.0 pilot = DONE/GO. **Phase 1 full build = mechanically DONE/PASS (W1–W5 +
 > physics, 2026-06-01) but SUPERSEDED on quality:** the first live Discord render exposed the
@@ -18,10 +18,18 @@ Paste the body below (inside the `---` block) into the next Claude session as th
 the mesh-deform rig as "누더기" (patchwork). The **rig-strategy pivot (ADR-0001) is decided**; the next work
 is its gate-ordered execution, NOT "Phase 1 done → Phase 2". Read `live2d/PIPELINE.md` + `live2d/ROI.md` FIRST.
 
-**START HERE — Phase A + B DONE (committed `3228a2a`) + Phase C+D AGENT-PREP DONE (2026-06-02:
-`full_segment.py` rewritten to the 통짜 cut + new `lotte.psd`, agent-verified). NEXT = the USER
-Cubism re-rig (Tier-3) that completes Phase C+D.** Read
-`live2d/PIPELINE.md` FIRST (authority; carries the A/B outcomes + the next-action). Phase A (config tune)
+**START HERE — Phase C+D 통짜 RE-RIG IN PROGRESS. The Angle channel is DONE + structurally verified
+GO (2026-06-02). NEXT = ④ blink (opacity-swap).** Read `live2d/PIPELINE.md` FIRST — its top frontier
+bullet carries the as-built deformer tree, the 1-param-per-deformer lesson, the GO verdict + caveats,
+and the exact next steps. In Cubism the USER has built: import + auto-mesh → deformer nest
+`body_warp ▸ head_x ▸ head_y ▸ head_warp ▸ {base, bands, hair, ribbon}` → **Angle X/Y/Z (one param
+per warp** — dodges the FREE 2-param cap AND fixes the diagonal-blend distortion) → single-2048 atlas
+→ one judgment export (moc3 v5). **NEXT = ④ blink** (CD-4 in `RIG_GUIDE.md`): key `eyeband_closed`
+opacity on `ParamEyeLOpen` (1→0, 0→100); then ⑤ smile/mouth opacity, ⑥ `ParamBreath`+`ParamBodyAngleX`
+keys on `body_warp`, ⑦ hair/ribbon physics, final export to **`live2d/model/`** → `tools/check_model.py`
+→ re-render. **Verify recipe:** `live2d/cd_render.html` + `live2d/tools/cd_capture.py` (SwiftShader CDP
+over the scene plate; **preserveDrawingBuffer + NO --virtual-time-budget are mandatory**). Eyes read
+closed until blink is wired (no runtime hack hides the bands — pixi caches drawable opacity). Phase A (config tune)
 **PASS**: head-lean gaze (`im.updateFocus` override, `GAZE={eye:0,xy:8,z:6,body:5}`, eyeball 0 = no iris
 cut) shipped in `build_discord_probe.py` + `runtime-check-full.html`; USER-confirmed in real Discord.
 Phase B (scene plate) **measured**: USER's GPT-image-2 plate `live2d/gen/scene-plate.png` ACCEPTED; the rig
@@ -41,7 +49,8 @@ BUT at that scale the rectangular patchwork seams are clearly visible ⇒ **Phas
    **SINGLE `base`, no head/body PSD split** (head-tilt + body-lean = whole-warp deformers in Cubism;
    a neckline cut would re-add a seam). Band coords: eyeband x0.27–0.72 y0.36–0.56, mouthband
    x0.42–0.60 y0.575–0.68; FEATHER=30.
-2. **USER (Tier-3, Cubism GUI — `live2d-authoring` boundary) — THE IMMEDIATE NEXT STEP:** re-import
+2. **USER (Tier-3, Cubism GUI — `live2d-authoring` boundary) — IN PROGRESS** (import + deformer nest +
+   Angle X/Y/Z DONE + GO; **④ blink is the immediate next step — see START HERE**): re-import
    `lotte.psd` → rig as **whole-image warp** (`base` under `ParamBreath` / `ParamAngleX/Y/Z` /
    `ParamBodyAngleX`; a head-region warp gives tilt) + `hair_L/R` + `ribbon` on physics deformers
    (reuse `model/lotte.physics3.json` feel) + **blink = `eyeband_closed` drawable OPACITY keyed to
