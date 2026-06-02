@@ -31,6 +31,13 @@
     const pins = (q.get('p') || '').split(',').filter(Boolean).map(s => s.split(':'));
     const blinkoff  = q.has('blinkoff');
     const breathoff = q.has('breathoff');
+    // Phase A head-lean gaze gains (per-axis focus->param). Lib defaults are
+    // eye×1, AngleX/Y×30, AngleZ(cross)×30, Body×10 — too large + cuts the iris.
+    // ?gaze=eye:0,xy:8,z:6,body:5  (eye:0 = no iris cut; gaze reads as head/body lean)
+    const GAZE = { eye: 0, xy: 8, z: 6, body: 5 };
+    (q.get('gaze') || '').split(',').filter(Boolean).forEach(s => {
+      const [k, v] = s.split(':'); if (k in GAZE) GAZE[k] = parseFloat(v);
+    });
     const log = (m) => { status.textContent += '\n' + m; };
     try {
       let coreMax = '?';
@@ -66,8 +73,28 @@
       // expose for interactive driving (CDP / console)
       window.__lotte = model;
       window.setParam = (id, v) => im.coreModel.setParameterValueById(id, v);
+      window.getParam = (id) => im.coreModel.getParameterValueById(id);
       window.__z = 0;            // CDP can poke this; autosine writes it
       window.__frames = 0;       // tick counter for liveness probing via CDP
+
+      // Phase A — head-lean gaze: remap focus() so the cursor drives a gentle, clamped
+      // head/body lean (NOT the iris). Replaces the lib's ±30° default mapping. The
+      // FocusController's own spring still supplies temporal damping.
+      im.updateFocus = function () {
+        const f = this.focusController, cm = this.coreModel;
+        cm.addParameterValueById('ParamEyeBallX', f.x * GAZE.eye);
+        cm.addParameterValueById('ParamEyeBallY', f.y * GAZE.eye);
+        cm.addParameterValueById('ParamAngleX', f.x * GAZE.xy);
+        cm.addParameterValueById('ParamAngleY', f.y * GAZE.xy);
+        cm.addParameterValueById('ParamAngleZ', f.x * f.y * -GAZE.z);
+        cm.addParameterValueById('ParamBodyAngleX', f.x * GAZE.body);
+        // debug stash (harness only) — additive contributions are rolled back by the
+        // frame-end loadParameters(), so getParam() can't observe them; read this instead.
+        window.__gazeDbg = { fx: +f.x.toFixed(3), fy: +f.y.toFixed(3),
+          eyeBall: +(f.x * GAZE.eye).toFixed(3), angleX: +(f.x * GAZE.xy).toFixed(2),
+          angleY: +(f.y * GAZE.xy).toFixed(2), angleZ: +(f.x * f.y * -GAZE.z).toFixed(2),
+          body: +(f.x * GAZE.body).toFixed(2), gains: GAZE };
+      };
 
       // ?autosine=1 : drive ParamAngleZ as a real-time sine AFTER the model's own update each
       // frame, so the physics pendulum (which reads ParamAngleZ as input) swings the hair.

@@ -109,6 +109,21 @@ TEMPLATE = r"""/* Lotte Live2D - REAL rig, one-time in-Discord visual check (Dev
       const model = await PIXI.live2d.Live2DModel.from(source);
       app.stage.addChild(model);
       const im = model.internalModel;
+      // Phase A - head-lean gaze: remap focus() so the cursor drives a gentle, clamped
+      // head/body lean (NOT the iris). The lib default is eye x1 / AngleX/Y x30 /
+      // AngleZ(cross) x30 / Body x10 -- reads "too large" live and cuts the iris on a
+      // flat source. eye weight 0 = no iris cut (ADR-0001). FocusController spring still
+      // supplies temporal damping. Gains are the Phase A tuning levers.
+      const GAZE = { eye: 0, xy: 8, z: 6, body: 5 };
+      im.updateFocus = function () {
+        const f = this.focusController, cm = this.coreModel;
+        cm.addParameterValueById("ParamEyeBallX", f.x * GAZE.eye);
+        cm.addParameterValueById("ParamEyeBallY", f.y * GAZE.eye);
+        cm.addParameterValueById("ParamAngleX", f.x * GAZE.xy);
+        cm.addParameterValueById("ParamAngleY", f.y * GAZE.xy);
+        cm.addParameterValueById("ParamAngleZ", f.x * f.y * -GAZE.z);
+        cm.addParameterValueById("ParamBodyAngleX", f.x * GAZE.body);
+      };
       const cw = im.originalWidth || model.width, ch = im.originalHeight || model.height; // intrinsic canvas (stable)
       const fit = () => { const s = Math.min(innerWidth / cw, innerHeight / ch) * 0.92; model.scale.set(s); model.anchor.set(0.5, 0.5); model.position.set(innerWidth / 2, innerHeight / 2); };
       let n = 0; const refit = () => { fit(); if (++n < 20) requestAnimationFrame(refit); }; refit();

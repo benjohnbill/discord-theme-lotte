@@ -181,3 +181,57 @@ ONLY" framing):
 cookbook: this CHARACTER-prefix + "change ONLY X" framing is reliable on GPT-image-2 for
 localized hidden-state edits; only the pilot's eyes-closed showed mouth drift, which the
 explicit "not the mouth" / "ONLY the eyes" wording here avoided).
+
+---
+
+## 4. Phase B — scene plate (character removed, background only)
+
+Built for the rig-strategy pivot (ADR-0001 / ROI.md Phase B). The rigged character
+(from `original`) composites OVER this plate; the plate must contain the lavender scene,
+the completed halo ring, and the bokeh/clover/motifs of `version` with the girl removed —
+so the rig sits on a congruent backdrop and never exposes a pixel-aligned static twin
+(no **doubling**; see CONTEXT.md). This is the INVERSE of the §3 edits: remove the
+character, keep + complete the background.
+
+Input: `live2d/source/lotte-discord-version.png` (1586×992 — the wallpaper WITH the girl,
+made by side-outpainting `original`). Tool: GPT-image-2. Output target: `live2d/gen/scene-plate.png`.
+
+```
+Reference image attached: a 16:10 anime wallpaper (1586x992) — a girl with long brown
+hair, large violet eyes, a violet ribbon, and a navy sailor uniform, centered against a
+soft dreamy purple-and-beige bokeh background with a soft circular halo behind her head,
+a subtle clover pattern, and sparse pastel kawaii motifs (tiny twinkling stars, small
+hearts, gentle flower petals).
+
+Generate a single image, the SAME dimensions and SAME 16:10 framing as the reference,
+that is the BACKGROUND ONLY — with the girl completely removed:
+
+1. REMOVE THE CHARACTER (highest priority)
+Completely remove the girl — her hair, face, ribbon, body, and uniform. Leave NO trace:
+no silhouette, no ghost, no faint outline, no stray hair strands, no shadow of her shape.
+The result must contain NO characters and NO people at all.
+
+2. RECONSTRUCT THE BACKGROUND where she was
+Fill the area she occupied with the same background that surrounds it, continued
+naturally and seamlessly:
+- the same soft dreamy purple-and-beige bokeh and muted purple + warm beige + soft pink palette
+- COMPLETE the soft circular halo into a full, unbroken glowing ring/oval behind where
+  she stood (the arc that was hidden by her head and hair, now visible)
+- continue the subtle clover pattern across the whole frame
+- keep the existing scattered pastel motifs (tiny twinkling stars, small hearts, gentle
+  flower petals, soft falling petals); a few may drift across the center too, sparingly
+- maintain the soft-focus, bokeh depth of field everywhere; smooth, even, dreamy
+
+3. PRESERVE the existing background pixels
+Keep the left/right/top/bottom background as in the reference wherever the girl is NOT —
+do not restyle, recolor, or re-light it. Only the region she occupied is newly filled.
+
+4. OUTPUT
+A single PNG at the reference's exact pixel size (1586x992), 16:10, background only.
+NO text, NO characters, NO sharp or harsh elements, NO watermark.
+```
+
+**Result / drift observation:** _pending generation (USER → GPT-image-2)._ Watch for: GPT
+resizing/restyling the whole frame (the eyes-closed edit came back 1353x1163 — accept any
+16:10 and realign on composite); residual ghost where the hair was; halo left as an open
+arc instead of a full ring. Save the accepted plate as `live2d/gen/scene-plate.png`.
