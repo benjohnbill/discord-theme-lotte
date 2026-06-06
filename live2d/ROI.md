@@ -52,8 +52,17 @@ Contribution shown with *confidence*; cost grounded in the reuse basis below.
   no fringe; (2) natural BIG framing chosen (body fills frame, matches `version`); (3) ⚠️ at that scale the
   rectangular patchwork seams are clearly visible ⇒ **Phase D confirmed NECESSARY** (element #8). Evidence
   `live2d/phaseB-*.png`.
-- **Phase C — gated high-value, medium cost.** Re-align the closed-eye band at full base + feather; rig as
-  opacity-swap. Gate at **real Discord scale**: does it read as a blink or a glitch (2-state first)?
+- **Phase C — blink: HIT A WARP/DISTORTION WALL (2026-06-03); now gated behind a localization test (USER
+  decision 2026-06-06).** The closed-eye band was rigged as an opacity-swap and re-rigged across ~10 rounds.
+  **Both band variants fail:** island-to-string → visible artifacts; full-silhouette (the landing mechanism) →
+  **warp/distortion on the eyelids** when the blink opacity drives. **Root cause UNCONFIRMED** — pixi-live2d-
+  display@0.4.0 runtime bug (⇒ clean in Cubism ⇒ FREE-tier library bump fixes it) vs inherent model/mesh
+  (⇒ warps in Cubism ⇒ re-bind / PRO mesh-copy, which FREE lacks). Gaze (Phase A) + breath already drive live
+  in Discord, so **blink is the SOLE blocker.** USER DECISION (2026-06-06) = run the single definitive
+  localization test FIRST (full-silhouette band at **opacity 100, Angle 0** in Cubism) before any more dev;
+  routes to a library bump (pixi) or a model re-bind / PRO mesh-copy (model). Option 2 (defer blink, ship
+  gaze+breath) is the fallback if the test is discouraging. Authority + full saga = `PIPELINE.md` top frontier
+  bullet + memory [[live2d-cubism-rig-gotchas]] §3.
 - **Phase D — core re-export (commit only after B/C signal). AGENT PREP DONE (2026-06-02).** `full_segment.py`
   rewritten to the 통짜 cut + `build_psd_full.py` updated → new `lotte.psd`, agent-verified (no holes/doubling,
   soft sway reveal, swaps read, edge-detect = no band rectangle). As-built = 7 layers: a SINGLE feathered

@@ -59,6 +59,11 @@ DENYLIST = [
     # near the mention whitelist the correct "Phase 2 is DEFERRED behind the pivot" phrasing.)
     ("INV-3", re.compile(r"(?:real|larger|next)\s+arc\s*=?\s*(?:is\s+)?Phase\s*2", re.I),
      "Phase 2 as the next/larger arc (DEFERRED behind the rig-strategy pivot, ADR-0001)"),
+    # INV-3 SUB-STATE 2026-06-06: CD-4 blink hit a warp/distortion wall (06-03); "blink ~90% /
+    # just re-rig+export" is now the superseded next-action framing. NO denylist regex added on
+    # purpose: "~90%" is a generic numeric token that legitimately appears in the live surfaces'
+    # OWN "this ~90% claim was superseded / FAILED" sentences (would false-positive), and the
+    # FRONTIER/frontier-agreement checks already guard cross-surface drift on the next action.
 ]
 
 # Hit line or up to 2 preceding non-blank lines mark it superseded/correct.

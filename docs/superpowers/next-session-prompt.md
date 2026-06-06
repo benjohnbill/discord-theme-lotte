@@ -1,4 +1,4 @@
-# Next Session — Lotte Live2D — Phase C+D re-rig: Angle channel DONE+GO; NEXT = ④ blink (opacity-swap)
+# Next Session — Lotte Live2D — CD-4 blink HIT A WARP WALL (06-03); NEXT = USER runs the opacity-100/Angle-0 localization test (06-06 decision)
 
 > Phase 0 = DONE/GO. Phase 1.0 pilot = DONE/GO. **Phase 1 full build = mechanically DONE/PASS (W1–W5 +
 > physics, 2026-06-01) but SUPERSEDED on quality:** the first live Discord render exposed the
@@ -18,14 +18,23 @@ Paste the body below (inside the `---` block) into the next Claude session as th
 the mesh-deform rig as "누더기" (patchwork). The **rig-strategy pivot (ADR-0001) is decided**; the next work
 is its gate-ordered execution, NOT "Phase 1 done → Phase 2". Read `live2d/PIPELINE.md` + `live2d/ROI.md` FIRST.
 
-**START HERE — Phase C+D 통짜 RE-RIG IN PROGRESS. The Angle channel is DONE + structurally verified
-GO (2026-06-02). NEXT = ④ blink (opacity-swap).** Read `live2d/PIPELINE.md` FIRST — its top frontier
-bullet carries the as-built deformer tree, the 1-param-per-deformer lesson, the GO verdict + caveats,
-and the exact next steps. In Cubism the USER has built: import + auto-mesh → deformer nest
+**START HERE — CD-4 BLINK HIT A WARP/DISTORTION WALL (2026-06-03); NEXT = the USER runs ONE localization
+test (2026-06-06 decision).** The Angle channel + deformer tree are DONE + GO (2026-06-02); blink is the
+SOLE remaining blocker (gaze + breath already drive live in Discord). On 06-03 the full-silhouette opacity-
+swap re-rig was completed and rendered — **both band variants fail** (island-to-string → artifacts; full-
+silhouette → **warp/distortion on the eyelids**), **root cause UNCONFIRMED** (pixi-live2d-display@0.4.0
+runtime bug ⇒ FREE library bump fixes it, vs inherent model/mesh ⇒ re-bind / Cubism PRO mesh-copy which
+FREE lacks). Read `live2d/PIPELINE.md` FIRST — its TOP 2026-06-06 frontier bullet carries the wall, the
+pixi-vs-model fork, and the exact next action. **NEXT ACTION (USER, Cubism):** set the full-silhouette band
+to **opacity 100 at Angle 0** and look — clean ⇒ pixi-specific (Claude then verifies a library bump in the
+SwiftShader harness); warps ⇒ model/mesh (re-bind, or PRO mesh-copy). Option 2 (defer blink, ship
+gaze+breath as sufficient) is the fallback if the test is discouraging. For context, the as-built rig: in
+Cubism the USER has built: import + auto-mesh → deformer nest
 `body_warp ▸ head_x ▸ head_y ▸ head_warp ▸ {base, bands, hair, ribbon}` → **Angle X/Y/Z (one param
 per warp** — dodges the FREE 2-param cap AND fixes the diagonal-blend distortion) → single-2048 atlas
-→ one judgment export (moc3 v5). **NEXT = ④ blink** (CD-4 in `RIG_GUIDE.md`): key `eyeband_closed`
-opacity on `ParamEyeLOpen` (1→0, 0→100); then ⑤ smile/mouth opacity, ⑥ `ParamBreath`+`ParamBodyAngleX`
+→ one judgment export (moc3 v5). **④ blink** (CD-4 in `RIG_GUIDE.md`) — key `eyeband_closed`
+opacity on `ParamEyeLOpen` (1→0, 0→100) — **was rigged 06-03 and HIT THE WARP WALL (see START HERE); it
+resumes only after the localization test clears the warp.** Then ⑤ smile/mouth opacity, ⑥ `ParamBreath`+`ParamBodyAngleX`
 keys on `body_warp`, ⑦ hair/ribbon physics, final export to **`live2d/model/`** → `tools/check_model.py`
 → re-render. **Verify recipe:** `live2d/cd_render.html` + `live2d/tools/cd_capture.py` (SwiftShader CDP
 over the scene plate; **preserveDrawingBuffer + NO --virtual-time-budget are mandatory**). Eyes read
@@ -50,7 +59,7 @@ BUT at that scale the rectangular patchwork seams are clearly visible ⇒ **Phas
    a neckline cut would re-add a seam). Band coords: eyeband x0.27–0.72 y0.36–0.56, mouthband
    x0.42–0.60 y0.575–0.68; FEATHER=30.
 2. **USER (Tier-3, Cubism GUI — `live2d-authoring` boundary) — IN PROGRESS** (import + deformer nest +
-   Angle X/Y/Z DONE + GO; **④ blink is the immediate next step — see START HERE**): re-import
+   Angle X/Y/Z DONE + GO; **④ blink HIT A WARP WALL 06-03 → the immediate next step is the opacity-100/Angle-0 localization test — see START HERE**): re-import
    `lotte.psd` → rig as **whole-image warp** (`base` under `ParamBreath` / `ParamAngleX/Y/Z` /
    `ParamBodyAngleX`; a head-region warp gives tilt) + `hair_L/R` + `ribbon` on physics deformers
    (reuse `model/lotte.physics3.json` feel) + **blink = `eyeband_closed` drawable OPACITY keyed to
