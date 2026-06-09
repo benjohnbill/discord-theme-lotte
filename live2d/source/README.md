@@ -36,12 +36,12 @@ pixel-aligned, only the left/right background is new. So `version`'s character i
 `original`'s character, and since `version` is 992 tall vs `original`'s 1254 for the
 same crop, **`original` carries more facial pixels.**
 
-Likely base plan (confirm in W1): **rig the character from `original`** (more facial
-resolution, it is the parent) and **borrow `version`'s extended background** as the
-ambient layer — they align because the character is pixel-aligned between them. W1
-upscales the chosen character source with waifu2x and writes
-`live2d/assets/lotte_base.png` with its rationale in `live2d/BASE.md`. These four
-files stay here as the untouched originals.
+**Settled (W1, 2026-05-31):** rig the character from `original`, borrow `version`'s extended
+background as the ambient layer (they align — the character is pixel-aligned between them). The
+upscaled master is `live2d/assets/lotte_base.png` (2508², PIL **Lanczos x2** — no neural upscaler
+in the env). The single home for these settled facts (and checksums) is **`live2d/DOMAIN_MAP.md`**
+(Base raster); this README stays the source-lineage manifest. These four files stay here as the
+untouched originals.
 
 **Provenance:** copied from the user's Windows assets folder
 `C:\Users\benjohnbill\OneDrive\바탕 화면\Life_System\04_System_Assets\` on 2026-05-31.

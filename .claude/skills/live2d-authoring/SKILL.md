@@ -74,7 +74,10 @@ moc3 writer.
 ## References (state + schemas live here — do not duplicate)
 
 - `live2d/PIPELINE.md` — pipeline-state authority (read FIRST)
-- `live2d/ROI.md` — pivot gate plan (Phase A→D) + reuse basis (param inventory)
-- `live2d/CONTEXT.md` — glossary · `live2d/RIG_GUIDE.md` — as-built rig tree
-- `docs/adr/0001-rig-strategy-pivot-deform-to-swap.md` — the pivot decision
+- `live2d/DOMAIN_MAP.md` — platform/tool facts (✅/⛔: moc3 ≤5, single-2048 atlas, machine-ops, verify recipe)
+- `docs/features/tongjja-rig/` — the 통짜 strategy (ADR-0001): `RIG_PROCEDURE` (the CD-1..9 walkthrough, reused
+  across investigations) + `INDEX`
+- `docs/features/cd4-blink/` — active blink investigation: `INDEX` (hub) · `RESEARCH` (saga, open ❓) · `DECISIONS`
+- `live2d/CONTEXT.md` — glossary. **As-built rig tree = the model files** (`pilot/lotte-good.cmo3`, `model/`)
+- `docs/adr/` — 0001 pivot · 0004 locked rig constraints (flat discipline) · 0002 this skill's mandate
 - memory [[bh-chrome-no-webgl]], [[live2d-claude-cubism-authority]]

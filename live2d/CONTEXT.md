@@ -1,6 +1,10 @@
 # Lotte Live2D — Context (glossary)
 
-Canonical language for the Lotte aliveness work. Glossary only — no implementation detail.
+Canonical language for the Lotte aliveness work. Glossary only — **denotation** (term → meaning). A term may
+have three facets that live in three homes and cross-link: its **meaning** here, its **truth-value** (a
+settled empirical claim) in `live2d/DOMAIN_MAP.md` (✅/⛔), and any **open question** in
+`docs/features/<slug>/RESEARCH.md` (❓). Where an entry below states a verified claim in passing, the
+authority for that claim is DOMAIN_MAP / the feature RESEARCH — this file defines the word.
 
 ## Terms
 

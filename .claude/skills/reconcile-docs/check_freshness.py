@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""reconcile-docs freshness validator.
+"""reconcile-docs freshness validator (post-restructure, ADR-0003).
 
 Makes the mechanical half of the reconcile-docs Step-2 "Detect drift" pass
 *executable* instead of eyeballed prose, so an execution lapse (the failure
@@ -7,21 +7,34 @@ mode that actually bit us: detection worked, write-back was skipped) is caught
 by a command rather than by another reminder.
 
 It does NOT replace judgment. It checks only what is enforceable:
-  A. INV denylist  — superseded values (INV-* in the registry) appearing
-                     UN-annotated and non-negated in a LIVE orientation surface.
+  A. INV denylist  — superseded values appearing UN-annotated and non-negated in
+                     a LIVE orientation surface.
   B. Frontier      — the "next/frontier" phase token agrees across surfaces
-                     (catches granularity lag, e.g. "W4" vs the authority's "W4.2").
-  C. Branch-state  — commit counts pinned in prose vs `git rev-list`, and any
-                     "clean fast-forward" claim vs the real master/HEAD topology.
+                     (W-stage granularity + pivot Phase A/B/C/D letters).
+  C. Branch-state  — commit counts pinned in prose vs `git rev-list`.
+  D. DOMAIN_MAP marker rule — `live2d/DOMAIN_MAP.md` must hold only settled
+                     ✅/⛔ facts; an `❓` bullet there is a FAIL (open questions
+                     belong in docs/features/<slug>/RESEARCH.md). [ADR-0003]
+  E. Recency-warn  — the authority's "as-of" date vs the latest claude-mem
+                     observation for this project; warns when memory is newer
+                     (the 06-06 ↔ 06-07 gap that slipped past a clean run). [ADR-0003]
+  F. Dissolved-ref — no LIVE orientation surface (incl. the CLAUDE.md entry doc)
+                     may cite a DISSOLVED doc (a tombstone) as if it were live.
+                     Tombstones are permanent redirects; a live nav surface must
+                     point at the new home. Frozen lineage (specs/plans/ADRs/
+                     archive) and the memory layer (separate track) are exempt. [ADR-0003]
 
-History surfaces (completed plans, FINDINGS — registry role contains
-"history"/"annotate"/"never rewrite") are EXEMPT from the denylist: they are
-supposed to retain the old values under a SUPERSEDED banner. Negated mentions
-("NOT 4096", "no ParamEyeForm") and correct-context mentions ("PRO-only",
-"resolved", "supersedes") are not violations either.
+Target list: PARSED FROM THE `CLAUDE.md` ENTRY-DOC MAP ("## Orientation docs"
+section) — the registry doc (DOC_ARCHITECTURE.md) was dissolved into CLAUDE.md
+(map) + DOMAIN_MAP.md (facts) + ADR-0003 (decision) + this checker (the
+agreement rules). The new-structure homes are also added explicitly so the
+check is robust even before the CLAUDE.md map edit is applied. A path-based
+fallback covers a missing/renamed entry doc.
 
-The surface list is PARSED FROM the registry table (single source of truth —
-do not duplicate it here), with a fallback if the table cannot be parsed.
+History surfaces (completed plans, FINDINGS, ADRs, docs/features/archive/, any
+*-pre-restructure-* snapshot) are EXEMPT from the denylist: they retain old
+values under a SUPERSEDED banner. Negated/correct-context mentions are not
+violations either.
 
 Usage:  python3 check_freshness.py [--root <worktree-root>]
 Exit:   0 = clean (warnings allowed), 1 = hard FAIL. Stdlib only.
@@ -31,13 +44,31 @@ import argparse
 import glob
 import os
 import re
+import sqlite3
 import subprocess
 import sys
 
 MEMORY_DIR = os.path.expanduser(
     "~/.claude/projects/-home-benjohnbill-dev-discord-theme-lotte/memory"
 )
-REGISTRY_REL = "docs/superpowers/DOC_ARCHITECTURE.md"
+ENTRY_REL = "CLAUDE.md"  # the entry-doc map (replaces the dissolved registry)
+CLAUDE_MEM_DB = os.path.expanduser("~/.claude-mem/claude-mem.db")
+DOMAIN_MAP_REL = "live2d/DOMAIN_MAP.md"
+
+# Surfaces that always belong to the live set, even if the CLAUDE.md map has not
+# yet been updated to name them (the new type-homes).
+EXPLICIT_REL = [
+    "live2d/PIPELINE.md",
+    "live2d/DOMAIN_MAP.md",
+    "live2d/CONTEXT.md",
+    "docs/superpowers/next-session-prompt.md",
+]
+EXPLICIT_GLOBS = [
+    "docs/features/*/*.md",   # active feature folders (archive/ is filtered out as history)
+    "docs/adr/*.md",
+    "docs/superpowers/specs/*.md",
+    "docs/superpowers/plans/*.md",
+]
 
 # INV-* denylist: a superseded value that must not appear live + un-annotated.
 DENYLIST = [
@@ -55,22 +86,15 @@ DENYLIST = [
     ("INV-5", re.compile(r"`?master`?\s+is\s+NOT\s+merged", re.I),
      "'master is NOT merged' (spike WAS merged into master 2026-06-01)"),
     # INV-3 PIVOT 2026-06-01: Phase 1 quality superseded → rig-strategy pivot (ADR-0001) is the frontier.
-    # "Phase 2 / Vencord userplugin as the next/larger arc" is now the superseded value. ("deferred"/"pivot"
-    # near the mention whitelist the correct "Phase 2 is DEFERRED behind the pivot" phrasing.)
     ("INV-3", re.compile(r"(?:real|larger|next)\s+arc\s*=?\s*(?:is\s+)?Phase\s*2", re.I),
      "Phase 2 as the next/larger arc (DEFERRED behind the rig-strategy pivot, ADR-0001)"),
-    # INV-3 SUB-STATE 2026-06-06: CD-4 blink hit a warp/distortion wall (06-03); "blink ~90% /
-    # just re-rig+export" is now the superseded next-action framing. NO denylist regex added on
-    # purpose: "~90%" is a generic numeric token that legitimately appears in the live surfaces'
-    # OWN "this ~90% claim was superseded / FAILED" sentences (would false-positive), and the
-    # FRONTIER/frontier-agreement checks already guard cross-surface drift on the next action.
 ]
 
 # Hit line or up to 2 preceding non-blank lines mark it superseded/correct.
 ANNOTATED = re.compile(
     r"superseded|⚠️|was wrong|\bstale\b|there is no|no standard|not merged|"
     r"originally named|renamed|correction|corrected|\bresolved\b|supersed|"
-    r"pro[\s-]?only|harmless|lacks it|\bsample\b|shizuku|phase 0|"
+    r"pro[\s-]?only|harmless|lacks it|\bsample\b|shizuku|phase 0|dissolved|tombstone|history|"
     r"deferred|\bpivot\b|gate-dependent|gate-ordered",
     re.I,
 )
@@ -81,18 +105,15 @@ FRONTIER = re.compile(
     r"(?:next\s*=\s*|Start at\s*\*{0,2}|Frontier\s*=\s*\*{0,2}|EXECUTE\s+|rig(?:s)? .*?\bin\s+)"
     r"\bW(\d+(?:\.\d+)?)\b"
 )
-# Pivot phase frontier (A/B/C/D). The W-token regex above is BLIND to the pivot naming,
-# so without this the frontier check is a no-op for the CURRENT frontier — which is exactly
-# how a stale "next = Phase B" slipped past a clean run (all surfaces consistently stale, but
-# the checker never looked at phase letters). Captures the phase token in a "next" context.
 PHASE_FRONTIER = re.compile(
     r"(?:NEXT|next\s+action|next\s+arc|next\s+step)\b[^.\n]{0,30}?\bPhase\s*([A-D](?:\s*\+\s*[A-D])*)\b",
     re.I,
 )
 COMMITS = re.compile(r"\b(\d+)\s+commits\b")
-# A commit-count phrased against origin is compared to origin..HEAD, not master..HEAD.
 AHEAD_OF_ORIGIN = re.compile(r"ahead of\s+`?origin", re.I)
-HISTORY_ROLE = re.compile(r"history|annotate|never rewrite|superseded", re.I)
+# A DOMAIN_MAP bullet whose marker is ❓ (an open question parked in the fact dictionary).
+DM_OPEN_MARKER = re.compile(r"^\s*[-*]\s*❓")
+ISO_DATE = re.compile(r"\b(20\d\d-\d\d-\d\d)\b")
 
 
 def sh(args, root):
@@ -100,57 +121,76 @@ def sh(args, root):
 
 
 def _expand(p, root):
-    p = p.replace("<date>", "*").replace("<hash>", "*")
+    p = p.replace("<date>", "*").replace("<hash>", "*").replace("<slug>", "*")
     if "/" not in p and not p.endswith(".md"):
         return []
     base = [os.path.expanduser(p)] if p[:1] in "~/" else glob.glob(os.path.join(root, p))
     out = []
     for f in base:
         if os.path.isdir(f):
-            out += glob.glob(os.path.join(f, "*.md"))
+            out += glob.glob(os.path.join(f, "**", "*.md"), recursive=True)
         elif f.endswith(".md"):
             out.append(f)
     return out
 
 
+def is_history(path):
+    pl = path.replace(os.sep, "/").lower()
+    return ("/features/archive/" in pl or "/plans/" in pl or "findings" in pl
+            or "/adr/" in pl or "-pre-restructure-" in pl)
+
+
 def parse_surfaces(root):
-    """Returns (surfaces, authority, history_set) parsed from the registry table."""
-    reg = os.path.join(root, REGISTRY_REL)
+    """Returns (surfaces, authority, history_set).
+
+    Targets come from the CLAUDE.md '## Orientation docs' map + the explicit
+    new-structure homes + the memory dir. History is detected by path.
+    """
     surfaces, history, authority = [], set(), None
-    try:
-        lines = open(reg, encoding="utf-8").read().splitlines()
-    except OSError:
-        return [], None, set()
-    in_table = False
-    for ln in lines:
-        if ln.startswith("## "):
-            in_table = "Orientation surfaces" in ln
-            continue
-        if not (in_table and ln.startswith("|")):
-            continue
-        is_hist = bool(HISTORY_ROLE.search(ln))
-        is_auth = "authority" in ln.lower()
-        for raw in re.findall(r"`([^`]+)`", ln):
-            for f in _expand(raw, root):
-                if f not in surfaces:
-                    surfaces.append(f)
-                if is_hist:
-                    history.add(f)
-                if is_auth and authority is None and f.endswith(".md"):
-                    authority = f
-    for f in glob.glob(os.path.join(MEMORY_DIR, "*.md")):
+
+    def add(f):
         if f not in surfaces:
             surfaces.append(f)
+        if is_history(f):
+            history.add(f)
+
+    # 1) the CLAUDE.md entry-doc map (orientation section only — not directory roles)
+    entry = os.path.join(root, ENTRY_REL)
+    try:
+        lines = open(entry, encoding="utf-8").read().splitlines()
+    except OSError:
+        lines = []
+    in_section = False
+    for ln in lines:
+        if ln.startswith("## "):
+            in_section = "orientation" in ln.lower()
+            continue
+        if not in_section:
+            continue
+        is_auth = ("authority" in ln.lower() or "read first" in ln.lower())
+        for raw in re.findall(r"`([^`]+)`", ln):
+            for f in _expand(raw, root):
+                add(f)
+                if is_auth and authority is None and f.replace(os.sep, "/").endswith("PIPELINE.md"):
+                    authority = f
+
+    # 2) explicit new-structure homes (robust before the CLAUDE.md edit lands)
+    for r in EXPLICIT_REL:
+        p = os.path.join(root, r)
+        if os.path.exists(p):
+            add(p)
+    for g in EXPLICIT_GLOBS:
+        for f in glob.glob(os.path.join(root, g)):
+            add(f)
+
+    # 3) the out-of-repo memory layer
+    for f in glob.glob(os.path.join(MEMORY_DIR, "*.md")):
+        add(f)
+
+    if authority is None:
+        pipe = os.path.join(root, "live2d/PIPELINE.md")
+        authority = pipe if os.path.exists(pipe) else None
     return surfaces, authority, history
-
-
-def fallback_surfaces(root):
-    rel = ["docs/superpowers/next-session-prompt.md", "live2d/PIPELINE.md",
-           "live2d/RIG_GUIDE.md", "live2d/DECISIONS.md", "live2d/BASE.md", "live2d/gen/PROMPTS.md"]
-    out = [os.path.join(root, r) for r in rel if os.path.exists(os.path.join(root, r))]
-    out += glob.glob(os.path.join(root, "docs/superpowers/specs/*.md"))
-    out += glob.glob(os.path.join(MEMORY_DIR, "*.md"))
-    return out, os.path.join(root, "live2d/PIPELINE.md"), set()
 
 
 def annotated_near(lines, i):
@@ -168,6 +208,54 @@ def annotated_near(lines, i):
     return False
 
 
+def latest_memory_date(root):
+    """Latest claude-mem observation date (YYYY-MM-DD) for this project, or None.
+
+    The IDEAL signal (the plan's intent) is the newest claude-mem observation; a
+    stdlib script cannot reach the MCP, but the local SQLite store is readable
+    read-only. Best-effort: any error (db absent on another machine, locked,
+    schema drift) → None, never fails the run."""
+    proj = os.path.basename(root.rstrip("/"))
+    try:
+        con = sqlite3.connect(f"file:{CLAUDE_MEM_DB}?mode=ro", uri=True, timeout=1.0)
+        try:
+            row = con.execute(
+                "SELECT MAX(created_at) FROM observations WHERE project=?", (proj,)
+            ).fetchone()
+        finally:
+            con.close()
+        if row and row[0]:
+            return row[0][:10]
+    except Exception:
+        return None
+    return None
+
+
+def latest_date_in(path):
+    try:
+        txt = open(path, encoding="utf-8").read()
+    except OSError:
+        return None
+    ds = ISO_DATE.findall(txt)
+    return max(ds) if ds else None
+
+
+def find_tombstones(root):
+    """Relpaths of dissolved docs — files whose H1 is marked DISSOLVED (the
+    permanent redirect tombstones, ADR-0003). Detected by content so a new
+    dissolution is caught without maintaining a hardcoded list."""
+    out = []
+    for p in glob.glob(os.path.join(root, "**", "*.md"), recursive=True):
+        try:
+            head = open(p, encoding="utf-8").read(300)
+        except OSError:
+            continue
+        first = head.splitlines()[0] if head.strip() else ""
+        if first.startswith("#") and re.search(r"\bDISSOLVED\b", first, re.I):
+            out.append(os.path.relpath(p, root).replace(os.sep, "/"))
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".")
@@ -175,9 +263,6 @@ def main():
     root = os.path.abspath(args.root)
 
     surfaces, authority, history = parse_surfaces(root)
-    if len(surfaces) < 3:
-        surfaces, authority, history = fallback_surfaces(root)
-    reg_abs = os.path.abspath(os.path.join(root, REGISTRY_REL))
     skill_dir = os.path.dirname(os.path.abspath(__file__))
     fails, warns = [], []
 
@@ -187,7 +272,7 @@ def main():
     # ---- A. INV denylist (live surfaces only) ----
     for path in surfaces:
         ap_ = os.path.abspath(path)
-        if ap_ == reg_abs or ap_.startswith(skill_dir) or path in history:
+        if ap_.startswith(skill_dir) or path in history:
             continue
         try:
             lines = open(path, encoding="utf-8").read().splitlines()
@@ -203,7 +288,7 @@ def main():
                     fails.append(f"[{inv}] {rel(path)}:{i+1}  un-annotated: {note}\n        > {line.strip()[:108]}")
                     break
 
-    # ---- B. frontier agreement ----
+    # ---- B. frontier agreement (W-stage granularity) ----
     def tokens(path):
         try:
             return set(FRONTIER.findall(open(path, encoding="utf-8").read()))
@@ -220,9 +305,6 @@ def main():
                 warns.append(f"[frontier] {rel(path)}: 'W{t}' not among authority tokens {sorted(auth_tokens)}")
 
     # ---- B2. pivot phase-frontier agreement (Phase A/B/C/D) ----
-    # A surface whose next-action phase letters are DISJOINT from the authority's is stale
-    # (e.g. "next = Phase B" vs authority "Phase C+D"). Overlap (C / D / C+D phrasings) passes;
-    # this is a FAIL, not a warn — it is the consistently-stale-frontier lapse we want to block.
     def phase_letters(path):
         out = set()
         try:
@@ -237,8 +319,8 @@ def main():
     if auth_letters:
         for path in surfaces:
             ap_ = os.path.abspath(path)
-            if ap_ == reg_abs or ap_.startswith(skill_dir) or path in history:
-                continue  # registry enumerates stale-triggers; history keeps old frontiers
+            if ap_.startswith(skill_dir) or path in history:
+                continue
             sl = phase_letters(path)
             if sl and sl.isdisjoint(auth_letters):
                 fails.append(
@@ -250,7 +332,6 @@ def main():
         mb = sh(["git", "merge-base", "master", "HEAD"], root)
         ahead = sh(["git", "rev-list", "--count", f"{mb}..HEAD"], root) if mb else ""
         behind = sh(["git", "rev-list", "--count", "HEAD..master"], root) if mb else ""
-        # origin baseline: a count phrased "ahead of origin" is compared to origin/master..HEAD.
         ahead_origin = sh(["git", "rev-list", "--count", "origin/master..HEAD"], root) or ""
         for path in surfaces:
             if path in history:
@@ -268,6 +349,55 @@ def main():
                     warns.append(f"[branch] {rel(path)}:{i+1}: prose pins '{m.group(1)} commits' but git ahead ({blabel}) = {baseline} (counts drift — prefer qualitative)")
         if behind and behind != "0":
             print(f"note: branch is 3-way (master has {behind} commit(s) HEAD lacks) — any 'clean FF' claim is a FAIL above.")
+
+    # ---- D. DOMAIN_MAP marker rule (no ❓ in the fact dictionary) ----
+    dm = os.path.join(root, DOMAIN_MAP_REL)
+    if os.path.exists(dm):
+        for i, line in enumerate(open(dm, encoding="utf-8").read().splitlines()):
+            if DM_OPEN_MARKER.search(line):
+                fails.append(
+                    f"[domain-map] {DOMAIN_MAP_REL}:{i+1}: an ❓ bullet in the fact dictionary — "
+                    f"open questions belong in docs/features/<slug>/RESEARCH.md (ADR-0003 marker rule)\n        > {line.strip()[:108]}")
+
+    # ---- E. recency-warn (authority as-of date vs latest claude-mem observation) ----
+    mem_date = latest_memory_date(root)
+    fr_date = latest_date_in(authority) if authority else None
+    if mem_date and fr_date and mem_date > fr_date:
+        warns.append(
+            f"[recency] authority {rel(authority)} as-of date {fr_date} < latest claude-mem observation "
+            f"{mem_date} (project '{os.path.basename(root.rstrip('/'))}') — work may have landed since the "
+            f"doc's stated date; a reconcile may be due. (Bump the authority's as-of date when you reconcile.)")
+
+    # ---- F. dissolved-ref (a live nav surface must not cite a dissolved doc as live) ----
+    tombstones = find_tombstones(root)
+    tomb_set = set(tombstones)
+    mem_abs = os.path.abspath(MEMORY_DIR)
+
+    def dref_skip(path):
+        rp = rel(path).replace(os.sep, "/")
+        ap2 = os.path.abspath(path)
+        # frozen lineage (history/specs/ADRs/archive), the tombstones themselves, this skill,
+        # and the memory layer (reconciled on a SEPARATE track — ADR-0003 Open) are exempt.
+        return (path in history or ap2.startswith(skill_dir) or rp in tomb_set
+                or "/specs/" in rp or ap2.startswith(mem_abs))
+
+    # the CLAUDE.md entry doc is the prime target even though it is not a scanned surface
+    dref_targets = [os.path.join(root, ENTRY_REL)] + [s for s in surfaces if not dref_skip(s)]
+    seen = set()
+    for path in dref_targets:
+        ap2 = os.path.abspath(path)
+        if ap2 in seen:
+            continue
+        seen.add(ap2)
+        try:
+            txt = open(path, encoding="utf-8").read()
+        except OSError:
+            continue
+        for diss in tombstones:
+            if diss in txt:
+                fails.append(
+                    f"[dissolved-ref] {rel(path)} cites dissolved '{diss}' as live — repoint to its new home "
+                    f"(the tombstone is a permanent redirect; do not cite a dissolved doc as an authority)")
 
     # ---- report ----
     print(f"reconcile-docs freshness: {len(surfaces)} surfaces "

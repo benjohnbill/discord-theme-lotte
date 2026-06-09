@@ -1,48 +1,16 @@
-# Doc Architecture Registry
+# Doc Architecture Registry — DISSOLVED (2026-06-09)
 
-> The **volatile target list** for the `reconcile-docs` skill. The skill is the stable
-> *procedure*; this file is the *what-to-check*. When the doc structure or a locked decision
-> changes, update THIS file — not the skill. The skill audits this registry against reality
-> each run (and proposes updates when it finds drift between them).
+> This registry (surface list + `INV-*` invariants) was **dissolved** (ADR-0003). It had become a fourth
+> copy of the frontier and a second place to keep in sync. Its parts were routed by type:
 
-## Orientation surfaces — where "where are we / what's next / what was decided" lives
+| Was… | Now lives in |
+|---|---|
+| The **doc map / read-order** (surface table) | `CLAUDE.md` ("Orientation docs" entry-path) |
+| The **`INV-*` platform facts** (runtime, base, atlas, moc3, eye-smile, …) | `live2d/DOMAIN_MAP.md` (✅/⛔) |
+| The **doc-architecture decision** (this restructure, the organizing principle) | `docs/adr/0003-doc-architecture-harness-alignment.md` |
+| The **cross-doc agreement *rules*** (INV denylist, frontier agreement, branch-state) | `.claude/skills/reconcile-docs/check_freshness.py` (the executable half — **capability preserved, re-aimed**, not deleted) |
+| The frozen full registry text | `docs/features/archive/doc-architecture-pre-restructure-2026-06-09.md` |
 
-| # | Surface | Path | Role | Fix mode |
-|---|---|---|---|---|
-| 1 | Launcher | `docs/superpowers/next-session-prompt.md` | Thin "paste to start" handoff | auto-fix (but see split-brain) |
-| 2 | Design spec | `docs/superpowers/specs/<date>-*-design.md` | The "why" + locked decisions | auto-fix wording; **propose** decision changes |
-| 3 | Plan | `docs/superpowers/plans/<date>-*.md` | The "how". **Completed plans = history** | annotate "SUPERSEDED"; never rewrite |
-| 4 | Pipeline tracker | `live2d/PIPELINE.md` | Live pipeline-state **authority** (created in pilot Task 0) | auto-fix |
-| 5 | Working docs | `live2d/{DECISIONS,BASE,RIG_GUIDE}.md`, `live2d/source/README.md`, `live2d/gen/PROMPTS.md` | Decisions, base lock, rig guide, source lineage, prompt audit log | auto-fix |
-| 5b | Pivot plan + ROI | `live2d/ROI.md` | Rig-strategy pivot's gate-ordered execution (Phase A→D) + cost/feasibility (created 2026-06-01) | auto-fix |
-| 5c | Glossary | `live2d/CONTEXT.md` | Canonical language: 통짜 base / scene plate / doubling / patchwork (created 2026-06-01) | auto-fix |
-| 6 | Phase 0 record | `experiments/live2d-spike/FINDINGS.md` | History (Phase 0 GO) | annotate; don't rewrite |
-| 10 | Decision records (ADR) | `docs/adr/*.md` | The "why" of locked decisions; **immutable** | annotate SUPERSEDED; never rewrite |
-| 7 | **Memory index** | `~/.claude/projects/-home-benjohnbill-dev-discord-theme-lotte/memory/MEMORY.md` | Auto-loaded each session | auto-fix |
-| 8 | **Memory files** | `~/.claude/projects/-home-benjohnbill-dev-discord-theme-lotte/memory/*.md` | Auto-loaded; load-bearing | auto-fix |
-| 9 | claude-mem observations | (search / `get_observations`) | Immutable point-in-time history | never edit; disambiguate via 1/2/7/8 |
-
-**Memory-layer mechanic (easy to forget — it is OUTSIDE the repo):** surfaces 7/8 are the cross-session memory. Editing the on-disk `.md` files is what persists; the shorter copy injected into the session prompt is a *summary* of them. Always reconcile the memory layer, not just in-repo docs.
-
-**Active plan (surface 3):** `plans/2026-05-31-lotte-live2d-full-build-w1-w5.md` (W1–W5) is now **completed history** — it built the Phase 1 rig, whose mesh-deform *approach* is superseded by the pivot (ADR-0001); annotate, don't rewrite. The current plan of record is `live2d/ROI.md` (surface 5b). The Phase 1.0 pilot plan `plans/2026-05-31-lotte-live2d-phase1-rig.md` is also completed history — its W1–W5 roadmap is annotated SUPERSEDED.
-
-**Read order for a fresh session:** launcher (1) → memory (7 → 8) → **PIPELINE (4, the live authority)** → **ROI.md (5b, pivot gate plan) + ADR-0001 (10, pivot decision) + CONTEXT.md (5c, glossary)** → active plan (3, now history) → spec (2) → pilot record `live2d/pilot/RESULT.md`.
-
-## Cross-doc invariants — must hold; check every run
-
-These are the "if A changed, B must match" rules. **They are volatile — update them as decisions change.**
-
-- **INV-1 Runtime.** The Lotte **rig** uses **Cubism 4** (`live2dcubismcore.min.js` + `pixi-live2d-display@0.4.0/dist/cubism4.min.js`). Cubism 2 (`dylanNew` core + `cubism2.min.js`) was Phase 0's Shizuku **sample** only. Any doc telling the next session to use cubism2 *for the rig* is STALE.
-- **INV-2 Base.** Rig the character from `lotte-discord-original.png` (more facial px); background from `lotte-discord-version.png` (pixel-aligned outpaint). Rasters live in `live2d/source/`, **never** `src/`. Any doc saying base = `version`, or path `src/...`, is STALE.
-- **INV-3 Frontier.** Phase 1 = **MECHANICALLY** complete (W1–W5 + hair/ribbon physics DONE/PASS; the full rig drives in pixi-live2d-display@0.4.0 + Core 5.1) **but SUPERSEDED on quality 2026-06-01** — the first live Discord render exposed the mesh-deform rig as 누더기 (patchwork). **Current frontier = the rig-strategy PIVOT** (`docs/adr/0001-rig-strategy-pivot-deform-to-swap.md`): face mesh-deform → **통짜 (whole-image warp) base + blink frame-swap + BG-scene + gaze = head-lean**. Gate-ordered execution = **`live2d/ROI.md`** (Phase A config tune → B scene-plate re-render gate → C blink-band gate → D core re-export); **Phase A + B + Phase C+D agent-prep DONE (2026-06-02) → NEXT = the USER Cubism re-rig that completes Phase C+D.** Phase A committed `3228a2a` (head-lean gaze, USER-confirmed in real Discord); Phase B measured (scene plate `live2d/gen/scene-plate.png` accepted; rig composited over it = coherent wallpaper at the natural BIG framing, BUT the rectangular patchwork seams show at that scale) ⇒ **Phase D confirmed NECESSARY.** The Tier-1 agent prep is now DONE: `full_segment.py` rewritten to the 통짜 cut → a **SINGLE feathered `base`** (the open choice resolved to single-base, NO head/body PSD split — head-tilt/body-lean are whole-warp deformers) + `hair_L/R` + `ribbon` + feathered swap bands `eyeband_closed`/`eyeband_smile`/`mouthband_closed`, all over a soft under-fill backing → new `lotte.psd`, agent-verified (no holes/doubling; edge-detect = no band rectangle); NEXT = USER re-rigs whole-warp + eye-band **opacity-swap** blink → re-export. **SUB-STATE (2026-06-06):** that re-rig was executed 06-03 and **CD-4 blink HIT A WARP/DISTORTION WALL** — both band variants fail (island-to-string → artifacts; full-silhouette → eyelid warp), root cause **pixi-live2d-display@0.4.0-runtime vs inherent model/mesh UNCONFIRMED** → blink is now gated behind a single USER localization test (full-silhouette band at **opacity 100 / Angle 0** in Cubism; clean ⇒ pixi → FREE library bump, warps ⇒ model → re-bind / PRO mesh-copy). Gaze (Phase A) + breath drive live in Discord, so blink is the SOLE blocker (option 2 = defer blink + ship those = the fallback). **Expression feasibility (decided this session):** on a flat source all expression = an opacity frame-swap of baked art; blink / eye-smile ^^ / closed-mouth-snap are cheap, **smooth/talking mouth is INFEASIBLE** (→ speech-bubble). Still OPEN — decided live in Cubism: which bands to WIRE (blink definite; ^^ / closed-mouth optional) · 2-state vs 3-state blink · blink survival at real scale. Any launcher/memory/doc that names **'Phase 2 / Vencord userplugin as the next (or larger) arc'**, or treats Phase 1 as the quality-complete endpoint, or names Phase 0 / the pilot / W1–W5 / 'Phase A config tune' / **'Phase B / scene plate'** / **'Phase C+D agent prep / rewrite full_segment.py'** / **'CD-4 blink ~90%'** / **'just re-rig + export the blink' (without the 06-03 warp wall + the localization test)** / 'execute the pilot' / 'brainstorm' as the next action, is STALE. (W5 polish itself stays resolved: (a) halo + (b) eye-smile CLOSED; (c) seam DEFERRED — it now rides the Phase D re-export.)
-- **INV-4 Authorities exist.** `live2d/PIPELINE.md` (live-state authority), `DECISIONS.md`, `RIG_GUIDE.md` were created in pilot Task 0 and now EXIST; `PIPELINE.md` is read-first. Any doc still saying these are "not yet created / created in Task 0" is STALE.
-- **INV-5 Split-brain — RESOLVED (2026-06-01).** `live2d-spike` was **merged into `master`** at Phase 1 / W5 completion (3-way merge `553f2a2`; the interim STALE banner `336822a` was dropped — commit `6ffae29`), and the worktree + branch were removed. **`master` is now the single authority** — there is no live2d-spike worktree any more. Any doc still saying "`live2d-spike` is the authority / ahead of master / NOT merged", or "merge at W5 (pending sign-off)", or referencing the STALE banner as live, is STALE. **`master` is still local-only (~55 commits ahead of `origin/master`, NOT pushed)** — pushing remains a Tier-3 action needing user sign-off; never push `master` yourself.
-- **INV-6 moc3 version.** The rig `.moc3` must export at **version ≤ 5** (the pinned web Core reports `csmGetLatestMocVersion()=5`). Cubism Editor 5.3 defaults to **v6**, which **fails to load**. Any doc/plan exporting the default or assuming "any moc3 loads" is STALE; fix = export 5.0/4.2, or bump the Core / use the `pixi-live2d-display-lipsyncpatch` fork. *(Pilot-confirmed.)*
-- **INV-7 Atlas cap.** Cubism **FREE** = a **single 2048×2048** texture atlas, ≤100 pieces; **multiple atlases are PRO-only** (web-verified W4.1, 2026-05-31). Any doc asserting **4096** for the rig, OR offering "2 atlases / multi-atlas" as a FREE fallback, is STALE. The fix for ~19 parts: pack into the one atlas via the atlas tool's **Auto Layout → "set magnification automatically"** (≈0.5× on layout); the hi-res master stays in `assets/`. (PRO or a lower upscale are the only ways to more atlas budget.)
-- **INV-8 Eye-smile param.** The eye-smile uses the Cubism template's standard **`EyeL Smile` / `EyeR Smile`** — there is **no standard `ParamEyeForm`**. All surfaces now agree (spec §5 corrected 2026-05-31 with a note; plan + `RIG_GUIDE.md` already correct). Any *new* doc reintroducing `ParamEyeForm` as a rig parameter is STALE.
-
-## Branches / worktrees in play
-
-- `master` — main; the **single authority** for Live2D now. Carries the full Phase 1 build (W1–W5 + physics) after the `live2d-spike` merge (`553f2a2`) + banner drop (`6ffae29`). **Local-only: ~55 commits ahead of `origin/master`, NOT pushed** — pushing is Tier-3, needs sign-off (never push/force `master` yourself). Also carries an unrelated uncommitted change (background-image swap in `src/base/background.css` + dist rebuild) that predates this session — not Live2D, leave to the user.
-- `live2d-spike` — **GONE** (merged + worktree removed 2026-06-01). Do not look for it; do not treat it as authority.
-- Other worktrees (`discord-dom-probe-and-archive`, `m5-drift-conventions`, `registry-hardening`, `theme-change-workflow`, `workspace-memory-foundation`) are separate initiatives — out of scope for Live2D reconciliation unless they hold a shared `CONTEXT.md`/glossary.
+The `reconcile-docs` skill no longer reads a registry: `check_freshness.py` now parses its target list from
+the `CLAUDE.md` map, enforces the DOMAIN_MAP marker rule, and warns when claude-mem has observations newer
+than the authority's as-of date.
