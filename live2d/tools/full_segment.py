@@ -132,18 +132,58 @@ def ref(name):
     return Image.open(p).convert("RGBA").resize((W, H), Image.LANCZOS) if p.exists() else img
 
 
-EYEBAND = (0.27, 0.36, 0.72, 0.56)
-MOUTHBAND = (0.42, 0.575, 0.60, 0.68)
+# Per-eye TIGHT masks (viewer-right eye higher; viewer-left lower, from the head tilt). The eye
+# bands paint alt-expression art ONLY over the eyes, composited over a copy of `base`, then reveal
+# the eye mask only. Every non-eye pixel (incl. the feathered rim) IS base, so: the feather blends
+# base-into-base (no rectangle seam), no mismatched foreign skin is ever shown (no gray patch), and
+# the open iris is fully REPLACED inside the mask (no bleed). Replaces the old wide EYEBAND rectangle
+# -- a rectangle reveals the closed source's whole lower face; extending it to cover the tilt-lower
+# eye dragged that mismatched jaw/mouth skin into view as a gray band. A tight per-eye mask can't.
+# --- BASE-FILLED swap bands (all three) ---------------------------------------------------------
+# Each band is a copy of `base` with the alt-expression art composited ONLY inside a tight FEATURE
+# mask (the eyes, or the mouth), then revealed through a full feathered RECTANGLE (alpha). Because
+# every NON-feature pixel of the band IS base, the band is invisible over base outside the feature
+# (base-over-base): NO gray patch, NO rectangle seam, NO transparent-edge black -- at ANY opacity or
+# scale. Only the feature actually changes. The rectangle is a simple opaque Cubism mesh (the existing
+# wide-band mesh already fits it -> reimport needs no re-mesh). This is what finally kills the seams:
+# the old bands pasted the WHOLE foreign face/cheek over the rectangle, so their edges showed.
+EYE_R = (0.47, 0.38, 0.67, 0.53)   # viewer-right eye (higher) -- feature mask
+EYE_L = (0.29, 0.42, 0.49, 0.58)   # viewer-left eye (lower, head tilt)
+MOUTH = (0.40, 0.60, 0.62, 0.71)   # mouth feature mask (covers base's open smile)
+
+eye_mask   = ImageChops.multiply(ImageChops.lighter(feather_rect(*EYE_R), feather_rect(*EYE_L)), matte_a)
+mouth_mask = ImageChops.multiply(feather_rect(*MOUTH), matte_a)
 
 
-def band(name, src, frac_box):
-    a = ImageChops.multiply(feather_rect(*frac_box), matte_a)
-    with_alpha(src, a).save(OUT / f"{name}.png")
-    print("wrote", name, frac_box)
+def swap_band(name, src, feature_mask):
+    """SMALL feature-region frame-swap: a copy of `base` with `src` composited ONLY inside
+    feature_mask, revealed through the FEATHERED FEATURE MASK (alpha = feature_mask) -- a SMALL band
+    over the eyes (or mouth), NOT the whole silhouette.
+
+    WHY (reverted 2026-06-07 from the full-silhouette variant): the full-silhouette alpha (= matte_a)
+    killed the rectangle dark-line by having no face-interior edge, BUT it forced a whole-character
+    band mesh, and the Live2D RUNTIME (official Core + pixi, BOTH SwiftShader and real GPU) renders
+    those overlapping whole-character band meshes catastrophically WARPED -- while the Cubism EDITOR
+    renders them clean (so the warp was invisible in-editor and only showed at runtime). Confirmed by
+    an export bisect: rt/rt2/rt3 (small-mesh bands, moc3 24K) render a CLEAN blink at runtime; rt4-rt7
+    (full-silhouette re-mesh, 34K) all WARP. The full-silhouette docstring itself had flagged this cost
+    ("needing a base-matching mesh -- the warp problem, tracked separately"); that warp is the blocker.
+
+    So: revert to a SMALL band (alpha = feature_mask) -> Auto Mesh yields a small mesh -> no warp.
+    Band content stays `base` everywhere except the feature, so the feathered mask rim is base-over-base
+    (no gray patch, RGB == base at the edge -> minimal premultiplied fringe). The eye_mask ends at
+    ~y0.58 (cheek), clear of the mouth (y0.62), so the eye bands no longer reach the mouth -- removing
+    the old wide-band mouth dark-line. Any residual edge line at the mask rim is killed by CLIPPING the
+    band to a soft eye/mouth clip mask in Cubism (the clip's soft edge, not the band texture, defines
+    the falloff). Content stays base elsewhere (no gray patch)."""
+    rgb = base.copy()
+    rgb.alpha_composite(with_alpha(src, feature_mask))
+    with_alpha(rgb, feature_mask).save(OUT / f"{name}.png")
+    print("wrote", name, "(small feature-region frame-swap)")
 
 
-band("eyeband_closed", closed, EYEBAND)
-band("eyeband_smile", ref("eyes-smile.png"), EYEBAND)
-band("mouthband_closed", ref("closed-mouth.png"), MOUTHBAND)
+swap_band("eyeband_closed", closed, eye_mask)
+swap_band("eyeband_smile", ref("eyes-smile.png"), eye_mask)
+swap_band("mouthband_closed", ref("closed-mouth.png"), mouth_mask)
 
 print("done —", len(list(OUT.glob("*.png"))), "layers:", sorted(p.stem for p in OUT.glob("*.png")))

@@ -1,13 +1,22 @@
-import base64, json, io, numpy as np
+import base64, json, io, os, os.path as _p, numpy as np
 from PIL import Image
 D = "/home/benjohnbill/dev/discord-theme-lotte/live2d"
+# source dir + basename are overridable so we can probe a WIP export (e.g. rt6/lotte-good)
+# without clobbering the convention model/ dir.  PROBE_SRC=<dir> PROBE_NAME=<basename>
+SRC = os.environ.get("PROBE_SRC", f"{D}/model")
+NAME = os.environ.get("PROBE_NAME", "lotte")
 
 # 1. atlas 2048 -> 1024 PNG bytes (UVs are normalized, so downscale is safe; halves paste size)
-atlas = Image.open(f"{D}/model/lotte.2048/texture_00.png").convert("RGBA").resize((1024,1024), Image.LANCZOS)
+atlas = Image.open(f"{SRC}/{NAME}.2048/texture_00.png").convert("RGBA").resize((1024,1024), Image.LANCZOS)
 buf = io.BytesIO(); atlas.save(buf, "PNG", optimize=True); tex = buf.getvalue()
 tex_b64 = base64.b64encode(tex).decode()
-moc_b64 = base64.b64encode(open(f"{D}/model/lotte.moc3","rb").read()).decode()
-phys_b64 = base64.b64encode(open(f"{D}/model/lotte.physics3.json","rb").read()).decode()
+moc_b64 = base64.b64encode(open(f"{SRC}/{NAME}.moc3","rb").read()).decode()
+# physics is optional (hair sway only; irrelevant to a blink check). Use SRC's if present, else
+# the convention model/ one, else none -> the probe omits the Physics reference.
+_phys = f"{SRC}/{NAME}.physics3.json"
+if not _p.exists(_phys):
+    _phys = f"{D}/model/lotte.physics3.json"
+phys_b64 = base64.b64encode(open(_phys, "rb").read()).decode() if _p.exists(_phys) else ""
 # Cubism 5 Core inlined (only cubism.live2d.com serves v5; Discord CSP blocks that origin but allows
 # blob: scripts, so we load the core from an inlined blob). Cache to /tmp; download if absent.
 import urllib.request
@@ -17,7 +26,8 @@ except FileNotFoundError:
     core_bytes = urllib.request.urlopen("https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js").read()
     open("/tmp/core_official.js","wb").write(core_bytes)
 core_b64 = base64.b64encode(core_bytes).decode()
-groups = json.dumps(json.load(open(f"{D}/model/lotte.model3.json")).get("Groups", []))
+_m3 = f"{SRC}/{NAME}.model3.json"
+groups = json.dumps(json.load(open(_m3)).get("Groups", []) if _p.exists(_m3) else [])
 
 # ambient lavender sampled from version.png corner (so the halo fringe blends, no double-girl)
 ver = np.asarray(Image.open(f"{D}/source/lotte-discord-version.png").convert("RGB"))
@@ -49,7 +59,7 @@ TEMPLATE = r"""/* Lotte Live2D - REAL rig, one-time in-Discord visual check (Dev
   const burl = (b, t) => URL.createObjectURL(new Blob([bytes(b)], { type: t }));
   const mocURL = burl(B64.moc, "application/octet-stream");
   const texURL = burl(B64.tex, "image/png");
-  const physURL = burl(B64.phys, "application/json");
+  const physURL = B64.phys ? burl(B64.phys, "application/json") : null;
 
   const W = innerWidth, H = innerHeight, killed = [];
   const cspHits = [];
@@ -76,7 +86,7 @@ TEMPLATE = r"""/* Lotte Live2D - REAL rig, one-time in-Discord visual check (Dev
     if (container) container.remove();
     document.getElementById("__lotteBgKill")?.remove();
     killed.forEach((el) => el.style.removeProperty("background-image"));
-    [mocURL, texURL, physURL].forEach((u) => URL.revokeObjectURL(u));
+    [mocURL, texURL, physURL].filter(Boolean).forEach((u) => URL.revokeObjectURL(u));
     container = null; onMove = null; app = null; console.log(TAG, "stopped + background restored");
   };
 
@@ -96,7 +106,9 @@ TEMPLATE = r"""/* Lotte Live2D - REAL rig, one-time in-Discord visual check (Dev
       const PIXI = window.PIXI;
       if (!(PIXI && PIXI.live2d && PIXI.live2d.Live2DModel)) throw new Error("pixi-live2d-display not present after load");
 
-      const json = { url: "./lotte.model3.json", Version: 3, FileReferences: { Moc: mocURL, Textures: [texURL], Physics: physURL }, Groups: GROUPS };
+      const fileRefs = { Moc: mocURL, Textures: [texURL] };
+      if (physURL) fileRefs.Physics = physURL;
+      const json = { url: "./lotte.model3.json", Version: 3, FileReferences: fileRefs, Groups: GROUPS };
       // blob: URLs must NOT be re-resolved (the lib's resolver mangles "blob:http://..." -> "blob:http//..."),
       // so wrap in ModelSettings and override resolveURL to identity.
       let source = json;
@@ -129,8 +141,31 @@ TEMPLATE = r"""/* Lotte Live2D - REAL rig, one-time in-Discord visual check (Dev
       let n = 0; const refit = () => { fit(); if (++n < 20) requestAnimationFrame(refit); }; refit();
       addEventListener("resize", fit);
       onMove = (e) => model.focus(e.clientX, e.clientY); addEventListener("mousemove", onMove);
-      console.log(TAG, "LOTTE_PROBE_OK rendered. Move the mouse - eyes/head follow. CSP:", cspHits.length ? cspHits : "no blocks");
-      console.log(TAG, "Stop with __lotteStop()");
+
+      // --- CD-4 blink verification driver ---------------------------------------------------
+      // We drive the eyes ourselves (not the auto-blink group) so the state is controllable for
+      // a clean screenshot. Default: auto-cycle open<->closed (square wave) so the blink is
+      // visible. Freeze for inspection from the console:
+      //   __lotteEyes(0)  -> hold CLOSED   (screenshot this for the iris/line/warp check)
+      //   __lotteEyes(1)  -> hold OPEN
+      //   __lotteEyes()   -> resume auto-cycle
+      try { im.eyeBlink = null; } catch (e) {}
+      let eyeMode = "cycle", t0 = performance.now();
+      window.__lotteEyes = (v) => {
+        eyeMode = (v === 0 || v === 1) ? v : "cycle";
+        console.log(TAG, "eyes:", eyeMode === "cycle" ? "AUTO-CYCLE" : (v ? "OPEN(1)" : "CLOSED(0)"));
+      };
+      app.ticker.add(() => {
+        const cm = im.coreModel; let v;
+        if (eyeMode === "cycle") { v = (((performance.now() - t0) / 1600) % 1) < 0.5 ? 1 : 0; }
+        else { v = eyeMode; }
+        cm.setParameterValueById("ParamEyeLOpen", v);
+        cm.setParameterValueById("ParamEyeROpen", v);
+      });
+
+      console.log(TAG, "LOTTE_PROBE_OK rendered. Mouse = head-lean. Eyes auto-blink.");
+      console.log(TAG, "FREEZE for screenshot:  __lotteEyes(0)=closed  __lotteEyes(1)=open  __lotteEyes()=auto");
+      console.log(TAG, "Stop with __lotteStop()  | CSP:", cspHits.length ? cspHits : "no blocks");
     } catch (e) { console.error(TAG, "LOTTE_PROBE_FAIL", e && e.message ? e.message : e); }
   })();
 })();

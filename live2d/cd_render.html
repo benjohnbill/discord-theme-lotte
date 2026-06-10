@@ -31,7 +31,7 @@
     try { await plateImg.decode(); } catch(e) {}
     const app = new PIXI.Application({view:document.getElementById('c'), resizeTo:window,
       backgroundAlpha:0, antialias:true, autoStart:true, preserveDrawingBuffer:true});
-    const model = await PIXI.live2d.Live2DModel.from(q.get('model') || './lotte.model3.json');
+    const model = await PIXI.live2d.Live2DModel.from(q.get('model') || './model/lotte.model3.json');
     app.stage.addChild(model);
     const im = model.internalModel, cm = im.coreModel;
     model.scale.set(parseFloat(q.get('scale') || '0.58'));

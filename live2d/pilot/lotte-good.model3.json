@@ -1,0 +1,10 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "lotte-good.moc3",
+		"Textures": [
+			"lotte-good.2048/texture_00.png"
+		],
+		"DisplayInfo": "lotte-good.cdi3.json"
+	}
+}
