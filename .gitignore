@@ -5,3 +5,7 @@ node_modules/
 dist/*.tmp.css
 .worktrees/
 .context/
+
+# tool state + local-only hookify rules (the `.local` convention — not shared)
+.gstack/
+.claude/hookify.*.local.md

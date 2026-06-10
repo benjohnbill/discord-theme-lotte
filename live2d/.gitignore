@@ -7,4 +7,18 @@ lotte.psd
 lotte-preview.png
 discord-lotte-probe.js
 _pretest-lotte.html
+
+# --- restructure 2026-06-09: scratch / regenerable / discard (off the repo) ---
+# blink-debug render-test scratch + regenerable atlas export (re-export from cmo3)
+rt*/
+lotte.2048/
+# one-shot probe / render harnesses (cd_render.html is the kept harness)
+op_*.html
+blink_check.html
+blink_check_bump.html
+# discarded Cubism tab (Tab 2 = blank corruption per recovery notes) — rm manually if confirmed
+pilot/lotte.cmo3
+pilot/lotte.moc3
+pilot/lotte.model3.json
+pilot/lotte.cdi3.json
 11
