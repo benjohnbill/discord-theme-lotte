@@ -2,6 +2,10 @@
 
 This repo manages a private Vencord Discord theme.
 
+Reference map:
+- `CONTEXT.md` captures concise theme memory, visual direction, domain language, and safety boundaries.
+- `docs/workflow.md` contains the detailed playbook for turning user visual intent into selector, CSS, registry, snapshot, build, check, commit, and optional sync work.
+
 Rules:
 - Treat `src/` as the CSS source of truth.
 - Treat `dist/NewKemonoFriends.theme.css` as generated output.
